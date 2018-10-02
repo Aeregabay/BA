@@ -5,8 +5,6 @@ import SearchBar from "./components/SearchBar";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { Router, Route, IndexRoute } from "react-router";
-import { HashRouter } from "react-router-dom";
 import MyProfile from "./pages/MyProfile";
 
 class App extends Component {
@@ -39,10 +37,4 @@ class App extends Component {
 }
 
 export default App;
-ReactDOM.render(
-  <Router>
-    <Route exact path="/" component={App} />
-    <Route path="myprofile" component={MyProfile} />
-  </Router>,
-  document.getElementById("app")
-);
+ReactDOM.render(<App />, document.getElementById("app"));
