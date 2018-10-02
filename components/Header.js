@@ -6,7 +6,7 @@ class Header extends Component {
     this.state = {};
   }
   render() {
-    return <header />;
+    return <h1>This is the header</h1>;
   }
 }
 

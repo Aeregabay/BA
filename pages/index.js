@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import "bootstrap/dist/css/bootstrap.css";
-import SearchBar from "./components/SearchBar";
-import Home from "./pages/Home";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import MyProfile from "./pages/MyProfile";
+import SearchBar from "../components/SearchBar";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import Link from "../next/link";
+
+import MyProfile from "./MyProfile";
 
 class App extends Component {
   constructor(props) {
@@ -28,7 +28,9 @@ class App extends Component {
     return (
       <div>
         <Header />
-        <Home />
+        <Link href="/myprofile">
+          <button>My Profile</button>
+        </Link>
         <SearchBar itemSearch={this.itemSearch.bind(this)} />
         <Footer />
       </div>
@@ -37,4 +39,4 @@ class App extends Component {
 }
 
 export default App;
-ReactDOM.render(<App />, document.getElementById("app"));
+// ReactDOM.render(<App />, document.getElementById("app"));
