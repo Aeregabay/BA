@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Button } from "semantic-ui-react";
-import { Link, Router } from "../routes";
 import Layout from "../components/Layout";
+import { Form } from "semantic-ui-react";
 
 class login extends Component {
   constructor(props) {
@@ -13,7 +12,24 @@ class login extends Component {
     return (
       <Layout>
         <div>
-          <h1>this is the login page</h1>
+          <h2>Login using your personal information</h2>
+          <Form>
+            <Form.Group>
+              <Form.Input
+                label="Username"
+                placeholder="enter your username"
+                width={6}
+                required
+              />
+              <Form.Input
+                label="Password"
+                placeholder="enter your password"
+                width={6}
+                required
+                type="password"
+              />
+            </Form.Group>
+          </Form>
         </div>
       </Layout>
     );

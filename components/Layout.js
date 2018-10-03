@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Router } from "../routes";
-import { Button } from "semantic-ui-react";
+import { Button, Header, Menu, Container } from "semantic-ui-react";
+import Head from "next/head";
 
 class Layout extends Component {
   constructor(props) {
@@ -8,6 +9,9 @@ class Layout extends Component {
     this.state = {};
   }
 
+  toBrowse = e => {
+    Router.push("/browse");
+  };
   toProfile = e => {
     Router.push("/myprofile");
   };
@@ -26,42 +30,46 @@ class Layout extends Component {
   render() {
     return (
       <div>
-        <link
-          rel="stylesheet"
-          href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css"
-        />
-        <h1>This is the global header</h1>
-        <Button
-          color="black"
-          onClick={this.toHome}
-          content="Home"
-          icon="Home"
-          labelPosition="right"
-        />
-        <Button.Group>
-          <Button
-            primary
-            icon="add"
-            onClick={this.toProfile}
-            content="My Profile"
-            labelPosition="right"
+        <Head>
+          <link
+            rel="stylesheet"
+            href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css"
           />
-          <Button
-            color="grey"
-            icon="minus"
-            onClick={this.toSettings}
-            content="Settings"
-            labelPosition="right"
-          />
-        </Button.Group>
-        <Button.Group>
-          <Button positive onClick={this.toLogin} content="Login" />
-          <Button.Or />
-          <Button color="purple" onClick={this.toRegister} content="Register" />
-        </Button.Group>
+        </Head>
+        <Container>
+          <Header size="huge" style={{ marginTop: "30px" }}>
+            Decentralized and Distributed Trading
+          </Header>
+          <Menu style={{ marginTop: "10px" }}>
+            <Menu.Item>
+              <Button onClick={this.toHome} content="Home" color="black" />
+            </Menu.Item>
+            <Menu.Item>
+              <Button onClick={this.toBrowse} content="Browse" color="grey" />
+            </Menu.Item>
+            <Menu.Item>
+              <Button onClick={this.toProfile} content="My Profile" />
+            </Menu.Item>
+            <Menu.Item>
+              <Button onClick={this.toSettings} content="Settings" />
+            </Menu.Item>
 
-        {this.props.children}
-        <h1>This is the global footer</h1>
+            <Menu.Menu position="right">
+              <Menu.Item>
+                <Button
+                  onClick={this.toRegister}
+                  content="Register"
+                  color="red"
+                />
+              </Menu.Item>
+              <Menu.Item>
+                <Button onClick={this.toLogin} content="Login" color="green" />
+              </Menu.Item>
+            </Menu.Menu>
+          </Menu>
+          {this.props.children}
+          <Header size="medium">Footer Section with links</Header>
+        </Container>
       </div>
     );
   }

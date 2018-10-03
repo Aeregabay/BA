@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { Button } from "semantic-ui-react";
-import { Link, Router } from "../routes";
 import Layout from "../components/Layout";
 
 class settings extends Component {
