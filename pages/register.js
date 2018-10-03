@@ -9,10 +9,6 @@ class register extends Component {
     this.state = {};
   }
 
-  toHome = e => {
-    Router.push("/");
-  };
-
   render() {
     return (
       <Layout>
