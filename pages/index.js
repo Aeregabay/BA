@@ -3,9 +3,8 @@ import ReactDOM from "react-dom";
 import SearchBar from "../components/SearchBar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import Link from "../next/link";
-
-import MyProfile from "./MyProfile";
+import { Link, Router } from "../routes";
+import MyProfile from "./myprofile";
 
 class App extends Component {
   constructor(props) {
@@ -24,13 +23,15 @@ class App extends Component {
     console.log(this.state.searchTerm);
   }
 
+  toProfile = e => {
+    Router.push("/myprofile");
+  };
+
   render() {
     return (
       <div>
         <Header />
-        <Link href="/myprofile">
-          <button>My Profile</button>
-        </Link>
+        <button onClick={this.toProfile}>My Profile</button>
         <SearchBar itemSearch={this.itemSearch.bind(this)} />
         <Footer />
       </div>
