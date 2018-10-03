@@ -28,9 +28,17 @@ var _react = require("react");
 
 var _react2 = _interopRequireDefault(_react);
 
+var _semanticUiReact = require("semantic-ui-react");
+
+var _routes = require("../routes");
+
+var _Layout = require("../components/Layout");
+
+var _Layout2 = _interopRequireDefault(_Layout);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = "C:\\BA\\BA\\pages\\myprofile.js?entry";
+var _jsxFileName = "D:\\OneDrive - uzh.ch\\Documents\\Uni\\BA\\dApp\\dapp-project\\pages\\myprofile.js?entry";
 
 
 var myprofile = function (_Component) {
@@ -48,12 +56,22 @@ var myprofile = function (_Component) {
   (0, _createClass3.default)(myprofile, [{
     key: "render",
     value: function render() {
-      return _react2.default.createElement("h1", {
+      return _react2.default.createElement(_Layout2.default, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 9
+          lineNumber: 14
         }
-      }, "this is the settings page");
+      }, _react2.default.createElement("div", {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 15
+        }
+      }, _react2.default.createElement("h1", {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 16
+        }
+      }, "this is the my profile page")));
     }
   }]);
 
@@ -61,4 +79,4 @@ var myprofile = function (_Component) {
 }(_react.Component);
 
 exports.default = myprofile;
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzXFxteXByb2ZpbGUuanMiXSwibmFtZXMiOlsiUmVhY3QiLCJDb21wb25lbnQiLCJteXByb2ZpbGUiLCJwcm9wcyIsInN0YXRlIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLEFBQU8sQUFBUzs7Ozs7Ozs7O0lBRVYsQTtxQ0FDSjs7cUJBQUEsQUFBWSxPQUFPO3dDQUFBOzs0SUFBQSxBQUNYLEFBQ047O1VBQUEsQUFBSyxRQUZZLEFBRWpCLEFBQWE7V0FDZDs7Ozs7NkJBQ1EsQUFDUDs2QkFBTyxjQUFBOztvQkFBQTtzQkFBQTtBQUFBO0FBQUEsT0FBQSxFQUFQLEFBQU8sQUFDUjs7Ozs7QUFQcUIsQSxBQVV4Qjs7a0JBQUEsQUFBZSIsImZpbGUiOiJteXByb2ZpbGUuanM/ZW50cnkiLCJzb3VyY2VSb290IjoiQzovQkEvQkEifQ==
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzXFxteXByb2ZpbGUuanMiXSwibmFtZXMiOlsiUmVhY3QiLCJDb21wb25lbnQiLCJCdXR0b24iLCJMaW5rIiwiUm91dGVyIiwiTGF5b3V0IiwibXlwcm9maWxlIiwicHJvcHMiLCJzdGF0ZSJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxBQUFPLEFBQVM7Ozs7QUFDaEIsQUFBUzs7QUFDVCxBQUFTLEFBQU0sQUFBYzs7QUFDN0IsQUFBTyxBQUFZOzs7Ozs7Ozs7SUFFYixBO3FDQUNKOztxQkFBQSxBQUFZLE9BQU87d0NBQUE7OzRJQUFBLEFBQ1gsQUFDTjs7VUFBQSxBQUFLLFFBRlksQUFFakIsQUFBYTtXQUNkOzs7Ozs2QkFFUSxBQUNQOzZCQUNFLEFBQUM7O29CQUFEO3NCQUFBLEFBQ0U7QUFERjtBQUFBLE9BQUEsa0JBQ0UsY0FBQTs7b0JBQUE7c0JBQUEsQUFDRTtBQURGO0FBQUEseUJBQ0UsY0FBQTs7b0JBQUE7c0JBQUE7QUFBQTtBQUFBLFNBSE4sQUFDRSxBQUNFLEFBQ0UsQUFJUDs7Ozs7QUFkcUIsQSxBQWlCeEI7O2tCQUFBLEFBQWUiLCJmaWxlIjoibXlwcm9maWxlLmpzP2VudHJ5Iiwic291cmNlUm9vdCI6IkQ6L09uZURyaXZlIC0gdXpoLmNoL0RvY3VtZW50cy9VbmkvQkEvZEFwcC9kYXBwLXByb2plY3QifQ==

@@ -1,10 +1,7 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import SearchBar from "../components/SearchBar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { Link, Router } from "../routes";
-import MyProfile from "./myprofile";
+
+import Layout from "../components/Layout";
 
 class App extends Component {
   constructor(props) {
@@ -23,18 +20,11 @@ class App extends Component {
     console.log(this.state.searchTerm);
   }
 
-  toProfile = e => {
-    Router.push("/myprofile");
-  };
-
   render() {
     return (
-      <div>
-        <Header />
-        <button onClick={this.toProfile}>My Profile</button>
+      <Layout>
         <SearchBar itemSearch={this.itemSearch.bind(this)} />
-        <Footer />
-      </div>
+      </Layout>
     );
   }
 }
