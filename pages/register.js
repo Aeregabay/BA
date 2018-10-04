@@ -8,19 +8,25 @@ class register extends Component {
     this.state = {};
   }
 
+  onSubmit(event) {
+    event.preventDefault();
+    console.log("default prevented");
+  }
+
   render() {
     return (
       <Layout>
         <Container>
           <div>
             <h2>Register here to trade!</h2>
-            <Form>
+            <Form onSubmit={this.onSubmit}>
               <Form.Group>
                 <Form.Input
                   label="First Name"
                   placeholder="First Name"
                   width={6}
                   required
+                  autoFocus
                 />
                 <Form.Input
                   label="Middle Name"
@@ -74,9 +80,9 @@ class register extends Component {
                   required
                 />
               </Form.Group>
+              <Button content="Submit!" color="red" />
             </Form>
           </div>
-          <Button content="Submit!" color="red" />
         </Container>
       </Layout>
     );
