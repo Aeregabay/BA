@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import SearchBar from "../components/SearchBar";
-import { Header } from "semantic-ui-react";
+import { Header, Container } from "semantic-ui-react";
+import SearchBarNew from "../components/SearchBarNew";
 
 class browse extends Component {
   constructor(props) {
@@ -23,10 +24,13 @@ class browse extends Component {
   render() {
     return (
       <Layout>
-        <div>
-          <Header size="medium">Browse for products</Header>
-          <SearchBar itemSearch={this.itemSearch.bind(this)} />
-        </div>
+        <Container>
+          <div>
+            <Header size="medium">Browse for products</Header>
+            {/* <SearchBar itemSearch={this.itemSearch.bind(this)} /> */}
+            <SearchBarNew itemSearch={this.itemSearch.bind(this)} />
+          </div>
+        </Container>
       </Layout>
     );
   }

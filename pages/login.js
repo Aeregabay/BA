@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Form, Button } from "semantic-ui-react";
 import User from "../User";
+import { Router } from "../routes";
 
 class login extends Component {
   constructor(props) {
@@ -15,6 +16,7 @@ class login extends Component {
   onSubmit = event => {
     event.preventDefault();
     const user = new User(this.state.username, this.state.password);
+    Router.pushRoute("/");
   };
 
   render() {

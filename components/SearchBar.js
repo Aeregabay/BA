@@ -15,19 +15,21 @@ class SearchBar extends Component {
 
   render() {
     return (
-      <Container style={{ marginTop: "30px" }}>
-        <div className="ui fluid category search">
-          <div className="ui fluid icon input">
-            <input
-              type="text"
-              placeholder="What are you looking for?"
-              onChange={this.onChangeHandler.bind(this)}
-            />
-            <i className="search icon" />
+      <form>
+        <Container style={{ marginTop: "30px" }}>
+          <div className="ui fluid category search">
+            <div className="ui fluid icon input">
+              <input
+                type="text"
+                placeholder="What are you looking for?"
+                onChange={this.onChangeHandler.bind(this)}
+              />
+              <i className="search icon" />
+            </div>
           </div>
-        </div>
-        {/* <script> $(".ui.fluid.icon.input").search({});</script> */}
-      </Container>
+          {/* <script> $(".ui.fluid.icon.input").search({});</script> */}
+        </Container>
+      </form>
     );
   }
 }

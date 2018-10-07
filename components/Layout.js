@@ -12,6 +12,9 @@ class Layout extends Component {
   toBrowse = e => {
     Router.push("/browse");
   };
+  toSell = e => {
+    Router.push("/sell");
+  };
   toProfile = e => {
     Router.push("/myprofile");
   };
@@ -46,6 +49,9 @@ class Layout extends Component {
             </Menu.Item>
             <Menu.Item>
               <Button onClick={this.toBrowse} content="Browse" color="grey" />
+            </Menu.Item>
+            <Menu.Item>
+              <Button onClick={this.toSell} content="Sell" color="grey" />
             </Menu.Item>
             <Menu.Item>
               <Button onClick={this.toProfile} content="My Profile" />
