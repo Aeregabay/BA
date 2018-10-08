@@ -3,6 +3,7 @@ import Layout from "../components/Layout";
 import SearchBar from "../components/SearchBar";
 import { Header, Container } from "semantic-ui-react";
 import SearchBarNew from "../components/SearchBarNew";
+import Itemlist from "../components/Itemlist";
 
 class browse extends Component {
   constructor(props) {
@@ -24,13 +25,16 @@ class browse extends Component {
   render() {
     return (
       <Layout>
-        <Container>
-          <div>
-            <Header size="medium">Browse for products</Header>
-            {/* <SearchBar itemSearch={this.itemSearch.bind(this)} /> */}
-            <SearchBarNew itemSearch={this.itemSearch.bind(this)} />
-          </div>
-        </Container>
+        <div>
+          <Container>
+            <div>
+              <Header size="medium">Browse for products</Header>
+              {/* <SearchBar itemSearch={this.itemSearch.bind(this)} /> */}
+              <SearchBarNew itemSearch={this.itemSearch.bind(this)} />
+            </div>
+          </Container>
+          <Itemlist />
+        </div>
       </Layout>
     );
   }
