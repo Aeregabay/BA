@@ -47,6 +47,7 @@ app
           //if username can be used, write to DB
         } else {
           var username = req.body.username;
+          //hash password before writing to DB
           bcrypt.hash(req.body.password, 10, (err, hash) => {
             let sql =
               "INSERT INTO users (username, pw) VALUES ('" +
@@ -83,11 +84,20 @@ app
         if (err) {
           console.log("Username entered incorrectly, please try again");
           console.log(err);
+          //if user doesn't exist and needs to register
+        } else if (result.length == 0) {
+          console.log("user not found, redirecting to register page...");
+          res.status(200).json({
+            success: false,
+            userExists: false
+          });
           //if user exists and result has length property
         } else if (result.length) {
           console.log("user exists");
           bcrypt.compare(req.body.password, result[0].pw, (err, result2) => {
+            //if passwords match
             if (result2) {
+              //if person logging in has admin privileges
               if (result[0].admin == 1) {
                 let adminToken = jwt.sign(
                   {
@@ -108,6 +118,7 @@ app
                   message: "Here is your admin Token",
                   adminToken: adminToken
                 });
+                //if person logging in has no admin privileges
               } else {
                 let userToken = jwt.sign(
                   {
@@ -129,6 +140,7 @@ app
                   token: userToken
                 });
               }
+              //if passwords don't match
             } else {
               console.log(err);
               res.status(400).json({

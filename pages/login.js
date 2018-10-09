@@ -22,6 +22,8 @@ class login extends Component {
       const res = await axios.post(window.location.origin + "/login", data);
       if (res.data.success) {
         Router.push("/myprofile");
+      } else if (res.data.success == false && res.data.userExists == false) {
+        Router.push("/register");
       }
     } catch (error) {
       console.log(error);
