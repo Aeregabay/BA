@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Form, Button } from "semantic-ui-react";
-import User from "../User";
+import axios from "axios";
 import { Router } from "../routes";
 
 class login extends Component {
@@ -13,11 +13,20 @@ class login extends Component {
     };
   }
 
-  onSubmit = event => {
-    event.preventDefault();
-    const user = new User(this.state.username, this.state.password);
-    Router.pushRoute("/");
-  };
+  async onSubmit() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+    let data = { username, password };
+
+    try {
+      const res = await axios.post(window.location.origin + "/login", data);
+      if (res.data.success) {
+        Router.push("/myprofile");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   render() {
     return (
@@ -27,6 +36,7 @@ class login extends Component {
           <Form onSubmit={this.onSubmit}>
             <Form.Group>
               <Form.Input
+                id="username"
                 label="Username"
                 placeholder="enter your username"
                 width={6}
@@ -38,6 +48,7 @@ class login extends Component {
                 autoFocus
               />
               <Form.Input
+                id="password"
                 label="Password"
                 placeholder="enter your password"
                 width={6}

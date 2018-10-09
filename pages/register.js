@@ -8,16 +8,15 @@ class register extends Component {
   constructor(props) {
     super(props);
     this.state = { username: "", password: "" };
-    this.onSubmit = e => this._onSubmit();
+    // this.onSubmit = e => this._onSubmit(); //don't know what this does...
   }
 
-  async _onSubmit() {
+  async onSubmit() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
     let data = { username, password };
-
+    const res = await axios.post(window.location.origin + "/register", data);
     try {
-      const res = await axios.post(window.location.origin + "/register", data);
       if (res.data.success) {
         Router.push("/");
       }
@@ -47,6 +46,8 @@ class register extends Component {
                   label="Password"
                   placeholder="Enter your password"
                   width={6}
+                  type="password"
+                  required
                 />
                 <Form.Input
                   label="Last Name"
