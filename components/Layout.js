@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Router } from "../routes";
-import { Button, Header, Menu, Container } from "semantic-ui-react";
+import { Header, Menu, Container } from "semantic-ui-react";
 import Head from "next/head";
 
 class Layout extends Component {
@@ -40,10 +40,63 @@ class Layout extends Component {
           />
         </Head>
         <Container>
-          <Header size="huge" style={{ marginTop: "30px" }}>
-            Decentralized and Distributed Trading
+          <Header size="huge" style={{ marginTop: "15px" }} textAlign="center">
+            EthTrade - Decentralized Trading
           </Header>
-          <Menu style={{ marginTop: "10px" }}>
+          <div
+            className="ui menu"
+            style={{ marginTop: "30px", marginBottom: "40px" }}
+          >
+            <a className="header item" onClick={this.toHome}>
+              Home
+            </a>
+            <a className="item" onClick={this.toBrowse}>
+              Browse
+            </a>
+            <a className="item" onClick={this.toSell}>
+              Sell
+            </a>
+            <a className="item" onClick={this.toProfile}>
+              My Profile
+            </a>
+            <a className="item" onClick={this.toSettings}>
+              Settings
+            </a>
+            <div className="right menu">
+              <a
+                className="ui item"
+                onClick={this.toRegister}
+                style={{ color: "tomato" }}
+              >
+                Register
+              </a>
+              <a
+                className="ui item"
+                onClick={this.toLogin}
+                style={{ color: "MediumSeaGreen" }}
+                color="green"
+              >
+                Login
+              </a>
+            </div>
+          </div>
+        </Container>
+        {this.props.children}
+        <Container>
+          <Header size="medium" style={{ marginTop: "70px" }}>
+            Footer Section with links
+          </Header>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default Layout;
+
+//button version
+{
+  /* <Menu style={{ marginTop: "10px" }}>
             <Menu.Item>
               <Button onClick={this.toHome} content="Home" color="black" />
             </Menu.Item>
@@ -72,13 +125,5 @@ class Layout extends Component {
                 <Button onClick={this.toLogin} content="Login" color="green" />
               </Menu.Item>
             </Menu.Menu>
-          </Menu>
-          {this.props.children}
-          <Header size="medium">Footer Section with links</Header>
-        </Container>
-      </div>
-    );
-  }
+          </Menu> */
 }
-
-export default Layout;

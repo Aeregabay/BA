@@ -84,9 +84,9 @@ app
         if (err) {
           console.log("Username entered incorrectly, please try again");
           console.log(err);
-          //if user doesn't exist and needs to register
+          //if user doesn't exist
         } else if (result.length == 0) {
-          console.log("user not found, redirecting to register page...");
+          console.log("Username or password were incorrect");
           res.status(200).json({
             success: false,
             userExists: false
@@ -116,7 +116,8 @@ app
                 res.status(200).json({
                   success: true,
                   message: "Here is your admin Token",
-                  adminToken: adminToken
+                  adminToken: adminToken,
+                  admin: 1
                 });
                 //if person logging in has no admin privileges
               } else {
@@ -137,7 +138,8 @@ app
                 res.status(200).json({
                   success: true,
                   message: "Here is your user Token",
-                  token: userToken
+                  token: userToken,
+                  admin: 0
                 });
               }
               //if passwords don't match
@@ -152,7 +154,24 @@ app
         }
       });
     });
+    server.post("/myprofile", urlEncodedParser, (req, res) => {
+      const username = req.body.username;
+      let sql = "SELECT * FROM users WHERE users.username = '" + username + "'";
+      database.connection.query(sql, (err, result) => {
+        //if query fails
+        if (err) {
+          console.log("This really shouldn't happen, no username found");
+          console.log(err);
+        } else {
+          res.status(200).json({
+            success: true,
+            userData: result
+          });
+        }
+      });
+    });
   })
+
   .catch(err => {
     console.error(err.stack);
     process.exit(1);

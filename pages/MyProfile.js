@@ -1,5 +1,5 @@
+import ProfileBody from "../components/ProfileBody";
 import React, { Component } from "react";
-import Layout from "../components/Layout";
 
 class myprofile extends Component {
   constructor(props) {
@@ -7,14 +7,12 @@ class myprofile extends Component {
     this.state = {};
   }
 
+  async componentDidMount() {
+    this.child.clickableTrue();
+  }
+
   render() {
-    return (
-      <Layout>
-        <div>
-          <h1>this is the my profile page</h1>
-        </div>
-      </Layout>
-    );
+    return <ProfileBody ref={this.child} />;
   }
 }
 

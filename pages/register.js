@@ -18,7 +18,10 @@ class register extends Component {
     const res = await axios.post(window.location.origin + "/register", data);
     try {
       if (res.data.success) {
-        Router.push("/");
+        alert(
+          "Congratulations, you've successfully registred. Now proceed to the login page"
+        );
+        Router.push("/login");
       }
     } catch (error) {
       console.log(error);
@@ -37,7 +40,7 @@ class register extends Component {
                   id="username"
                   label="Username"
                   placeholder="Username"
-                  width={6}
+                  width={9}
                   required
                   autoFocus
                 />
@@ -45,47 +48,12 @@ class register extends Component {
                   id="password"
                   label="Password"
                   placeholder="Enter your password"
-                  width={6}
+                  width={9}
                   type="password"
                   required
                 />
-                <Form.Input
-                  label="Last Name"
-                  placeholder="Last Name"
-                  width={6}
-                />
               </Form.Group>
-              <Form.Group>
-                <Form.Input
-                  label="Street"
-                  placeholder="Enter your address"
-                  width={16}
-                />
-                <Form.Input label="House Number" placeholder="#" width={2} />
-              </Form.Group>
-              <Form.Group>
-                <Form.Input
-                  label="Zip Code"
-                  placeholder="Enter your Zip Code"
-                  width={4}
-                />
-                <Form.Input
-                  label="City"
-                  placeholder="Enter your City"
-                  width={7}
-                />
-                <Form.Input
-                  label="State"
-                  placeholder="Enter your state"
-                  width={7}
-                />
-                <Form.Input
-                  label="Country"
-                  placeholder="Enter your country"
-                  width={7}
-                />
-              </Form.Group>
-              <Button content="Submit!" color="red" />
+              <Button content="Register now" color="google plus" />
             </Form>
           </div>
         </Container>
