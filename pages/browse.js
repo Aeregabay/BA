@@ -29,7 +29,6 @@ class browse extends Component {
           <Container>
             <div>
               <Header size="medium">Browse for products</Header>
-              {/* <SearchBar itemSearch={this.itemSearch.bind(this)} /> */}
               <SearchBarNew itemSearch={this.itemSearch.bind(this)} />
             </div>
           </Container>

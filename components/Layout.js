@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Router } from "../routes";
-import { Header, Menu, Container } from "semantic-ui-react";
+import { Header, Container } from "semantic-ui-react";
 import Head from "next/head";
 
 class Layout extends Component {
@@ -8,7 +8,7 @@ class Layout extends Component {
     super(props);
     this.state = {};
   }
-
+  //methods to navigate between pages
   toBrowse = e => {
     Router.push("/browse");
   };
@@ -30,6 +30,7 @@ class Layout extends Component {
   toHome = e => {
     Router.push("/");
   };
+
   render() {
     return (
       <div>
@@ -43,7 +44,9 @@ class Layout extends Component {
           <Header size="huge" style={{ marginTop: "15px" }} textAlign="center">
             EthTrade - Decentralized Trading
           </Header>
+
           <div
+            //Navbar menu
             className="ui menu"
             style={{ marginTop: "30px", marginBottom: "40px" }}
           >
@@ -93,37 +96,3 @@ class Layout extends Component {
 }
 
 export default Layout;
-
-//button version
-{
-  /* <Menu style={{ marginTop: "10px" }}>
-            <Menu.Item>
-              <Button onClick={this.toHome} content="Home" color="black" />
-            </Menu.Item>
-            <Menu.Item>
-              <Button onClick={this.toBrowse} content="Browse" color="grey" />
-            </Menu.Item>
-            <Menu.Item>
-              <Button onClick={this.toSell} content="Sell" color="grey" />
-            </Menu.Item>
-            <Menu.Item>
-              <Button onClick={this.toProfile} content="My Profile" />
-            </Menu.Item>
-            <Menu.Item>
-              <Button onClick={this.toSettings} content="Settings" />
-            </Menu.Item>
-
-            <Menu.Menu position="right">
-              <Menu.Item>
-                <Button
-                  onClick={this.toRegister}
-                  content="Register"
-                  color="red"
-                />
-              </Menu.Item>
-              <Menu.Item>
-                <Button onClick={this.toLogin} content="Login" color="green" />
-              </Menu.Item>
-            </Menu.Menu>
-          </Menu> */
-}

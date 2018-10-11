@@ -20,11 +20,11 @@ class ProfileBody extends Component {
       clickable: true
     };
   }
-
+  //method to go to admin page only if user is admin and on his profile page
   toAdmin = e => {
     Router.push("/admin");
   };
-
+  //functions to toggle clickable for adminpage button
   clickableTrue() {
     this.setState({ clickable: true });
   }
@@ -32,6 +32,7 @@ class ProfileBody extends Component {
     this.setState({ clickable: false });
   }
 
+  //get userdata to display in myprofile
   async componentDidMount() {
     const username = getCurrentUser();
     const res = await axios.post(window.location.origin + "/myprofile", {
@@ -62,6 +63,7 @@ class ProfileBody extends Component {
   }
 
   render() {
+    //etherscan link builder
     const etherscanAddress =
       "https://etherscan.io/address/" + this.state.ethAddress;
 
@@ -77,6 +79,7 @@ class ProfileBody extends Component {
           </Header>
         </div>
         <Container textAlign="center">
+          {/* button only appears when user has admin rights and is on his myprofile page */}
           {this.state.admin && this.state.clickable ? (
             <div
               className="ui blue button"

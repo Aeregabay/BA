@@ -9,6 +9,7 @@ class admin extends Component {
     this.child = React.createRef();
   }
 
+  //make "Go to Admin Page" button disappear, since user is already on the page
   async componentDidMount() {
     this.child.current.clickableFalse();
   }

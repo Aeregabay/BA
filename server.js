@@ -154,6 +154,7 @@ app
         }
       });
     });
+
     server.post("/myprofile", urlEncodedParser, (req, res) => {
       const username = req.body.username;
       let sql = "SELECT * FROM users WHERE users.username = '" + username + "'";

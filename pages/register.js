@@ -8,12 +8,12 @@ class register extends Component {
   constructor(props) {
     super(props);
     this.state = { username: "", password: "" };
-    // this.onSubmit = e => this._onSubmit(); //don't know what this does...
   }
 
   async onSubmit() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
+    //create JSON with user input and send it to DB
     let data = { username, password };
     const res = await axios.post(window.location.origin + "/register", data);
     try {
