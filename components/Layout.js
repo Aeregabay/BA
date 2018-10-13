@@ -2,24 +2,35 @@ import React, { Component } from "react";
 import { Router } from "../routes";
 import { Header, Container } from "semantic-ui-react";
 import Head from "next/head";
+import axios from "axios";
 
 class Layout extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { cookie: "" };
   }
+
+  async componentDidMount() {
+    let cookie = await axios.post(window.location.origin + "/getCookie");
+    this.setState({ cookie });
+  }
+
   //methods to navigate between pages
-  toBrowse = e => {
-    Router.push("/browse");
-  };
-  toSell = e => {
+
+  toSell = () => {
+    this.tokenVerify(this.cookie);
     Router.push("/sell");
   };
-  toProfile = e => {
+  toProfile = () => {
+    this.tokenVerify(this.cookie);
     Router.push("/myprofile");
   };
-  toSettings = e => {
+  toSettings = () => {
+    this.tokenVerify(this.cookie);
     Router.push("/settings");
+  };
+  toBrowse = e => {
+    Router.push("/browse");
   };
   toLogin = e => {
     Router.push("/login");
@@ -29,6 +40,19 @@ class Layout extends Component {
   };
   toHome = e => {
     Router.push("/");
+  };
+
+  tokenVerify = token => {
+    if (!token) {
+      Router.push("/login");
+    }
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        Router.push("/login");
+      } else {
+        next();
+      }
+    });
   };
 
   render() {

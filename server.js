@@ -11,22 +11,20 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const secret = "realmadrid";
+const cors = require("cors");
 
 app
   .prepare()
   .then(() => {
     const server = express();
-    server.listen(3000, err => {
-      if (err) throw err;
-      console.log("Listening on Localhost:3000");
-    });
-    server.get("*", (req, res) => {
-      return handler(req, res);
-    });
 
     //Register Data (probably not used in future) in DB
     server.use(bodyParser.text());
     server.use(bodyParser.json());
+    server.use(cors());
+    server.use(cookieParser());
+    //protect the pages that should not be available if user is not logged in
+
     server.post("/register", urlEncodedParser, (req, res) => {
       //check whether username already exists in DB
       let sqlSearch =
@@ -98,7 +96,7 @@ app
             //if passwords match
             if (result2) {
               //if person logging in has admin privileges
-              if (result[0].admin == 1) {
+              if (result[0].admin === 1) {
                 let adminToken = jwt.sign(
                   {
                     username: req.body.username,
@@ -171,9 +169,63 @@ app
         }
       });
     });
+
+    server.post("/getCookie", urlEncodedParser, (req, res) => {
+      let cookie = req.cookies["x-access-token"];
+      res.status(200).json({ cookie });
+    });
+
+    server.use(
+      unless(
+        ["/login", "/browse", "/index", "/register", "/_next"],
+        (req, res, next) => {
+          const token = req.cookies["x-access-token"];
+          console.log(token);
+          if (token) {
+            jwt.verify(token, secret, (err, decoded) => {
+              if (err) {
+              } else {
+                req.decoded = decoded;
+                next();
+              }
+            });
+          } else {
+            console.log("You have to be logged in to view this page");
+            console.log("You are now being redirected to the login page");
+            res.redirect("/login");
+          }
+        }
+      )
+    );
+
+    server.get("*", (req, res) => {
+      return handler(req, res);
+    });
+
+    server.listen(3000, err => {
+      if (err) throw err;
+      console.log("Listening on Localhost:3000");
+    });
   })
 
   .catch(err => {
     console.error(err.stack);
     process.exit(1);
   });
+
+function unless(paths, middleware) {
+  return function(req, res, next) {
+    let isHave = false;
+    paths.forEach(path => {
+      if (path === req.path || req.path.includes(path)) {
+        isHave = true;
+        return;
+      }
+    });
+    if (isHave) {
+      return next();
+    } else {
+      return middleware(req, res, next);
+    }
+  };
+}
