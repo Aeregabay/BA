@@ -175,6 +175,20 @@ app
       res.status(200).json({ cookie });
     });
 
+    server.post("/deleteCookie", urlEncodedParser, (req, res) => {
+      res.cookie("x-access-token");
+      res.status(200).send({ message: "successful logout" });
+    });
+
+    server.get("*", (req, res) => {
+      return handler(req, res);
+    });
+
+    server.listen(3000, err => {
+      if (err) throw err;
+      console.log("Listening on Localhost:3000");
+    });
+
     server.use(
       unless(
         ["/login", "/browse", "/index", "/register", "/_next"],
@@ -197,15 +211,6 @@ app
         }
       )
     );
-
-    server.get("*", (req, res) => {
-      return handler(req, res);
-    });
-
-    server.listen(3000, err => {
-      if (err) throw err;
-      console.log("Listening on Localhost:3000");
-    });
   })
 
   .catch(err => {

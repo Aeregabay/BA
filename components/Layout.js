@@ -3,30 +3,38 @@ import { Router } from "../routes";
 import { Header, Container } from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
+import getCurrentUser from "../utils/UserUtils";
+const jwt = require("jsonwebtoken");
+const secret = "realmadrid";
 
 class Layout extends Component {
   constructor(props) {
     super(props);
-    this.state = { cookie: "" };
+    this.state = {
+      cookie: "",
+      currentUser: ""
+    };
   }
 
   async componentDidMount() {
     let cookie = await axios.post(window.location.origin + "/getCookie");
     this.setState({ cookie });
+    let currentUser = getCurrentUser();
+    this.setState({ currentUser });
   }
 
   //methods to navigate between pages
 
   toSell = () => {
-    this.tokenVerify(this.cookie);
+    this.tokenVerify();
     Router.push("/sell");
   };
   toProfile = () => {
-    this.tokenVerify(this.cookie);
+    this.tokenVerify();
     Router.push("/myprofile");
   };
   toSettings = () => {
-    this.tokenVerify(this.cookie);
+    this.tokenVerify();
     Router.push("/settings");
   };
   toBrowse = e => {
@@ -41,14 +49,23 @@ class Layout extends Component {
   toHome = e => {
     Router.push("/");
   };
+  logout = async () => {
+    const res = await axios.post(
+      window.location.origin + "/deleteCookie",
+      this.state.cookie
+    );
+    Router.push("/");
+    alert("You've successfully logged out");
+  };
 
-  tokenVerify = token => {
-    if (!token) {
+  tokenVerify = () => {
+    if (!this.state.cookie) {
       Router.push("/login");
     }
-    jwt.verify(token, secret, (err, decoded) => {
+    jwt.verify(this.state.cookie, secret, (err, decoded) => {
       if (err) {
         Router.push("/login");
+        console.log("error");
       } else {
         next();
       }
@@ -90,21 +107,42 @@ class Layout extends Component {
               Settings
             </a>
             <div className="right menu">
-              <a
-                className="ui item"
-                onClick={this.toRegister}
-                style={{ color: "tomato" }}
-              >
-                Register
-              </a>
-              <a
+              {this.state.currentUser.length < 1 ? (
+                <a
+                  className="ui item"
+                  onClick={this.toRegister}
+                  style={{ color: "tomato" }}
+                >
+                  Register
+                </a>
+              ) : (
+                ""
+              )}
+              {this.state.currentUser.length > 0 ? (
+                <a
+                  className="ui item"
+                  onClick={this.logout}
+                  style={{ color: "tomato" }}
+                >
+                  Logout
+                </a>
+              ) : (
+                <a
+                  className="ui item"
+                  onClick={this.toLogin}
+                  style={{ color: "MediumSeaGreen" }}
+                >
+                  Login
+                </a>
+              )}
+              {/* <a
                 className="ui item"
                 onClick={this.toLogin}
                 style={{ color: "MediumSeaGreen" }}
                 color="green"
               >
                 Login
-              </a>
+              </a> */}
             </div>
           </div>
         </Container>
