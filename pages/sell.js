@@ -1,14 +1,8 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import {
-  Container,
-  Form,
-  Button,
-  Header,
-  Input,
-  TextArea,
-  Select
-} from "semantic-ui-react";
+import { Container, Form, Button, Header } from "semantic-ui-react";
+
+import CreatableSelect from "react-select/lib/Creatable";
 
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -80,6 +74,8 @@ const options = [
   { key: "yes", text: "Yes", value: "yes" },
   { key: "no", text: "No", value: "no" }
 ];
+
+const tags = [{ value: "computers", label: "Computers" }];
 
 class sell extends Component {
   constructor(props) {
@@ -154,14 +150,17 @@ class sell extends Component {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Input
-                  label="Tags"
-                  placeholder="Please enter tags that describe your item"
-                  width={16}
-                  required
-                />
+                <Container>
+                  <CreatableSelect
+                    id="tags"
+                    placeholder="Enter the tags here that describe your item"
+                    isClearable
+                    isMulti
+                    options={tags}
+                  />
+                </Container>
               </Form.Group>
-              <Button content="Register now" color="google plus" />
+              <Button content="Place item" color="google plus" />
             </Form>
           </div>
         </Container>
