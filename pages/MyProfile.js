@@ -5,11 +5,12 @@ class myprofile extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.child = React.createRef();
   }
 
   //make "Go to Admin page" button appear (only if admin rights)
   async componentDidMount() {
-    this.child.clickableTrue();
+    this.child.current.clickableTrue();
   }
 
   render() {

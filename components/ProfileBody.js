@@ -34,10 +34,7 @@ class ProfileBody extends Component {
 
   //get userdata to display in myprofile
   async componentDidMount() {
-    const username = getCurrentUser();
-    const res = await axios.post(window.location.origin + "/myprofile", {
-      username
-    });
+    const res = await axios.post(window.location.origin + "/myprofile");
     try {
       if (res.data.success) {
         this.setState({

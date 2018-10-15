@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const jwtDecode = require("jwt-decode");
 const cookieParser = require("cookie-parser");
 const secret = "realmadrid";
 const cors = require("cors");
@@ -154,7 +155,9 @@ app
     });
 
     server.post("/myprofile", urlEncodedParser, (req, res) => {
-      const username = req.body.username;
+      let cookie = req.cookies["x-access-token"];
+      let decoded = jwtDecode(cookie);
+      let username = decoded.username;
       let sql = "SELECT * FROM users WHERE users.username = '" + username + "'";
       database.connection.query(sql, (err, result) => {
         //if query fails
@@ -172,7 +175,18 @@ app
 
     server.post("/getCookie", urlEncodedParser, (req, res) => {
       let cookie = req.cookies["x-access-token"];
-      res.status(200).json({ cookie });
+      let username;
+
+      if (cookie) {
+        jwt.verify(cookie, secret, (err, decoded) => {
+          if (err) {
+            console.log("no cookie available");
+          } else {
+            username = decoded.username;
+            res.status(200).json({ cookie, username });
+          }
+        });
+      }
     });
 
     server.post("/deleteCookie", urlEncodedParser, (req, res) => {

@@ -3,8 +3,6 @@ import { Router } from "../routes";
 import { Header, Container } from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
-import getCurrentUser from "../utils/UserUtils";
-const jwt = require("jsonwebtoken");
 const secret = "realmadrid";
 
 class Layout extends Component {
@@ -12,30 +10,46 @@ class Layout extends Component {
     super(props);
     this.state = {
       cookie: "",
-      currentUser: ""
+      currentUser: "",
+      isLoggedIn: false
     };
   }
 
   async componentDidMount() {
-    let cookie = await axios.post(window.location.origin + "/getCookie");
-    this.setState({ cookie });
-    let currentUser = getCurrentUser();
-    this.setState({ currentUser });
+    let response = await axios.post(window.location.origin + "/getCookie");
+    if (response.data.success) {
+      this.setState({
+        cookie: response.data.cookie,
+        currentUser: response.data.username,
+        isLoggedIn: true
+      });
+    }
   }
 
   //methods to navigate between pages
-
   toSell = () => {
-    this.tokenVerify();
-    Router.push("/sell");
+    if (this.state.isLoggedIn) {
+      Router.push("/sell");
+    } else {
+      alert("You need to be logged in to access this page");
+      Router.push("/login");
+    }
   };
   toProfile = () => {
-    this.tokenVerify();
-    Router.push("/myprofile");
+    if (this.state.isLoggedIn) {
+      Router.push("/myprofile");
+    } else {
+      alert("You need to be logged in to access this page");
+      Router.push("/login");
+    }
   };
   toSettings = () => {
-    this.tokenVerify();
-    Router.push("/settings");
+    if (this.state.isLoggedIn) {
+      Router.push("/settings");
+    } else {
+      alert("You need to be logged in to access this page");
+      Router.push("/login");
+    }
   };
   toBrowse = e => {
     Router.push("/browse");
@@ -56,20 +70,6 @@ class Layout extends Component {
     );
     Router.push("/");
     alert("You've successfully logged out");
-  };
-
-  tokenVerify = () => {
-    if (!this.state.cookie) {
-      Router.push("/login");
-    }
-    jwt.verify(this.state.cookie, secret, (err, decoded) => {
-      if (err) {
-        Router.push("/login");
-        console.log("error");
-      } else {
-        next();
-      }
-    });
   };
 
   render() {
