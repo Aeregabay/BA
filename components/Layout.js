@@ -82,7 +82,10 @@ class Layout extends Component {
           />
         </Head>
         <Container>
-          <Header size="huge" style={{ marginTop: "15px" }} textAlign="center">
+          <Header
+            size="huge"
+            style={{ marginTop: "15px", textAlign: "center" }}
+          >
             EthTrade - Decentralized Trading
           </Header>
 

@@ -11,11 +11,14 @@ class App extends Component {
 
   render() {
     return (
-      <Container textAlign="left">
+      <Container style={{ textAlign: "left" }}>
         <Layout>
           <Container
-            style={{ marginTop: "35px", marginBottom: "50px" }}
-            textAlign="left"
+            style={{
+              marginTop: "35px",
+              marginBottom: "50px",
+              textAlign: "left"
+            }}
           >
             <Header as="h2" content="Welcome to my beautiful page" />
             <Button floated="right" content="doing nothing" color="blue" />

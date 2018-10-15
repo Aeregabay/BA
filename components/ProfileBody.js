@@ -68,14 +68,13 @@ class ProfileBody extends Component {
       <Layout>
         <div>
           <Header
-            textAlign="center"
             size="large"
-            style={{ marginBottom: "30px" }}
+            style={{ marginBottom: "30px", textAlign: "center" }}
           >
             Welcome to your profile, {this.state.username}
           </Header>
         </div>
-        <Container textAlign="center">
+        <Container style={{ textAlign: "center" }}>
           {/* button only appears when user has admin rights and is on his myprofile page */}
           {this.state.admin && this.state.clickable ? (
             <div
@@ -84,7 +83,6 @@ class ProfileBody extends Component {
               style={{
                 marginBottom: "30px"
               }}
-              textAlign="center"
               onClick={this.toAdmin}
             >
               Go to Admin page
