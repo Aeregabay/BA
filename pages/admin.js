@@ -17,13 +17,6 @@ class admin extends Component {
   render() {
     return (
       <Container>
-        <Header
-          size="large"
-          style={{ marginBottom: "30px", textAlign: "center" }}
-          hidden={!this.state.admin}
-        >
-          This is the admin page
-        </Header>
         <ProfileBody ref={this.child} />
       </Container>
     );

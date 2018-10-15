@@ -194,19 +194,20 @@ app
       res.status(200).send({ message: "successful logout" });
     });
 
-    server.get("/admin", hasAdminRights, (req, res) => {
-      const token = req.cookies["x-access-token"];
-      jwt.verify(token, secret, (err, decoded) => {
-        if (err) {
-          res.redirect("/error");
-        }
-        if (decoded.admin[0] === false) {
-          console.log(decoded);
-          res.redirect("/error");
-        } else {
-          return next();
-        }
-      });
+    server.post("/admin", hasAdminRights, (req, res) => {
+      console.log("Admin access granted");
+      // const token = req.cookies["x-access-token"];
+      // jwt.verify(token, secret, (err, decoded) => {
+      //   if (err) {
+      //     res.redirect("/error");
+      //   }
+      //   if (decoded.admin[0] === false) {
+      //     console.log(decoded);
+      //     res.redirect("/error");
+      //   } else {
+      //     return next();
+      //   }
+      // });
     });
 
     server.get("*", (req, res) => {

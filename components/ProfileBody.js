@@ -17,7 +17,10 @@ class ProfileBody extends Component {
       ethAddress: "",
       admin: "",
       userType: "",
-      clickable: true
+      //determines whether the "go to admin page" button should be visible
+      clickable: true,
+      //determines whether the admin user is on his profile page or not
+      isMyProfilePage: false
     };
   }
   //method to go to admin page only if user is admin and on his profile page
@@ -30,6 +33,10 @@ class ProfileBody extends Component {
   }
   clickableFalse() {
     this.setState({ clickable: false });
+  }
+
+  isMyProfilePageTrue() {
+    this.setState({ isMyProfilePage: true });
   }
 
   //get userdata to display in myprofile
@@ -67,12 +74,23 @@ class ProfileBody extends Component {
     return (
       <Layout>
         <div>
-          <Header
-            size="large"
-            style={{ marginBottom: "30px", textAlign: "center" }}
-          >
-            Welcome to your profile, {this.state.username}
-          </Header>
+          {/* check which header should be displayed, admin or myprofile header */}
+          {this.state.admin && !this.state.isMyProfilePage ? (
+            <Header
+              size="large"
+              style={{ marginBottom: "30px", textAlign: "center" }}
+              hidden={!this.state.admin}
+            >
+              This is the admin page, {this.state.username}
+            </Header>
+          ) : (
+            <Header
+              size="large"
+              style={{ marginBottom: "30px", textAlign: "center" }}
+            >
+              Welcome to your profile, {this.state.username}
+            </Header>
+          )}
         </div>
         <Container style={{ textAlign: "center" }}>
           {/* button only appears when user has admin rights and is on his myprofile page */}

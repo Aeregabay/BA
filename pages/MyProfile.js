@@ -11,6 +11,7 @@ class myprofile extends Component {
   //make "Go to Admin page" button appear (only if admin rights)
   async componentDidMount() {
     this.child.current.clickableTrue();
+    this.child.current.isMyProfilePageTrue();
   }
 
   render() {
