@@ -183,7 +183,7 @@ app
             console.log("no cookie available");
           } else {
             username = decoded.username;
-            res.status(200).json({ cookie, username });
+            res.status(200).json({ cookie, username, success: true });
           }
         });
       }
