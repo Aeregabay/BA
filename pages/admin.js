@@ -18,7 +18,6 @@ class admin extends Component {
     return (
       <Container>
         <Header
-          textalign="center"
           size="large"
           style={{ marginBottom: "30px", textAlign: "center" }}
           hidden={!this.state.admin}

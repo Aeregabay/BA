@@ -9,8 +9,8 @@ class error extends Component {
     this.state = {};
   }
 
-  toLogin = () => {
-    Router.push("/login");
+  toProfile = () => {
+    Router.push("/myprofile");
   };
 
   render() {
@@ -21,7 +21,7 @@ class error extends Component {
             <Header size="huge" color="red">
               You are not allowed to see the content of this page
             </Header>
-            <Button content="Back to Login" onClick={this.toLogin} />
+            <Button content="Back to My Profile" onClick={this.toProfile} />
           </div>
         </Container>
       </Layout>

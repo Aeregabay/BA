@@ -194,6 +194,21 @@ app
       res.status(200).send({ message: "successful logout" });
     });
 
+    server.get("/admin", hasAdminRights, (req, res) => {
+      const token = req.cookies["x-access-token"];
+      jwt.verify(token, secret, (err, decoded) => {
+        if (err) {
+          res.redirect("/error");
+        }
+        if (decoded.admin[0] === false) {
+          console.log(decoded);
+          res.redirect("/error");
+        } else {
+          return next();
+        }
+      });
+    });
+
     server.get("*", (req, res) => {
       return handler(req, res);
     });
@@ -203,6 +218,7 @@ app
       console.log("Listening on Localhost:3000");
     });
 
+    //protect all pages exept the ones below from access without login
     server.use(
       unless(
         ["/login", "/browse", "/index", "/register", "/_next"],
@@ -212,6 +228,7 @@ app
           if (token) {
             jwt.verify(token, secret, (err, decoded) => {
               if (err) {
+                console.log(err);
               } else {
                 req.decoded = decoded;
                 next();
@@ -247,4 +264,21 @@ function unless(paths, middleware) {
       return middleware(req, res, next);
     }
   };
+}
+
+function hasAdminRights(req, res, next) {
+  const token = req.cookies["x-access-token"];
+  if (token) {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        console.log(err);
+      } else {
+        if (decoded.admin === false) {
+          res.redirect("/error");
+        } else {
+          return next();
+        }
+      }
+    });
+  }
 }
