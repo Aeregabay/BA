@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import { Router } from "../routes";
-import { Header, Container } from "semantic-ui-react";
+import { Router, Link } from "../routes";
+import { Header, Container, Divider, List } from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
-const secret = "realmadrid";
 
 class Layout extends Component {
   constructor(props) {
@@ -151,9 +150,16 @@ class Layout extends Component {
         </Container>
         {this.props.children}
         <Container>
-          <Header size="medium" style={{ marginTop: "70px" }}>
-            Footer Section with links
-          </Header>
+          <Divider fitted style={{ marginTop: "300px" }} />
+          <p>
+            <b>Links</b>
+          </p>
+          <List bulleted horizontal>
+            <List.Item as="a" href="https://github.com/Aeregabay/BA">
+              <List.Icon name="github" />
+              GitHub Repo
+            </List.Item>
+          </List>
         </Container>
       </div>
     );
