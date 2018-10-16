@@ -90,7 +90,7 @@ class sell extends Component {
   }
 
   async onSubmit(e) {
-    const formData = new FormData();
+    //create array with object details to send to server
     let myFormData;
     if (isOwner) {
       myFormData = {
@@ -102,29 +102,13 @@ class sell extends Component {
         options: options,
         pics: allPics
       };
-      for (let key in myFormData) {
-        console.log(key, myFormData[key]);
-        formData.append(key, myFormData[key]);
-      }
-
-      // formData.append("title", document.getElementById("title").value);
-      // formData.append("price", document.getElementById("price").value);
-      // formData.append(
-      //   "description",
-      //   document.getElementById("description").value
-      // );
-      // formData.append("category", category);
-      // formData.append("currentValues", currentValues);
-      // formData.append("options", options);
-      // formData.append("pics", allPics);
-      console.log(formData);
     } else {
       alert("You have to own the item in order to sell it, try again");
       Router.push("/");
     }
 
+    //send created array to server
     try {
-      console.log(formData);
       const res = await axios.post(
         window.location.origin + "/sell",
         myFormData
