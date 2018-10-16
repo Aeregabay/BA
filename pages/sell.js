@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Container, Form, Button, Header } from "semantic-ui-react";
-
-import CreatableSelect from "react-select/lib/Creatable";
+import { Container, Form, Button, Header, Dropdown } from "semantic-ui-react";
 
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -69,13 +67,18 @@ const categories = [
     value: "wineConsumption"
   }
 ];
-
-const options = [
+const ownerOptions = [
   { key: "yes", text: "Yes", value: "yes" },
   { key: "no", text: "No", value: "no" }
 ];
 
-const tags = [{ value: "computers", label: "Computers" }];
+let options = [
+  { key: "computers", text: "Computers", value: "Computers" },
+  { key: "cars", text: "Cars", value: "Cars" }
+];
+let isOwner = false;
+let category = "";
+let currentValues = [];
 
 class sell extends Component {
   constructor(props) {
@@ -83,7 +86,40 @@ class sell extends Component {
     this.state = {};
   }
 
+  handleAddition = (e, { value }) => {
+    options.push({ key: value, text: value, value });
+  };
+
+  handleChange = (e, { value }) => {
+    currentValues.push(value);
+  };
+
+  handleCategoryChange = (e, { value }) => {
+    this.category = value;
+  };
+
+  isOwner = (e, { value }) => {
+    e.persist();
+    if (value === "yes") {
+      this.isOwner = true;
+    } else {
+      this.isOwner = false;
+    }
+  };
+
+  async onSubmit() {
+    console.log(document.getElementById("title").value);
+    console.log(document.getElementById("price").value);
+    console.log(document.getElementById("description").value);
+    console.log(isOwner);
+    console.log(category);
+    console.log(currentValues);
+    console.log(options);
+  }
+
   render() {
+    const { currentValues } = this.state;
+    console.log(currentValues);
     return (
       <Layout>
         <Container>
@@ -106,19 +142,9 @@ class sell extends Component {
                   control="input"
                   label="Item title"
                   placeholder="Enter the title that should appear in searchresults"
-                  width={15}
+                  width={16}
                   required
                   autoFocus
-                />
-                <Form.Input
-                  fluid="true"
-                  id="price"
-                  control="input"
-                  label="Selling price"
-                  placeholder="Item price"
-                  width={3}
-                  required
-                  type="number"
                 />
               </Form.Group>
               <Form.Group>
@@ -137,28 +163,47 @@ class sell extends Component {
                   label="Category"
                   options={categories}
                   placeholder="Category"
-                  width={10}
+                  width={12}
                   required
+                  onChange={this.handleCategoryChange}
                 />
-                <Form.Select
-                  id="owner"
-                  label="Item Owner"
-                  options={options}
-                  placeholder="Do you own this item?"
+                <Form.Input
+                  fluid="true"
+                  id="price"
+                  control="input"
+                  label="Selling price"
+                  placeholder="Item price"
+                  width={4}
                   required
-                  width={6}
+                  type="number"
                 />
               </Form.Group>
               <Form.Group>
-                <Container>
-                  <CreatableSelect
-                    id="tags"
-                    placeholder="Enter the tags here that describe your item"
-                    isClearable
-                    isMulti
-                    options={tags}
-                  />
-                </Container>
+                <Form.Select
+                  label="Tags"
+                  options={options}
+                  placeholder="Enter the tags here that describe your item"
+                  search
+                  selection
+                  fluid
+                  multiple
+                  allowAdditions
+                  value={currentValues}
+                  onAddItem={this.handleAddition}
+                  onChange={this.handleChange}
+                  width={12}
+                  required
+                />
+                <Form.Select
+                  label="Owner"
+                  onChange={this.isOwner}
+                  options={ownerOptions}
+                  placeholder="Do you own this item?"
+                  selection
+                  search
+                  required
+                  width={4}
+                />
               </Form.Group>
               <Button content="Place item" color="google plus" />
             </Form>
