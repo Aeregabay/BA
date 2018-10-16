@@ -95,15 +95,15 @@ class sell extends Component {
   };
 
   handleCategoryChange = (e, { value }) => {
-    this.category = value;
+    category = value;
   };
 
   isOwner = (e, { value }) => {
     e.persist();
     if (value === "yes") {
-      this.isOwner = true;
+      isOwner = true;
     } else {
-      this.isOwner = false;
+      isOwner = false;
     }
   };
 

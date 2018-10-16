@@ -154,23 +154,39 @@ app
       });
     });
 
+    server.get("/admin", hasAdminRights, (req, res, next) => {
+      return next();
+    });
+    server.get("/myprofile", isLoggedIn, (req, res, next) => {
+      return next();
+    });
+    server.get("/sell", isLoggedIn, (req, res, next) => {
+      return next();
+    });
+    server.get("/settings", isLoggedIn, (req, res, next) => {
+      return next();
+    });
+
     server.post("/myprofile", urlEncodedParser, (req, res) => {
       let cookie = req.cookies["x-access-token"];
-      let decoded = jwtDecode(cookie);
-      let username = decoded.username;
-      let sql = "SELECT * FROM users WHERE users.username = '" + username + "'";
-      database.connection.query(sql, (err, result) => {
-        //if query fails
-        if (err) {
-          console.log("This really shouldn't happen, no username found");
-          console.log(err);
-        } else {
-          res.status(200).json({
-            success: true,
-            userData: result
-          });
-        }
-      });
+      if (cookie) {
+        let decoded = jwtDecode(cookie);
+        let username = decoded.username;
+        let sql =
+          "SELECT * FROM users WHERE users.username = '" + username + "'";
+        database.connection.query(sql, (err, result) => {
+          //if query fails
+          if (err) {
+            console.log("This really shouldn't happen, no username found");
+            console.log(err);
+          } else {
+            res.status(200).json({
+              success: true,
+              userData: result
+            });
+          }
+        });
+      }
     });
 
     server.post("/getCookie", urlEncodedParser, (req, res) => {
@@ -190,24 +206,8 @@ app
     });
 
     server.post("/deleteCookie", urlEncodedParser, (req, res) => {
-      res.cookie("x-access-token");
+      res.clearCookie("x-access-token");
       res.status(200).send({ message: "successful logout" });
-    });
-
-    server.post("/admin", hasAdminRights, (req, res) => {
-      console.log("Admin access granted");
-      // const token = req.cookies["x-access-token"];
-      // jwt.verify(token, secret, (err, decoded) => {
-      //   if (err) {
-      //     res.redirect("/error");
-      //   }
-      //   if (decoded.admin[0] === false) {
-      //     console.log(decoded);
-      //     res.redirect("/error");
-      //   } else {
-      //     return next();
-      //   }
-      // });
     });
 
     server.get("*", (req, res) => {
@@ -281,5 +281,26 @@ function hasAdminRights(req, res, next) {
         }
       }
     });
+  } else {
+    res.redirect("/error");
+  }
+}
+
+function isLoggedIn(req, res, next) {
+  const token = req.cookies["x-access-token"];
+  if (token) {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        console.log(err);
+      } else {
+        if (!decoded.username) {
+          res.redirect("/error");
+        } else {
+          return next();
+        }
+      }
+    });
+  } else {
+    res.redirect("/error");
   }
 }
