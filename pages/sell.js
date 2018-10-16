@@ -89,6 +89,55 @@ class sell extends Component {
     this.state = { files: [] };
   }
 
+  async onSubmit(e) {
+    const formData = new FormData();
+    let myFormData;
+    if (isOwner) {
+      myFormData = {
+        title: document.getElementById("title").value,
+        price: document.getElementById("price").value,
+        description: document.getElementById("description").value,
+        category: category,
+        currentValues: currentValues,
+        options: options,
+        pics: allPics
+      };
+      for (let key in myFormData) {
+        console.log(key, myFormData[key]);
+        formData.append(key, myFormData[key]);
+      }
+
+      // formData.append("title", document.getElementById("title").value);
+      // formData.append("price", document.getElementById("price").value);
+      // formData.append(
+      //   "description",
+      //   document.getElementById("description").value
+      // );
+      // formData.append("category", category);
+      // formData.append("currentValues", currentValues);
+      // formData.append("options", options);
+      // formData.append("pics", allPics);
+      console.log(formData);
+    } else {
+      alert("You have to own the item in order to sell it, try again");
+      Router.push("/");
+    }
+
+    try {
+      console.log(formData);
+      const res = await axios.post(
+        window.location.origin + "/sell",
+        myFormData
+      );
+      if (res.data.success) {
+        alert("Your item has successfully submitted");
+        Router.push("/browse");
+      }
+    } catch (err) {
+      alert("Your request has not been successful, here is the error:" + err);
+    }
+  }
+
   handleAddition = (e, { value }) => {
     options.push({ key: value, text: value, value });
   };
@@ -118,36 +167,6 @@ class sell extends Component {
     }
     this.setState({ files: allPics });
   };
-
-  async onSubmit(e) {
-    const formData = new FormData();
-    if (isOwner) {
-      formData.append("title", document.getElementById("title").value);
-      formData.append("price", document.getElementById("price").value);
-      formData.append(
-        "description",
-        document.getElementById("description").value
-      );
-      formData.append("category", category);
-      formData.append("currentValues", currentValues);
-      formData.append("options", options);
-      formData.append("pics", allPics);
-    } else {
-      alert("You have to own the item in order to sell it, try again");
-      Router.push("/");
-    }
-
-    try {
-      console.log(formData);
-      const res = await axios.post(window.location.origin + "/sell", formData);
-      if (res.data.success) {
-        alert("Your item has successfully submitted");
-        Router.push("/browse");
-      }
-    } catch (err) {
-      alert("Your request has not been successful, here is the error:" + err);
-    }
-  }
 
   render() {
     const { currentValues } = this.state;
