@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Container, Form, Button, Header, Dropdown } from "semantic-ui-react";
+import { Router } from "../routes";
+import { Container, Form, Button, Header, Icon } from "semantic-ui-react";
+import axios from "axios";
 
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -79,11 +81,12 @@ let options = [
 let isOwner = false;
 let category = "";
 let currentValues = [];
+let allPics = [];
 
 class sell extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { files: [] };
   }
 
   handleAddition = (e, { value }) => {
@@ -107,19 +110,47 @@ class sell extends Component {
     }
   };
 
-  async onSubmit() {
-    console.log(document.getElementById("title").value);
-    console.log(document.getElementById("price").value);
-    console.log(document.getElementById("description").value);
-    console.log(isOwner);
-    console.log(category);
-    console.log(currentValues);
-    console.log(options);
+  handleFiles = e => {
+    let i;
+    let tempFiles = e.target.files;
+    for (i = 0; i < tempFiles.length; i++) {
+      allPics.push(tempFiles[i]);
+    }
+    this.setState({ files: allPics });
+  };
+
+  async onSubmit(e) {
+    const formData = new FormData();
+    if (isOwner) {
+      formData.append("title", document.getElementById("title").value);
+      formData.append("price", document.getElementById("price").value);
+      formData.append(
+        "description",
+        document.getElementById("description").value
+      );
+      formData.append("category", category);
+      formData.append("currentValues", currentValues);
+      formData.append("options", options);
+      formData.append("pics", allPics);
+    } else {
+      alert("You have to own the item in order to sell it, try again");
+      Router.push("/");
+    }
+
+    try {
+      console.log(formData);
+      const res = await axios.post(window.location.origin + "/sell", formData);
+      if (res.data.success) {
+        alert("Your item has successfully submitted");
+        Router.push("/browse");
+      }
+    } catch (err) {
+      alert("Your request has not been successful, here is the error:" + err);
+    }
   }
 
   render() {
     const { currentValues } = this.state;
-    console.log(currentValues);
     return (
       <Layout>
         <Container>
@@ -205,6 +236,35 @@ class sell extends Component {
                   width={4}
                 />
               </Form.Group>
+              {/* <Dropzone
+                accept=".jpeg, .png"
+                multiple
+                className="ignore"
+                onDrop={this.onDrop}
+              > */}
+              <Form.Group>
+                <Form.Input
+                  fluid
+                  type="file"
+                  label="Upload your pictures here"
+                  name="file"
+                  id="file"
+                  multiple
+                  onChange={this.handleFiles}
+                >
+                  {/* <Container> */}
+                  {/* <Button
+                    size="huge"
+                    icon="plus"
+                    labelPosition="left"
+                    fluid
+                    content="Upload pictures of your item here (click or drag and drop to grey area)"
+                  /> */}
+                  {/* </Container> */}
+                </Form.Input>
+              </Form.Group>
+              {/* </Dropzone> */}
+
               <Button content="Place item" color="google plus" />
             </Form>
           </div>

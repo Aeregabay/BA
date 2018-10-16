@@ -189,6 +189,110 @@ app
       }
     });
 
+    server.post("/sell", urlEncodedParser, (req, res) => {
+      let objectId;
+      console.log(req.body);
+      let cookie = req.cookies["x-access-token"];
+      if (cookie) {
+        let decoded = jwtDecode(cookie);
+        let username = decoded.username;
+        let objectSql =
+          "INSERT INTO objects (title, description, price, owner, category) VALUES ('" +
+          req.body.title +
+          "', '" +
+          req.body.description +
+          "', '" +
+          req.body.price +
+          "', '" +
+          req.body.username +
+          "', '" +
+          req.body.category +
+          "'";
+
+        let objectIdSql =
+          "SELECT id FROM objects WHERE title = '" +
+          req.body.title +
+          "' AND description = '" +
+          req.body.description +
+          "' AND price = '" +
+          req.body.price +
+          "' AND owner = '" +
+          req.body.username +
+          "' AND category = '" +
+          req.body.category +
+          "'";
+
+        database.connection.query(objectSql, (err, objectResult) => {
+          //if query fails
+          if (err) {
+            console.log("The object insertion has failed");
+            console.log(err);
+          } else {
+            console.log(objectResult);
+            database.connection.query(objectIdSql, (err, objectIdResult) => {
+              //if query fails
+              if (err) {
+                console.log("The objectIdSearch has failed");
+                console.log(err);
+              } else {
+                objectId = objectIdResult;
+              }
+            });
+          }
+        });
+
+        let tags = req.body.currentValues;
+        let i;
+        for (i = 0; i < tags.length; i++) {
+          let tagsSql =
+            "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
+            objectId +
+            "', '" +
+            tags[i].value +
+            "'";
+          database.connection.query(tagsSql, (err, tagsResult) => {
+            //if query fails
+            if (err) {
+              console.log("The tags insertion has failed at tag " + i);
+              console.log(err);
+            } else {
+              console.log(tagsResult);
+            }
+          });
+        }
+
+        let pics = req.body.pics;
+        for (i = 0; i < pics.length; i++) {
+          let picsSql =
+            "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
+            objectId +
+            "', '" +
+            username +
+            "_" +
+            pics[i].name +
+            "'";
+
+          database.connection.query(picsSql, (err, picsResult) => {
+            //if query fails
+            if (err) {
+              console.log("The pics insertion has failed at pic " + i);
+              console.log(err);
+            } else {
+              console.log(picsResult);
+              picsResult.status(200).json({
+                success: true,
+                message: "The object has successfully been inserted into the DB"
+              });
+            }
+          });
+        }
+        res.status(200).json({
+          success: true,
+          userData: result
+        });
+      }
+    });
+
     server.post("/getCookie", urlEncodedParser, (req, res) => {
       let cookie = req.cookies["x-access-token"];
       let username;
