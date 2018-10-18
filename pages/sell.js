@@ -89,6 +89,22 @@ class sell extends Component {
     this.state = { files: [] };
   }
 
+  //load tags from DB to choose from
+  async componentDidMount() {
+    let tags = await axios.post(window.location.origin + "/getTags");
+    if (tags.data.success) {
+      for (let i = 0; i < tags.data.tags.length; i++) {
+        options.push({
+          key: tags.data.tags[i].content,
+          text: tags.data.tags[i].content,
+          value: tags.data.tags[i].content
+        });
+      }
+    } else {
+      alert("The tag retrieval was not successfull on the client side");
+    }
+  }
+
   async onSubmit(e) {
     //create FormData with object details to send to server
     let formData = new FormData();

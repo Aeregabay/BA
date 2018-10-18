@@ -358,6 +358,21 @@ app
       res.status(200).send({ message: "successful logout" });
     });
 
+    server.post("/getTags", urlEncodedParser, (req, res) => {
+      let tagSql = "SELECT content FROM tags;";
+
+      database.connection.query(tagSql, (err, result) => {
+        if (err) {
+          console.log("The tag retrieval was not successful..." + err);
+        } else {
+          res.status(200).json({
+            success: true,
+            tags: result
+          });
+        }
+      });
+    });
+
     server.get("*", (req, res) => {
       return handler(req, res);
     });
