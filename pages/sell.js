@@ -74,10 +74,7 @@ const ownerOptions = [
   { key: "no", text: "No", value: "no" }
 ];
 
-let options = [
-  { key: "computers", text: "Computers", value: "Computers" },
-  { key: "cars", text: "Cars", value: "Cars" }
-];
+let options = [];
 let isOwner = false;
 let category = "";
 let currentValues = [];
