@@ -13,19 +13,20 @@ const jwtDecode = require("jwt-decode");
 const cookieParser = require("cookie-parser");
 const secret = "realmadrid";
 const cors = require("cors");
+const fileUpload = require("express-fileupload");
 
 app
   .prepare()
   .then(() => {
     const server = express();
 
-    //Register Data (probably not used in future) in DB
     server.use(bodyParser.text());
     server.use(bodyParser.json());
     server.use(cors());
     server.use(cookieParser());
-    //protect the pages that should not be available if user is not logged in
+    server.use(fileUpload());
 
+    //Register Data (probably not used in future) in DB
     server.post("/register", urlEncodedParser, (req, res) => {
       //check whether username already exists in DB
       let sqlSearch =
@@ -154,9 +155,11 @@ app
       });
     });
 
+    //catch request to admin page and check whether user has adminrights or not
     server.get("/admin", hasAdminRights, (req, res, next) => {
       return next();
     });
+    //catch requests to myprofile, sell and settings page and check whether user is logged in or not
     server.get("/myprofile", isLoggedIn, (req, res, next) => {
       return next();
     });
@@ -167,15 +170,19 @@ app
       return next();
     });
 
+    //My Profile page request
     server.post("/myprofile", urlEncodedParser, (req, res) => {
+      //check if cookie is available
       let cookie = req.cookies["x-access-token"];
+      //if available, decode username and fetch data from DB
       if (cookie) {
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
         let sql =
           "SELECT * FROM users WHERE users.username = '" + username + "'";
         database.connection.query(sql, (err, result) => {
-          //if query fails
+          //This error should not be reached, since the user would already be blocked from
+          //accessing the my profile page on the client side, if he is not logged in
           if (err) {
             console.log("This really shouldn't happen, no username found");
             console.log(err);
@@ -191,13 +198,14 @@ app
 
     //insert object details into DB (different tables)
     server.post("/sell", urlEncodedParser, (req, res) => {
+      //cookie check, again, user is blocked from client side if not logged in
+      //therefore error check on server side not necessary
       let cookie = req.cookies["x-access-token"];
       if (cookie) {
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
-        let objectId;
 
-        //statement for Object details into object table
+        //SQL statement to insert object details into DB
         let objectSql =
           "INSERT INTO objects (title, description, price, owner, category) VALUES ('" +
           req.body.title +
@@ -210,6 +218,17 @@ app
           "', '" +
           req.body.category +
           "')";
+
+        //write object to DB
+        database.connection.query(objectSql, (err, objectResult) => {
+          //if query fails
+          if (err) {
+            console.log("The object insertion has failed");
+            console.log(err);
+          } else {
+            console.log("object success");
+          }
+        });
 
         //statement to get back ObjectId that we need for
         // statements below (tags corresponding to an object)
@@ -226,18 +245,10 @@ app
           req.body.category +
           "'";
 
-        //write object to DB
-        database.connection.query(objectSql, (err, objectResult) => {
-          //if query fails
-          if (err) {
-            console.log("The object insertion has failed");
-            console.log(err);
-          } else {
-            console.log("object success");
-          }
-        });
+        //create objectId variable to write SQL response into it
+        let objectId;
 
-        //get back ObjectId
+        //SQL query to obtain objectId
         database.connection.query(objectIdSql, (err, objectIdResult) => {
           //if query fails
           if (err) {
@@ -248,19 +259,21 @@ app
             objectId = objectIdResult[0].id;
             console.log("objectId retrieval success");
 
+            //TAGS INSERTION BLOCK
             //this block transforms req.body.currentValues into the array we need to
             //insert into the INSERT statement
             let tags = req.body.currentValues;
-            let middleTags = tags[tags.length - 1];
+            let finalTags = tags.split(",");
 
             //initiate the statement and append the statement for each tag inside the tags array
+            //for this, multiple execution has to be enabled in MySQL
             let tagsSql = "";
-            for (let i = 0; i < middleTags.length; i++) {
+            for (let i = 0; i < finalTags.length; i++) {
               tagsSql +=
                 "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
                 objectId +
                 "', '" +
-                middleTags[i] +
+                finalTags[i] +
                 "');";
             }
 
@@ -272,30 +285,52 @@ app
                 console.log(err);
               } else {
                 console.log("tag insertion success");
+
+                //PICS INSERTION BLOCK
+                //create pics array to write req.files.currentValues into it (tags from client side)
+                let pics = [];
+                let picKeys = Object.keys(req.files);
+
+                picKeys.forEach(function(key) {
+                  pics.push(req.files[key]);
+                });
+                //Just like with the tags, create concattenated SQL statement to insert each pic
+                //in pics array into DB
+                let picsSql = "";
+                for (let i = 0; i < pics.length; i++) {
+                  let picName = username + "_" + pics[i].name;
+                  picsSql +=
+                    "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
+                    objectId +
+                    "', '" +
+                    picName +
+                    "');";
+                }
+                //actual SQL query to insert pics into DB
+                database.connection.query(picsSql, (err, picsResult) => {
+                  //if query fails
+                  if (err) {
+                    console.log("The pics insertion has failed");
+                    console.log(err);
+                  } else {
+                    console.log("Pic insertion success");
+
+                    //if successfully inserted into DB, move Pics to local static folder
+                    for (let i = 0; i < pics.length; i++) {
+                      pics[i].mv("static/" + pics[i].name, function(err) {
+                        if (err) {
+                          return res.status(500).send(err);
+                        }
+                      });
+                    }
+                  }
+                });
               }
             });
-
-            // let pics = req.body.pics;
-            // let picsSql =
-            //   "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
-            //   objectId +
-            //   "', '" +
-            //   username +
-            //   "_" +
-            //   pics[i].name +
-            //   "')";
-            // for (pic in pics) {
-            //   database.connection.query(picsSql, (err, picsResult) => {
-            //     //if query fails
-            //     if (err) {
-            //       console.log("The pics insertion has failed");
-            //       console.log(err);
-            //     }
-            //   });
-            // }
           }
         });
       }
+      //if everything succeeded, send confirmation to client side
       res.status(200).json({
         success: true,
         message: "The object has successfully been inserted into the DB"

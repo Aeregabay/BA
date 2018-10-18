@@ -90,29 +90,37 @@ class sell extends Component {
   }
 
   async onSubmit(e) {
-    //create array with object details to send to server
-    let myFormData;
+    //create FormData with object details to send to server
+    let formData = new FormData();
     if (isOwner) {
-      myFormData = {
-        title: document.getElementById("title").value,
-        price: document.getElementById("price").value,
-        description: document.getElementById("description").value,
-        category: category,
-        currentValues: currentValues,
-        options: options,
-        pics: allPics
-      };
+      //these properties are fetchable via document.getElementById() from JSX part
+      formData.append("title", document.getElementById("title").value);
+      formData.append("price", document.getElementById("price").value);
+      formData.append(
+        "description",
+        document.getElementById("description").value
+      );
+      //these properties were written into variables by their onChange methods and
+      //retrieved that way
+      formData.append("category", category);
+      formData.append("currentValues", currentValues);
+      formData.append("options", options);
+
+      //append all pics inside allPics array to the formData individually with
+      //incrementing key names like pic$ (pic0, pic1, etc...)
+      for (let i = 0; i < allPics.length; i++) {
+        formData.append("pic" + i, allPics[i]);
+      }
     } else {
       alert("You have to own the item in order to sell it, try again");
       Router.push("/");
     }
 
-    //send created array to server
+    //send created formData to server
     try {
-      const res = await axios.post(
-        window.location.origin + "/sell",
-        myFormData
-      );
+      const res = await axios.post(window.location.origin + "/sell", formData);
+
+      //when successful, redirect to /browse page
       if (res.data.success) {
         alert("Your item has successfully submitted");
         Router.push("/browse");
@@ -127,7 +135,7 @@ class sell extends Component {
   };
 
   handleChange = (e, { value }) => {
-    currentValues.push(value);
+    currentValues[0] = value;
   };
 
   handleCategoryChange = (e, { value }) => {
