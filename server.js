@@ -373,6 +373,82 @@ app
       });
     });
 
+    server.post("/getObjects", urlEncodedParser, (req, res) => {
+      let objectSql = "SELECT * FROM objects LIMIT 10;";
+      let objectIds = [];
+      let resultingTags = [];
+      let resultingPics = [];
+      let objectsToSend;
+
+      database.connection.query(objectSql, (err, objects) => {
+        if (err) {
+          console.log("The object retrieval from the DB has failed");
+        } else {
+          for (let i = 0; i < objects.length; i++) {
+            objectIds.push(objects[i].id);
+          }
+          objectsToSend = objects;
+          for (let i = 0; i < objectIds.length; i++) {
+            let correspTags =
+              "SELECT * FROM tags WHERE corresp_obj_id = '" +
+              objectIds[i] +
+              "';";
+            database.connection.query(correspTags, (err, tags) => {
+              if (err) {
+                console.log("The tags retrieval from the DB has failed");
+              } else {
+                for (let i = 0; i < tags.length; i++) {
+                  let tag = [
+                    {
+                      id: tags[i].id,
+                      corresp_obj_id: tags[i].corresp_obj_id,
+                      content: tags[i].content
+                    }
+                  ];
+                  resultingTags.push(tag);
+                }
+              }
+            });
+          }
+          for (let i = 0; i < objects.length; i++) {
+            let correspPics =
+              "SELECT * FROM pics WHERE corresp_obj_id = '" +
+              objectIds[i] +
+              "';";
+            database.connection.query(correspPics, (err, pics) => {
+              if (err) {
+                console.log("The pics retrieval from the DB has failed");
+              } else {
+                for (let i = 0; i < pics.length; i++) {
+                  let pic = [
+                    {
+                      id: pics[i].id,
+                      corresp_obj_id: pics[i].corresp_obj_id,
+                      name: pics[i].name
+                    }
+                  ];
+                  resultingPics.push(pic);
+                  console.log("431");
+                }
+              }
+            });
+          }
+        }
+      });
+      console.log("437");
+      console.log(resultingPics);
+      console.log(resultingTags);
+      res.status(200).send({
+        objectIds,
+        objectsToSend,
+        resultingTags,
+        resultingPics,
+        message: "The object retrieval has been successful",
+        success: true
+      });
+      console.log("finished");
+    });
+
     server.get("*", (req, res) => {
       return handler(req, res);
     });

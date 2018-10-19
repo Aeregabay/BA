@@ -1,15 +1,39 @@
 import React, { Component } from "react";
 import { Container } from "semantic-ui-react";
+import axios from "axios";
 
 class Itemlist extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      initObjects: [],
+      initObjectIds: [],
+      initObjectTags: [],
+      initObjectPics: []
+    };
+  }
+
+  async componentDidMount() {
+    let objects = await axios.post(window.location.origin + "/getObjects");
+    if (objects.data.success) {
+      this.setState({
+        initObjects: objects.data.objects,
+        initObjectIds: objects.data.objectIds,
+        initObjectTags: objects.data.resultingTags,
+        initObjectPics: objects.data.resultingPics
+      });
+      console.log(objects.data.objects);
+      console.log(objects.data.objectIds);
+      console.log(objects.data.resultingTags);
+      console.log(objects.data.resultingPics);
+    } else {
+      console.log("failure");
+    }
   }
   render() {
     return (
       <Container>
-        <div className="ui items">
+        {/* <div className="ui items">
           {}
           <div className="item">
             <div className="ui small image">
@@ -54,7 +78,7 @@ class Itemlist extends Component {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </Container>
     );
   }
