@@ -17,15 +17,11 @@ class Itemlist extends Component {
     let objects = await axios.post(window.location.origin + "/getObjects");
     if (objects.data.success) {
       this.setState({
-        initObjects: objects.data.objects,
+        initObjects: objects.data.objectsToSend,
         initObjectIds: objects.data.objectIds,
         initObjectTags: objects.data.resultingTags,
         initObjectPics: objects.data.resultingPics
       });
-      console.log(objects.data.objects);
-      console.log(objects.data.objectIds);
-      console.log(objects.data.resultingTags);
-      console.log(objects.data.resultingPics);
     } else {
       console.log("failure");
     }

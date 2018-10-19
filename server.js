@@ -373,30 +373,42 @@ app
       });
     });
 
+    //get objects from DB to display in /browse page for ItemList component
     server.post("/getObjects", urlEncodedParser, (req, res) => {
+      //select statement for 10 objects from DB to display
       let objectSql = "SELECT * FROM objects LIMIT 10;";
+
+      //arrays to return in the final statement
       let objectIds = [];
       let resultingTags = [];
       let resultingPics = [];
-      let objectsToSend;
+      let objectsToSend = [];
 
+      //actually fetch objects from DB
       database.connection.query(objectSql, (err, objects) => {
         if (err) {
           console.log("The object retrieval from the DB has failed");
         } else {
+          //create objectsId array that we need to fetch the corresponding tags and pics
           for (let i = 0; i < objects.length; i++) {
             objectIds.push(objects[i].id);
           }
+          //set query result to local variable to return in the end
           objectsToSend = objects;
+
+          //multiple execution statement for fetching all tags corresponding to a certain item
           for (let i = 0; i < objectIds.length; i++) {
             let correspTags =
               "SELECT * FROM tags WHERE corresp_obj_id = '" +
               objectIds[i] +
               "';";
+
+            //execute statement above
             database.connection.query(correspTags, (err, tags) => {
               if (err) {
                 console.log("The tags retrieval from the DB has failed");
               } else {
+                //create tag objects to send to client, loop because multiple tags per objectId
                 for (let i = 0; i < tags.length; i++) {
                   let tag = [
                     {
@@ -405,12 +417,15 @@ app
                       content: tags[i].content
                     }
                   ];
+                  //push created tags to array that we return to the client
                   resultingTags.push(tag);
                 }
               }
             });
           }
-          for (let i = 0; i < objects.length; i++) {
+
+          //exactly the same procedure for pics retrieval (see tag retrieval)
+          for (i = 0; i < objectIds.length; i++) {
             let correspPics =
               "SELECT * FROM pics WHERE corresp_obj_id = '" +
               objectIds[i] +
@@ -428,25 +443,25 @@ app
                     }
                   ];
                   resultingPics.push(pic);
-                  console.log("431");
                 }
               }
             });
           }
         }
       });
-      console.log("437");
-      console.log(resultingPics);
-      console.log(resultingTags);
-      res.status(200).send({
-        objectIds,
-        objectsToSend,
-        resultingTags,
-        resultingPics,
-        message: "The object retrieval has been successful",
-        success: true
-      });
-      console.log("finished");
+      //timeout to prevent status to be sent before sql queries are returned
+      //without this, empty arrays are sent to client and headers will be tried to be set
+      //after they've been sent, which results in an error
+      setTimeout(function() {
+        res.status(200).send({
+          objectIds,
+          objectsToSend,
+          resultingTags,
+          resultingPics,
+          message: "The object retrieval has been successful",
+          success: true
+        });
+      }, 50);
     });
 
     server.get("*", (req, res) => {

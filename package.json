@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "ajv": "^6.0.0",
+    "async-series": "0.0.1",
     "axios": "^0.18.0",
     "babel-loader": "^8.0.4",
     "babel-preset-env": "^1.7.0",
