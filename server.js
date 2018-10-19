@@ -317,11 +317,14 @@ app
 
                     //if successfully inserted into DB, move Pics to local static folder
                     for (let i = 0; i < pics.length; i++) {
-                      pics[i].mv("static/" + pics[i].name, function(err) {
-                        if (err) {
-                          return res.status(500).send(err);
+                      pics[i].mv(
+                        "static/" + username + "_" + pics[i].name,
+                        function(err) {
+                          if (err) {
+                            return res.status(500).send(err);
+                          }
                         }
-                      });
+                      );
                     }
                   }
                 });

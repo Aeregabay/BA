@@ -152,7 +152,11 @@ class sell extends Component {
   };
 
   handleCategoryChange = (e, { value }) => {
-    category = value;
+    for (let i = 0; i < categories.length; i++) {
+      if (value === categories[i].value) {
+        category = categories[i].text;
+      }
+    }
   };
 
   isOwner = (e, { value }) => {

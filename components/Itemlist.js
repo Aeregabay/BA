@@ -1,5 +1,13 @@
 import React, { Component } from "react";
-import { Container } from "semantic-ui-react";
+import {
+  Container,
+  Card,
+  Icon,
+  Image,
+  CardHeader,
+  CardMeta,
+  CardDescription
+} from "semantic-ui-react";
 import axios from "axios";
 
 class Itemlist extends Component {
@@ -25,11 +33,82 @@ class Itemlist extends Component {
     } else {
       console.log("failure");
     }
+
+    this.renderObjects();
+  }
+
+  renderObjects() {
+    let finalObjects = [];
+
+    for (let i = 0; i < this.state.initObjects.length; i++) {
+      let tags = [];
+      let pics = [];
+      let title = this.state.initObjects[i].title;
+      let description = this.state.initObjects[i].description;
+      let id = this.state.initObjects[i].id;
+      let owner = this.state.initObjects[i].owner;
+      let price = this.state.initObjects[i].price;
+      let category = this.state.initObjects[i].category;
+
+      for (let i = 0; i < this.state.initObjectTags.length; i++) {
+        if (this.state.initObjectTags[i][0].corresp_obj_id === id) {
+          tags.push(this.state.initObjectTags[i][0].content + " | ");
+        }
+      }
+      for (let i = 0; i < this.state.initObjectPics.length; i++) {
+        if (this.state.initObjectPics[i][0].corresp_obj_id == id) {
+          pics.push(this.state.initObjectPics[i][0].name);
+        }
+      }
+
+      let imgSrc = "../static/" + pics[0];
+
+      finalObjects.push(
+        <div style={{ marginBottom: "30px", marginRight: "30px" }}>
+          <Card style={{ maxHeight: "500px" }}>
+            <Image
+              src={imgSrc}
+              style={{
+                maxHeight: "300px",
+                maxWidth: "300px"
+              }}
+            />
+            <Card.Content>
+              <Card.Header>{title}</Card.Header>
+              <Card.Meta>{price}</Card.Meta>
+              <Card.Description>{description}</Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              <a>
+                <Icon name="filter" />
+                {category}
+              </a>
+              <p />
+              <a>
+                <Icon name="tags" />
+                {tags}
+              </a>
+            </Card.Content>
+          </Card>
+        </div>
+      );
+    }
+
+    return finalObjects;
   }
   render() {
     return (
       <Container>
-        {/* <div className="ui items">
+        <Card.Group centered itemsPerRow={2}>
+          {this.renderObjects()}
+        </Card.Group>
+      </Container>
+    );
+  }
+}
+export default Itemlist;
+{
+  /* <div className="ui items">
           {}
           <div className="item">
             <div className="ui small image">
@@ -74,9 +153,5 @@ class Itemlist extends Component {
               </div>
             </div>
           </div>
-        </div> */}
-      </Container>
-    );
-  }
+        </div> */
 }
-export default Itemlist;
