@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Form, Button, Container } from "semantic-ui-react";
 import axios from "axios";
-import { Router } from "../routes";
+import Router from "../routes";
 import { setCookie } from "../utils/CookieUtils";
 
 class login extends Component {
@@ -27,11 +27,11 @@ class login extends Component {
         //if person logging in is not an admin
         if (res.data.admin == 0) {
           setCookie("x-access-token", res.data.token, 1);
-          Router.push("/myprofile");
+          Router.pushRoute("myprofile");
           //if person is an admin
         } else {
           setCookie("x-access-token", res.data.adminToken, 1);
-          Router.push("/admin");
+          Router.pushRoute("admin");
         }
       } else if (res.data.success == false && res.data.userExists == false) {
         alert("Username or password incorrect, please try again");

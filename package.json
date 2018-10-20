@@ -23,6 +23,7 @@
     "mysql": "^2.16.0",
     "next": "^7.0.2",
     "next-routes": "^1.4.2",
+    "nextjs-dynamic-routes": "^2.2.0",
     "popper.js": "^1.14.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",

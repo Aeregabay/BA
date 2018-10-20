@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Button, Header, Container } from "semantic-ui-react";
-import { Router } from "../routes";
+import Router from "../routes";
 import axios from "axios";
 
 class error extends Component {
@@ -20,10 +20,10 @@ class error extends Component {
   }
 
   toProfile = () => {
-    Router.push("/myprofile");
+    Router.pushRoute("myprofile");
   };
   toLogin = () => {
-    Router.push("/login");
+    Router.pushRoute("login");
   };
 
   render() {

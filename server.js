@@ -1,7 +1,7 @@
 const next = require("next");
-const routes = require("./routes");
+const router = require("./routes");
 const app = next({ dev: process.env.NODE_ENV !== "production" });
-const handler = routes.getRequestHandler(app);
+const handler = router.getRequestHandler(app);
 const bodyParser = require("body-parser");
 const urlEncodedParser = bodyParser.urlencoded({ extended: false });
 const database = require("./database");
@@ -167,6 +167,10 @@ app
       return next();
     });
     server.get("/settings", isLoggedIn, (req, res, next) => {
+      return next();
+    });
+    server.get("/", (req, res, next) => {
+      res.redirect("/index");
       return next();
     });
 
@@ -465,6 +469,21 @@ app
           success: true
         });
       }, 50);
+    });
+
+    server.post("/item/:id", (req, res) => {
+      let objectId = req.body.objectId;
+      let getObjectSql = "SELECT * FROM objects WHERE id ='" + objectId + "';";
+      let object;
+
+      database.connection.query(getObjectSql, (err, res) => {
+        if (err) {
+          console.log(err);
+          console.log("The retrieval of object #" + objectId + " has failed.");
+        } else {
+          console.log(res);
+        }
+      });
     });
 
     server.get("*", (req, res) => {

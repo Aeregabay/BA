@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Router } from "../routes";
+import Router from "../routes";
 import { Container, Form, Button, Header, Icon } from "semantic-ui-react";
 import axios from "axios";
 
@@ -126,7 +126,7 @@ class sell extends Component {
       }
     } else {
       alert("You have to own the item in order to sell it, try again");
-      Router.push("/");
+      Router.pushRoute("index");
     }
 
     //send created formData to server
@@ -136,7 +136,7 @@ class sell extends Component {
       //when successful, redirect to /browse page
       if (res.data.success) {
         alert("Your item has successfully submitted");
-        Router.push("/browse");
+        Router.pushRoute("browse");
       }
     } catch (err) {
       alert("Your request has not been successful, here is the error:" + err);

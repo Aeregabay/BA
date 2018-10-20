@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { Container, Card, Icon, Image } from "semantic-ui-react";
 import axios from "axios";
+import Router from "../routes";
+
+let currentObjectId = "";
 
 class Itemlist extends Component {
   constructor(props) {
@@ -28,6 +31,11 @@ class Itemlist extends Component {
     }
   }
 
+  pushRoute(id) {
+    let toPushUrl = "/item/" + id;
+    Router.pushRoute("item", { id: id });
+  }
+
   renderObjects() {
     //array to return after all 10 items are constructed
     let finalObjects = [];
@@ -42,6 +50,7 @@ class Itemlist extends Component {
       let title = this.state.initObjects[i].title;
       let description = this.state.initObjects[i].description;
       let id = this.state.initObjects[i].id;
+      currentObjectId = id;
       let owner = this.state.initObjects[i].owner;
       let price = this.state.initObjects[i].price;
       let category = this.state.initObjects[i].category;
@@ -86,9 +95,11 @@ class Itemlist extends Component {
                   maxWidth: "300px",
                   borderRadius: "2px"
                 }}
+                value={id}
+                onClick={this.pushRoute.bind(this, id)}
               />
             </div>
-            <Card.Content style={{}}>
+            <Card.Content style={{}} href="/blabla">
               <Card.Header>{title}</Card.Header>
               <Card.Meta>{price} CHF</Card.Meta>
               <Card.Description>{description}</Card.Description>

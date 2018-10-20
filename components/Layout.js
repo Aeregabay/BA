@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Router, Link } from "../routes";
+import Router from "../routes";
 import { Header, Container, Divider, List } from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
@@ -28,46 +28,46 @@ class Layout extends Component {
   //methods to navigate between pages
   toSell = () => {
     if (this.state.isLoggedIn) {
-      Router.push("/sell");
+      Router.pushRoute("sell");
     } else {
       alert("You need to be logged in to access this page");
-      Router.push("/login");
+      Router.pushRoute("login");
     }
   };
   toProfile = () => {
     if (this.state.isLoggedIn) {
-      Router.push("/myprofile");
+      Router.pushRoute("myprofile");
     } else {
       alert("You need to be logged in to access this page");
-      Router.push("/login");
+      Router.pushRoute("login");
     }
   };
   toSettings = () => {
     if (this.state.isLoggedIn) {
-      Router.push("/settings");
+      Router.pushRoute("settings");
     } else {
       alert("You need to be logged in to access this page");
-      Router.push("/login");
+      Router.pushRoute("login");
     }
   };
   toBrowse = e => {
-    Router.push("/browse");
+    Router.pushRoute("browse");
   };
   toLogin = e => {
-    Router.push("/login");
+    Router.pushRoute("login");
   };
   toRegister = e => {
-    Router.push("/register");
+    Router.pushRoute("register");
   };
-  toHome = e => {
-    Router.push("/");
+  toIndex = e => {
+    Router.pushRoute("index");
   };
   logout = async () => {
     const res = await axios.post(
       window.location.origin + "/deleteCookie",
       this.state.cookie
     );
-    Router.push("/");
+    Router.pushRoute("index");
     alert("You've successfully logged out");
   };
 
@@ -93,7 +93,7 @@ class Layout extends Component {
             className="ui menu"
             style={{ marginTop: "30px", marginBottom: "40px" }}
           >
-            <a className="header item" onClick={this.toHome}>
+            <a className="header item" onClick={this.toIndex}>
               Home
             </a>
             <a className="item" onClick={this.toBrowse}>

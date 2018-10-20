@@ -3,7 +3,7 @@ import Layout from "../components/Layout";
 import { Container, Header } from "semantic-ui-react";
 import axios from "axios";
 import getCurrentUser from "../utils/UserUtils";
-import { Router } from "../routes";
+import Router from "../routes";
 
 class ProfileBody extends Component {
   constructor(props) {
@@ -25,7 +25,7 @@ class ProfileBody extends Component {
   }
   //method to go to admin page only if user is admin and on his profile page
   toAdmin = e => {
-    Router.push("/admin");
+    Router.pushRoute("admin");
   };
   //functions to toggle clickable for adminpage button
   clickableTrue() {

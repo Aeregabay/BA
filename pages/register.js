@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Button, Form, Container } from "semantic-ui-react";
 import axios from "axios";
-import { Router } from "../routes";
+import Router from "../routes";
 
 class register extends Component {
   constructor(props) {
@@ -21,7 +21,7 @@ class register extends Component {
         alert(
           "Congratulations, you've successfully registred. Now proceed to the login page"
         );
-        Router.push("/login");
+        Router.pushRoute("login");
       }
     } catch (error) {
       console.log(error);
