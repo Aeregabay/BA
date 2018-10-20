@@ -31,8 +31,7 @@ class Itemlist extends Component {
     }
   }
 
-  pushRoute(id) {
-    let toPushUrl = "/item/" + id;
+  async pushRoute(id) {
     Router.pushRoute("item", { id: id });
   }
 

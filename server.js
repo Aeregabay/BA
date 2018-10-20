@@ -471,17 +471,46 @@ app
       }, 50);
     });
 
-    server.post("/item/:id", (req, res) => {
-      let objectId = req.body.objectId;
+    server.post("/item", (req, res) => {
+      let objectId = req.body.id;
       let getObjectSql = "SELECT * FROM objects WHERE id ='" + objectId + "';";
+      let tagSql =
+        "SELECT content FROM tags WHERE corresp_obj_id ='" + objectId + "';";
+      let picSql =
+        "SELECT name FROM pics WHERE corresp_obj_id ='" + objectId + "';";
       let object;
+      let tags = [];
+      let pics = [];
 
-      database.connection.query(getObjectSql, (err, res) => {
+      database.connection.query(getObjectSql, (err, resObject) => {
         if (err) {
           console.log(err);
           console.log("The retrieval of object #" + objectId + " has failed.");
         } else {
-          console.log(res);
+          object = resObject;
+          database.connection.query(tagSql, (err, resTags) => {
+            if (err) {
+              console.log(err);
+              console.log(
+                "The retrieval of tags for object #" + objectId + " has failed."
+              );
+            } else {
+              tags = resTags;
+              database.connection.query(picSql, (err, resPics) => {
+                if (err) {
+                  console.log(err);
+                  console.log(
+                    "The retrieval of pics for object #" +
+                      objectId +
+                      " has failed."
+                  );
+                } else {
+                  pics = resPics;
+                  res.status(200).send({ success: true, object, tags, pics });
+                }
+              });
+            }
+          });
         }
       });
     });
@@ -498,7 +527,7 @@ app
     //protect all pages exept the ones below from access without login
     server.use(
       unless(
-        ["/login", "/browse", "/index", "/register", "/_next"],
+        ["/login", "/browse", "/index", "/register", "/_next", "/item/:id"],
         (req, res, next) => {
           const token = req.cookies["x-access-token"];
           console.log(token);
