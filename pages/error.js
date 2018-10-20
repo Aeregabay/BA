@@ -10,7 +10,7 @@ class error extends Component {
     this.state = { cookie: "" };
   }
 
-  async componentDidMount() {
+  async componentWillMount() {
     let response = await axios.post(window.location.origin + "/getCookie");
     if (response.data.success) {
       this.setState({

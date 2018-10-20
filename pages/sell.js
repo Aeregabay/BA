@@ -87,7 +87,7 @@ class sell extends Component {
   }
 
   //load tags from DB to choose from
-  async componentDidMount() {
+  async componentWillMount() {
     let tags = await axios.post(window.location.origin + "/getTags");
     if (tags.data.success) {
       for (let i = 0; i < tags.data.tags.length; i++) {

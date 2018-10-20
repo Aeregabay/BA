@@ -1,13 +1,5 @@
 import React, { Component } from "react";
-import {
-  Container,
-  Card,
-  Icon,
-  Image,
-  CardHeader,
-  CardMeta,
-  CardDescription
-} from "semantic-ui-react";
+import { Container, Card, Icon, Image } from "semantic-ui-react";
 import axios from "axios";
 
 class Itemlist extends Component {
@@ -21,6 +13,7 @@ class Itemlist extends Component {
     };
   }
 
+  //fetch 10 objects from DB at page loadup and write to state
   async componentDidMount() {
     let objects = await axios.post(window.location.origin + "/getObjects");
     if (objects.data.success) {
@@ -33,16 +26,19 @@ class Itemlist extends Component {
     } else {
       console.log("failure");
     }
-
-    this.renderObjects();
   }
 
   renderObjects() {
+    //array to return after all 10 items are constructed
     let finalObjects = [];
 
+    //this whole following process has to be done for all objects
+    //that were initially fetched
     for (let i = 0; i < this.state.initObjects.length; i++) {
+      //arrays to be filled with only necessary information
       let tags = [];
       let pics = [];
+      //variables to make further code easier to read
       let title = this.state.initObjects[i].title;
       let description = this.state.initObjects[i].description;
       let id = this.state.initObjects[i].id;
@@ -50,35 +46,59 @@ class Itemlist extends Component {
       let price = this.state.initObjects[i].price;
       let category = this.state.initObjects[i].category;
 
+      //for each object, write all the tags that correspond to it
+      //from the initObjectTags array to this new array
       for (let i = 0; i < this.state.initObjectTags.length; i++) {
         if (this.state.initObjectTags[i][0].corresp_obj_id === id) {
           tags.push(this.state.initObjectTags[i][0].content + " | ");
         }
       }
+
+      //for each object, write all the pics that correspond to it
+      //from the initObjectPics array to this new array
       for (let i = 0; i < this.state.initObjectPics.length; i++) {
         if (this.state.initObjectPics[i][0].corresp_obj_id == id) {
           pics.push(this.state.initObjectPics[i][0].name);
         }
       }
+      //remove the vertical divider from the last tag for nicer display
+      tags[tags.length - 1] = tags[tags.length - 1].substring(
+        0,
+        tags[tags.length - 1].length - 2
+      );
 
+      //create img source
       let imgSrc = "../static/" + pics[0];
 
+      //create the actual JSX objects and push to array that is returned
       finalObjects.push(
         <div style={{ marginBottom: "30px", marginRight: "30px" }}>
-          <Card style={{ maxHeight: "500px" }}>
-            <Image
-              src={imgSrc}
+          <Card raised link style={{ height: "500px", width: "300px" }}>
+            <div
               style={{
-                maxHeight: "300px",
-                maxWidth: "300px"
+                height: "330px"
               }}
-            />
-            <Card.Content>
+            >
+              <Image
+                src={imgSrc}
+                style={{
+                  maxHeight: "300px",
+                  maxWidth: "300px",
+                  borderRadius: "2px"
+                }}
+              />
+            </div>
+            <Card.Content style={{}}>
               <Card.Header>{title}</Card.Header>
-              <Card.Meta>{price}</Card.Meta>
+              <Card.Meta>{price} CHF</Card.Meta>
               <Card.Description>{description}</Card.Description>
             </Card.Content>
             <Card.Content extra>
+              <a>
+                <Icon name="user secret" />
+                {owner}
+              </a>
+              <p />
               <a>
                 <Icon name="filter" />
                 {category}
@@ -98,8 +118,13 @@ class Itemlist extends Component {
   }
   render() {
     return (
-      <Container>
-        <Card.Group centered itemsPerRow={2}>
+      <Container
+        style={{
+          marginTop: "30px",
+          display: "flex"
+        }}
+      >
+        <Card.Group centered itemsPerRow={3}>
           {this.renderObjects()}
         </Card.Group>
       </Container>
