@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Button, Form, Container } from "semantic-ui-react";
+import { Button, Form, Container, Message } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
 
@@ -33,8 +33,8 @@ class register extends Component {
       <Layout>
         <Container>
           <div>
-            <h2>Register here to trade!</h2>
-            <Form onSubmit={this.onSubmit}>
+            <Message attached header="Register here to trade!" />
+            <Form onSubmit={this.onSubmit} className="attached fluid segment">
               <Form.Group>
                 <Form.Input
                   id="username"

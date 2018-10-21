@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Form, Button, Container } from "semantic-ui-react";
+import { Form, Button, Container, Message } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
 import { setCookie } from "../utils/CookieUtils";
@@ -46,8 +46,8 @@ class login extends Component {
       <Layout>
         <div>
           <Container>
-            <h3>Login using your personal information</h3>
-            <Form onSubmit={this.onSubmit}>
+            <Message attached header="Login using your personal information." />
+            <Form onSubmit={this.onSubmit} className="attached fluid segment">
               <Form.Group>
                 <Form.Input
                   id="username"
