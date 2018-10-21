@@ -264,12 +264,6 @@ class sell extends Component {
                   width={4}
                 />
               </Form.Group>
-              {/* <Dropzone
-                accept=".jpeg, .png"
-                multiple
-                className="ignore"
-                onDrop={this.onDrop}
-              > */}
               <Form.Group>
                 <Form.Input
                   fluid
@@ -279,19 +273,8 @@ class sell extends Component {
                   id="file"
                   multiple
                   onChange={this.handleFiles}
-                >
-                  {/* <Container> */}
-                  {/* <Button
-                    size="huge"
-                    icon="plus"
-                    labelPosition="left"
-                    fluid
-                    content="Upload pictures of your item here (click or drag and drop to grey area)"
-                  /> */}
-                  {/* </Container> */}
-                </Form.Input>
+                />
               </Form.Group>
-              {/* </Dropzone> */}
 
               <Button content="Place item" color="google plus" />
             </Form>

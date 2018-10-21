@@ -506,7 +506,9 @@ app
                   );
                 } else {
                   pics = resPics;
-                  res.status(200).send({ success: true, object, tags, pics });
+                  res
+                    .status(200)
+                    .send({ success: true, object, tags, pics, id: objectId });
                 }
               });
             }
