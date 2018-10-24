@@ -42,6 +42,8 @@ class Itemlist extends Component {
     //this whole following process has to be done for all objects
     //that were initially fetched
     for (let i = 0; i < this.state.initObjects.length; i++) {
+      let uniqueKey = "Card" + i;
+
       //arrays to be filled with only necessary information
       let tags = [];
       let pics = [];
@@ -80,7 +82,10 @@ class Itemlist extends Component {
 
       //create the actual JSX objects and push to array that is returned
       finalObjects.push(
-        <div style={{ marginBottom: "30px", marginRight: "30px" }}>
+        <div
+          key={uniqueKey}
+          style={{ marginBottom: "30px", marginRight: "30px" }}
+        >
           <Card raised link style={{ height: "500px", width: "300px" }}>
             <div
               style={{
