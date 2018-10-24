@@ -19,10 +19,13 @@ class item extends Component {
     };
   }
 
+  //fetch object from server and write to state
   async componentWillMount() {
     let thisObject;
+
     let pathname = window.location.pathname.split("/");
     let id = pathname[pathname.length - 1];
+
     let response = await axios.post(window.location.origin + "/item", { id });
     if (response.data.success) {
       thisObject = response.data.object;
@@ -46,6 +49,7 @@ class item extends Component {
   }
 
   render() {
+    //settings for react-slick plugin
     const settings = {
       dots: true,
       infinite: true,
@@ -53,15 +57,12 @@ class item extends Component {
       slidesToScroll: 1,
       fade: true,
       speed: 500,
-      dotsClass: "slick-dots slick-thumb",
-      adaptiveHeight: true,
-      focusOnSelect: true,
-      onEdge: true,
       prevArrow: <CustomPrevArrow />,
       nextArrow: <CustomNextArrow />
     };
     return (
       <div>
+        {/* import stylesheets for react-slick plugin */}
         <head>
           <link
             rel="stylesheet"
@@ -78,6 +79,7 @@ class item extends Component {
         <Layout>
           <Container textAlign="center">
             <Header size="huge">{this.state.title}</Header>
+            {/* Slider from react-slick and map all the pics into the Slider */}
             <Slider {...settings} style={{ margin: "auto" }}>
               {this.state.pics.map((pic, i) => (
                 <div>
@@ -98,6 +100,8 @@ class item extends Component {
 
 export default item;
 
+//custom buttons for navigating through the image gallery
+//standard buttons are white and therefore not visible on white background
 function CustomNextArrow(props) {
   const { className, style, onClick } = props;
   return (
