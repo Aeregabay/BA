@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import Router from "../routes";
-import { Container, Form, Button, Header, Icon } from "semantic-ui-react";
+import { Container, Form, Button, Header, FormInput } from "semantic-ui-react";
 import axios from "axios";
+import NumberFormat from "react-number-format";
 
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -92,7 +93,9 @@ class sell extends Component {
     if (tags.data.success) {
       for (let i = 0; i < tags.data.tags.length; i++) {
         options.push({
-          key: tags.data.tags[i].content,
+          key: Math.random()
+            .toString(36)
+            .substr(2, 16),
           text: tags.data.tags[i].content,
           value: tags.data.tags[i].content
         });
@@ -109,6 +112,7 @@ class sell extends Component {
       //these properties are fetchable via document.getElementById() from JSX part
       formData.append("title", document.getElementById("title").value);
       formData.append("price", document.getElementById("price").value);
+
       formData.append(
         "description",
         document.getElementById("description").value
@@ -144,7 +148,13 @@ class sell extends Component {
   }
 
   handleAddition = (e, { value }) => {
-    options.push({ key: value, text: value, value });
+    options.push({
+      key: Math.random()
+        .toString(36)
+        .substr(2, 16),
+      text: value,
+      value
+    });
   };
 
   handleChange = (e, { value }) => {
@@ -226,16 +236,16 @@ class sell extends Component {
                   required
                   onChange={this.handleCategoryChange}
                 />
-                <Form.Input
-                  fluid="true"
-                  id="price"
-                  control="input"
-                  label="Selling price"
-                  placeholder="Item price"
-                  width={4}
-                  required
-                  type="number"
-                />
+                <FormInput required label="Selling price" fluid>
+                  <NumberFormat
+                    id="price"
+                    placeholder="Item price"
+                    customInput={FormInput}
+                    thousandSeparator="´"
+                    suffix=" CHF"
+                    allowNegative={false}
+                  />
+                </FormInput>
               </Form.Group>
               <Form.Group>
                 <Form.Select

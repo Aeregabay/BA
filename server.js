@@ -14,6 +14,7 @@ const cookieParser = require("cookie-parser");
 const secret = "realmadrid";
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
+const SqlString = require("sqlstring");
 
 app
   .prepare()
@@ -213,11 +214,11 @@ app
         let objectSql =
           "INSERT INTO objects (title, description, price, owner, category) VALUES ('" +
           req.body.title +
-          "', '" +
-          req.body.description +
-          "', '" +
-          req.body.price +
-          "', '" +
+          "', " +
+          SqlString.escape(req.body.description) +
+          ", " +
+          SqlString.escape(req.body.price) +
+          ", '" +
           username +
           "', '" +
           req.body.category +
@@ -239,11 +240,11 @@ app
         let objectIdSql =
           "SELECT id FROM objects WHERE title = '" +
           req.body.title +
-          "' AND description = '" +
-          req.body.description +
-          "' AND price = '" +
-          req.body.price +
-          "' AND owner = '" +
+          "' AND description = " +
+          SqlString.escape(req.body.description) +
+          " AND price = " +
+          SqlString.escape(req.body.price) +
+          " AND owner = '" +
           username +
           "' AND category = '" +
           req.body.category +

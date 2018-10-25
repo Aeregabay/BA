@@ -28,12 +28,14 @@
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-dropzone": "^6.2.3",
+    "react-number-format": "^3.6.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.5",
     "react-slick": "^0.23.2",
     "semantic-ui-css": "^2.4.0",
     "semantic-ui-react": "^0.82.5",
+    "sqlstring": "^2.3.1",
     "webpack-dev-middleware": "^3.4.0"
   },
   "scripts": {

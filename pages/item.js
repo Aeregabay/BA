@@ -149,7 +149,7 @@ class item extends Component {
                       size="mini"
                     />
                   </Header>
-                  <p size="big" style={{ marginLeft: 15 }}>
+                  <p align="justify" size="big" style={{ marginLeft: 15 }}>
                     {this.state.description}
                   </p>
                 </Grid.Column>
@@ -159,7 +159,7 @@ class item extends Component {
                     <Icon name="usd" size="mini" style={{ marginLeft: 10 }} />
                   </Header>
                   <p size="big" style={{ marginRight: 30 }}>
-                    {this.state.price}$
+                    {this.state.price}
                   </p>
                 </Grid.Column>
               </Grid.Row>
@@ -230,7 +230,7 @@ class item extends Component {
                     color="orange"
                     onClick={this.purchaseItem}
                   >
-                    Purchase for {this.state.price}$
+                    Purchase for {this.state.price}
                   </Button>
                 </Grid.Column>
               </Grid.Row>
