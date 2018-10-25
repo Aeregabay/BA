@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Router from "../routes";
-import { Header, Container, Divider, List } from "semantic-ui-react";
+import { Header, Container, Divider, List, Icon } from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
 
@@ -85,7 +85,8 @@ class Layout extends Component {
             size="huge"
             style={{ marginTop: "15px", textAlign: "center" }}
           >
-            EthTrade - Decentralized Trading
+            EthTrade <Icon name="ethereum" />
+            Decentralized Trading
           </Header>
 
           <div
@@ -94,18 +95,23 @@ class Layout extends Component {
             style={{ marginTop: "30px", marginBottom: "40px" }}
           >
             <a className="header item" onClick={this.toIndex}>
+              <Icon name="home" />
               Home
             </a>
             <a className="item" onClick={this.toBrowse}>
+              <Icon name="search" />
               Browse
             </a>
             <a className="item" onClick={this.toSell}>
+              <Icon name="dollar sign" />
               Sell
             </a>
             <a className="item" onClick={this.toProfile}>
+              <Icon name="user" />
               My Profile
             </a>
             <a className="item" onClick={this.toSettings}>
+              <Icon name="settings" />
               Settings
             </a>
             <div className="right menu">
@@ -115,6 +121,7 @@ class Layout extends Component {
                   onClick={this.toRegister}
                   style={{ color: "tomato" }}
                 >
+                  <Icon name="write" />
                   Register
                 </a>
               ) : (
@@ -126,6 +133,7 @@ class Layout extends Component {
                   onClick={this.logout}
                   style={{ color: "tomato" }}
                 >
+                  <Icon name="shutdown" />
                   Logout
                 </a>
               ) : (
@@ -134,6 +142,7 @@ class Layout extends Component {
                   onClick={this.toLogin}
                   style={{ color: "MediumSeaGreen" }}
                 >
+                  <Icon name="key" />
                   Login
                 </a>
               )}
