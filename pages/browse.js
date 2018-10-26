@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import SearchBar from "../components/SearchBar";
 import { Header, Container } from "semantic-ui-react";
 import SearchBarNew from "../components/SearchBarNew";
 import Itemlist from "../components/Itemlist";
@@ -9,30 +8,32 @@ class browse extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchTerm: "",
-      items: [],
-      selectedItem: null
+      objectIds: []
     };
+    this.itemlist = React.createRef();
   }
 
-  itemSearch(searchTerm) {
+  //take search query from search bar and pass it to Itemlist component to display searched items
+  passObjectIds(ids) {
     this.setState({
-      searchTerm
+      objectIds: ids
     });
-    console.log(this.state.searchTerm);
+    this.itemlist.current.updateItems(this.state.objectIds);
   }
 
   render() {
     return (
       <Layout>
         <div>
-          <Container>
+          <Container style={{ align: "center" }}>
             <div>
-              <Header size="medium">Browse for products</Header>
-              <SearchBarNew itemSearch={this.itemSearch.bind(this)} />
+              <Header size="large" style={{ textAlign: "center" }}>
+                Browse for products
+              </Header>
+              <SearchBarNew passObjectIds={this.passObjectIds.bind(this)} />
             </div>
+            <Itemlist ref={this.itemlist} />
           </Container>
-          <Itemlist />
         </div>
       </Layout>
     );

@@ -16,6 +16,24 @@ class Itemlist extends Component {
     };
   }
 
+  //update displayed items after search query input
+  async updateItems(objectIds) {
+    let objects = await axios.post(window.location.origin + "/getObjects", {
+      objectIds
+    });
+
+    if (objects.data.success) {
+      this.setState({
+        initObjects: objects.data.objectsToSend,
+        initObjectIds: objects.data.objectIds,
+        initObjectTags: objects.data.resultingTags,
+        initObjectPics: objects.data.resultingPics
+      });
+    } else {
+      console.log("failure");
+    }
+  }
+
   //fetch 10 objects from DB at page loadup and write to state
   async componentWillMount() {
     let objects = await axios.post(window.location.origin + "/getObjects");
@@ -115,7 +133,7 @@ class Itemlist extends Component {
           <Card raised link style={{ height: "550px", width: "300px" }}>
             <div
               style={{
-                height: "330px"
+                height: "300px"
               }}
             >
               <Image
@@ -175,7 +193,11 @@ class Itemlist extends Component {
           display: "flex"
         }}
       >
-        <Card.Group centered itemsPerRow={3}>
+        <Card.Group
+          centered
+          itemsPerRow={3}
+          style={{ maxWidth: "90%", marginLeft: "6.4%" }}
+        >
           {this.renderObjects()}
         </Card.Group>
       </Container>

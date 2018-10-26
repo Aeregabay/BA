@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import SearchBar from "../components/SearchBar";
 import { Container, Header, Button } from "semantic-ui-react";
 import Layout from "../components/Layout";
 

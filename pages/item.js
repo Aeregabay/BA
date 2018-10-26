@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
-import { Container, Header, Button, Icon, Grid } from "semantic-ui-react";
+import {
+  Container,
+  Header,
+  Button,
+  Icon,
+  Grid,
+  Divider
+} from "semantic-ui-react";
 import Slider from "react-slick";
 import Router from "../routes";
 
@@ -121,6 +128,7 @@ class item extends Component {
         <Layout>
           <Container textAlign="center">
             <Header size="huge">{this.state.title}</Header>
+            <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
 
             {/* Slider from react-slick and map all the pics into the Slider */}
             <Slider {...settings} style={{ margin: "auto" }}>
@@ -134,6 +142,8 @@ class item extends Component {
                 </div>
               ))}
             </Slider>
+            <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
+
             <Grid
               stackable
               columns={2}

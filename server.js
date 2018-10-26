@@ -383,8 +383,17 @@ app
 
     //get objects from DB to display in /browse page for ItemList component
     server.post("/getObjects", urlEncodedParser, (req, res) => {
-      //select statement for 10 objects from DB to display
-      let objectSql = "SELECT * FROM objects LIMIT 10;";
+      let objectSql;
+
+      //if function is called to update objects (with search query)
+      if (req.body.objectIds) {
+        objectSql =
+          "SELECT * FROM objects WHERE id IN (" + req.body.objectIds + ")";
+      } else {
+        //select statement for 10 objects from DB to display
+        //this is done on browse page startup (without search query)
+        objectSql = "SELECT * FROM objects LIMIT 10;";
+      }
 
       //arrays to return in the final statement
       let objectIds = [];
@@ -516,6 +525,91 @@ app
           });
         }
       });
+    });
+
+    //searchterm entry on browse page
+    server.post("/search", (req, res) => {
+      //take query from client and split into single terms to search individually
+      let searchQuery = req.body.query;
+      let terms = searchQuery.split(" ");
+
+      //escape the content of the terms (to prevent apostrophes from breaking the sql query)
+      //remove the apostrophes around the term after escaping
+      for (let i = 0; i < terms.length; i++) {
+        terms[i] = SqlString.escape(terms[i]);
+        terms[i] = terms[i].substring(1, terms[i].length - 1);
+      }
+
+      //array of objectIds to return in the end
+      let objectIds = [];
+
+      //look for each term in all the object titles
+      //if any title contains the term, the objects id is added to the array
+      for (let i = 0; i < terms.length; i++) {
+        let titleTerm =
+          "SELECT id FROM objects WHERE title LIKE '%" + terms[i] + "%'";
+        database.connection.query(titleTerm, (err, titleResult) => {
+          if (err) {
+            console.log("Term search in objects/title failed");
+            console.log(err);
+          } else {
+            for (let i = 0; i < titleResult.length; i++) {
+              objectIds.push(titleResult[i].id);
+            }
+          }
+        });
+
+        //If any tag corresponds or contains the term, it's corresponding object id
+        //will be added
+        let tagTerm =
+          "SELECT corresp_obj_id FROM tags WHERE content LIKE '%" +
+          terms[i] +
+          "%'";
+        database.connection.query(tagTerm, (err, tagResult) => {
+          if (err) {
+            console.log("Term search in objects/tags failed");
+            console.log(err);
+          } else {
+            for (let i = 0; i < tagResult.length; i++) {
+              objectIds.push(tagResult[i].corresp_obj_id);
+            }
+          }
+        });
+
+        //if any object description contains the search term it's object id will be added
+        let descriptionTerm =
+          "SELECT id FROM objects WHERE description LIKE '%" + terms[i] + "%'";
+        database.connection.query(descriptionTerm, (err, descriptionResult) => {
+          if (err) {
+            console.log("Term search in objects/title failed");
+            console.log(err);
+          } else {
+            for (let i = 0; i < descriptionResult.length; i++) {
+              objectIds.push(descriptionResult[i].id);
+            }
+          }
+        });
+
+        //same thing for categories that contain the term
+        let categoryTerm =
+          "SELECT id FROM objects WHERE category LIKE '%" + terms[i] + "%'";
+        database.connection.query(categoryTerm, (err, categoryResult) => {
+          if (err) {
+            console.log("Term search in objects/title failed");
+            console.log(err);
+          } else {
+            for (let i = 0; i < categoryResult.length; i++) {
+              objectIds.push(categoryResult[i].id);
+            }
+            //this is called as soon as all the terms have been searched for
+            if (i === terms.length - 1) {
+              //create unique Set of ids (removing duplicates from objectIds)
+              let uniqueIds = new Set(objectIds);
+              res.status(200).send({ success: true, ids: uniqueIds });
+            }
+          }
+        });
+      }
     });
 
     server.get("*", (req, res) => {
