@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Header, Container } from "semantic-ui-react";
-import SearchBarNew from "../components/SearchBarNew";
+import SearchBar from "../components/SearchBar";
 import Itemlist from "../components/Itemlist";
 
 class browse extends Component {
@@ -30,7 +30,7 @@ class browse extends Component {
               <Header size="large" style={{ textAlign: "center" }}>
                 Browse for products
               </Header>
-              <SearchBarNew passObjectIds={this.passObjectIds.bind(this)} />
+              <SearchBar passObjectIds={this.passObjectIds.bind(this)} />
             </div>
             <Itemlist ref={this.itemlist} />
           </Container>

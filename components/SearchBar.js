@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Container, Icon, Input } from "semantic-ui-react";
 
-class SearchBarNew extends Component {
+class SearchBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -67,4 +67,4 @@ class SearchBarNew extends Component {
   }
 }
 
-export default SearchBarNew;
+export default SearchBar;
