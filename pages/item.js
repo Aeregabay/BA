@@ -27,22 +27,35 @@ class item extends Component {
     };
   }
 
+  // async getObjectIds(searchTerm) {
+  //   let result = await axios.post(window.location.origin + "/search", {
+  //     query: searchTerm
+  //   });
+  //   if (result.data.success) {
+  //     passObjectIds(result.data.ids);
+  //     this.setState({ query: "", isLoading: false });
+  //   } else {
+  //     console.log("the search has failed");
+  //   }
+  // }
+
   onCategoryClick = () => {
     //TODO redirect to browse page with category already inserted into search
     //and query executed
-    Router.pushRoute("browse");
+    // Router.pushRoute("browse");
+    // this.getObjectIds(this.state.category);
   };
 
   onSellerClick = () => {
     //TODO create public page for owner and corresponding items for sale
     //also ratings for this user could be displayed here
-    Router.pushRoute("index");
+    // Router.pushRoute("index");
   };
 
   onTagClick = () => {
     //TODO redirect to browse page with tag already inserted into search
     //and query executed
-    Router.pushRoute("browse");
+    // Router.pushRoute("browse");
   };
 
   purchaseItem = () => {
