@@ -36,7 +36,29 @@ class Itemlist extends Component {
 
   //fetch 10 objects from DB at page loadup and write to state
   async componentWillMount() {
-    let objects = await axios.post(window.location.origin + "/getObjects");
+    //adds case that page is accessed with prefetched Ids
+    let objects;
+
+    //case that url only contains pathname "browse"
+    if (window.location.pathname === "/browse") {
+      objects = await axios.post(window.location.origin + "/getObjects");
+
+      // case that url looks like this: "/browse/id1-id2-id3"
+    } else {
+      //deconstruct pathname into "/browse" and the id-part that we need
+      let pathname = window.location.pathname.split("/");
+
+      //second entry in the splitted array is the part that we need
+      let objectIdsDash = pathname[pathname.length - 1];
+
+      //now split all the ids that are delimited with "-"
+      let objectIdsFinal = objectIdsDash.split("-");
+
+      //call getObjects with newly contructed array of ids of objects to fetch
+      objects = await axios.post(window.location.origin + "/getObjects", {
+        objectIds: objectIdsFinal
+      });
+    }
     if (objects.data.success) {
       this.setState({
         initObjects: objects.data.objectsToSend,

@@ -4,6 +4,7 @@ const router = new Router();
 
 router.add({ name: "item", pattern: "/item/:id" });
 router.add({ name: "browse", pattern: "/browse" });
+router.add({ name: "browseIds", pattern: "/browse/:id", page: "browse" });
 router.add({ name: "index", pattern: "/index" });
 router.add({ name: "admin", pattern: "/admin" });
 router.add({ name: "error", pattern: "/error" });

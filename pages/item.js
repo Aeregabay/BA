@@ -27,35 +27,45 @@ class item extends Component {
     };
   }
 
-  // async getObjectIds(searchTerm) {
-  //   let result = await axios.post(window.location.origin + "/search", {
-  //     query: searchTerm
-  //   });
-  //   if (result.data.success) {
-  //     passObjectIds(result.data.ids);
-  //     this.setState({ query: "", isLoading: false });
-  //   } else {
-  //     console.log("the search has failed");
-  //   }
-  // }
+  //fetches objectIds to display from server
+  async getObjectIds(searchTerm) {
+    let result = await axios.post(window.location.origin + "/search", {
+      query: searchTerm
+    });
+    if (result.data.success) {
+      let objectIds = result.data.ids;
+      let idString = "";
+
+      //constructs String to display in URL to later read out
+      //the string looks like: /browse/id1-id2-id3 etc.
+      for (let i = 0; i < objectIds.length; i++) {
+        idString += objectIds[i] + "-";
+      }
+      //remove last "-" to make reading out in ItemList component cleaner
+      idString = idString.slice(0, idString.length - 1);
+
+      //push to constructed route
+      Router.pushRoute("browseIds", { id: idString });
+      this.setState({ query: "", isLoading: false });
+    } else {
+      console.log("the search has failed");
+    }
+  }
 
   onCategoryClick = () => {
-    //TODO redirect to browse page with category already inserted into search
-    //and query executed
-    // Router.pushRoute("browse");
-    // this.getObjectIds(this.state.category);
+    //shows browse page with object already prefiltered by searchterm === this.state.category
+    this.getObjectIds(this.state.category);
   };
 
   onSellerClick = () => {
     //TODO create public page for owner and corresponding items for sale
     //also ratings for this user could be displayed here
-    // Router.pushRoute("index");
+    // Router.pushRoute("profile/xxx");
   };
 
-  onTagClick = () => {
-    //TODO redirect to browse page with tag already inserted into search
-    //and query executed
-    // Router.pushRoute("browse");
+  onTagClick = content => {
+    //same as onCategoryClik but with tag content
+    this.getObjectIds(content);
   };
 
   purchaseItem = () => {
