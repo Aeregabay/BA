@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Container, Icon, Input } from "semantic-ui-react";
+import { Container, Icon, Input, Button } from "semantic-ui-react";
 
 class SearchBar extends Component {
   constructor(props) {
@@ -28,7 +28,7 @@ class SearchBar extends Component {
   //when search icon is clicked
   onIconClick() {
     this.setState({ isLoading: true });
-    sendQuery();
+    this.getObjectIds();
   }
 
   //when enter key is hit
@@ -37,6 +37,12 @@ class SearchBar extends Component {
       this.setState({ isLoading: true });
       this.getObjectIds();
     }
+  }
+
+  //clearFilters function for button underneath the searchBar
+  clearFilters() {
+    this.setState({ query: "" });
+    this.getObjectIds();
   }
 
   render() {
@@ -60,6 +66,14 @@ class SearchBar extends Component {
             onKeyPress={this.onEnter.bind(this)}
             style={{ maxWidth: "85.5%", margin: "auto" }}
             loading={this.state.isLoading}
+          />
+          <Button
+            fluid
+            onClick={() => {
+              this.clearFilters();
+            }}
+            style={{ maxWidth: "85.5%", margin: "auto", marginTop: "5px" }}
+            content="Clear Filters"
           />
         </Container>
       </div>
