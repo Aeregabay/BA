@@ -191,15 +191,15 @@ class sell extends Component {
     const { currentValues } = this.state;
     return (
       <Layout>
-        <Container>
+        <Container style={{ margin: "20px" }}>
           <div>
-            <Header textAlign="center" size="huge">
+            <Header style={{ color: "#999966" }} textAlign="center" size="huge">
               Welcome to the selling page
             </Header>
             <Header
               textAlign="center"
               size="medium"
-              style={{ marginBottom: "70px" }}
+              style={{ marginBottom: "70px", color: "#999966" }}
             >
               Please enter all the information about your item below
             </Header>
@@ -286,7 +286,10 @@ class sell extends Component {
                 />
               </Form.Group>
 
-              <Button content="Place item" color="google plus" />
+              <Button
+                content="Place item"
+                style={{ color: "white", backgroundColor: "tomato" }}
+              />
             </Form>
           </div>
         </Container>

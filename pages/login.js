@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Form, Button, Container, Message } from "semantic-ui-react";
+import { Form, Button, Container, Message, Icon } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
 import { setCookie } from "../utils/CookieUtils";
@@ -45,8 +45,12 @@ class login extends Component {
     return (
       <Layout>
         <div>
-          <Container>
-            <Message attached header="Login using your personal information." />
+          <Container style={{ margin: "20px" }}>
+            <Message
+              style={{ color: "#999966" }}
+              attached
+              header="Login using your personal information."
+            />
             <Form onSubmit={this.onSubmit} className="attached fluid segment">
               <Form.Group>
                 <Form.Input
@@ -74,7 +78,9 @@ class login extends Component {
                   }
                 />
               </Form.Group>
-              <Button content="Login" color="green" />
+              <Button style={{ color: "white", backgroundColor: "#00cc7a" }}>
+                Login <Icon name="sign-in" style={{ marginLeft: "5px" }} />
+              </Button>
             </Form>
           </Container>
         </div>

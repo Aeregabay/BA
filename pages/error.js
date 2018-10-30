@@ -29,7 +29,7 @@ class error extends Component {
   render() {
     return (
       <Layout>
-        <Container textAlign="center">
+        <Container textAlign="center" style={{ margin: "20px" }}>
           <div>
             <Header size="huge" color="red">
               You are not allowed to see the content of this page

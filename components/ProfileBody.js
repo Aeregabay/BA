@@ -73,67 +73,82 @@ class ProfileBody extends Component {
 
     return (
       <Layout>
-        <div>
-          {/* check which header should be displayed, admin or myprofile header */}
-          {this.state.admin && !this.state.isMyProfilePage ? (
-            <Header
-              size="large"
-              style={{ marginBottom: "30px", textAlign: "center" }}
-              hidden={!this.state.admin}
-            >
-              This is the admin page, {this.state.username}
-            </Header>
-          ) : (
-            <Header
-              size="large"
-              style={{ marginBottom: "30px", textAlign: "center" }}
-            >
-              Welcome to your profile, {this.state.username}
-            </Header>
-          )}
-        </div>
-        <Container style={{ textAlign: "center" }}>
-          {/* button only appears when user has admin rights and is on his myprofile page */}
-          {this.state.admin && this.state.clickable ? (
-            <div
-              className="ui blue button"
-              hidden={!this.state.admin}
-              style={{
-                marginBottom: "30px"
-              }}
-              onClick={this.toAdmin}
-            >
-              Go to Admin page
-            </div>
-          ) : (
-            ""
-          )}
-        </Container>
-        <Container>
-          <div
-            className="ui fluid centered raised link card"
-            style={{ width: "340px" }}
-          >
-            <div className="image">
-              <img
-                src={this.state.profilePic}
+        <div style={{ margin: "20px" }}>
+          <div>
+            {/* check which header should be displayed, admin or myprofile header */}
+            {this.state.admin && !this.state.isMyProfilePage ? (
+              <Header
+                size="large"
                 style={{
-                  backgroundColor: "white",
-                  maxWidth: "340px"
+                  marginBottom: "30px",
+                  textAlign: "center",
+                  color: "#999966"
                 }}
-              />
-            </div>
-            <div className="content">
-              <div className="header">{this.state.username}</div>
-              <div className="meta">You are {this.state.userType}</div>
-            </div>
-            <div className="extra content">
-              <a href={etherscanAddress} target="_blank">
-                <i className="ethereum icon">{this.state.ethAddress}</i>
-              </a>
-            </div>
+                hidden={!this.state.admin}
+              >
+                This is the admin page, {this.state.username}
+              </Header>
+            ) : (
+              <Header
+                size="large"
+                style={{
+                  marginBottom: "30px",
+                  textAlign: "center",
+                  color: "#999966"
+                }}
+              >
+                Welcome to your profile, {this.state.username}
+              </Header>
+            )}
           </div>
-        </Container>
+          <Container style={{ textAlign: "center" }}>
+            {/* button only appears when user has admin rights and is on his myprofile page */}
+            {this.state.admin && this.state.clickable ? (
+              <div
+                className="ui basic button"
+                hidden={!this.state.admin}
+                style={{
+                  marginBottom: "30px",
+                  border: "1px solid #999966"
+                }}
+                onClick={this.toAdmin}
+              >
+                <span style={{ color: "#999966" }}> Go to Admin page</span>
+              </div>
+            ) : (
+              ""
+            )}
+          </Container>
+          <Container>
+            <div
+              className="ui fluid centered raised link card"
+              style={{ width: "340px" }}
+            >
+              <div className="image">
+                <img
+                  src={this.state.profilePic}
+                  style={{
+                    backgroundColor: "white",
+                    maxWidth: "340px"
+                  }}
+                />
+              </div>
+              <div className="content">
+                <div className="header" style={{ color: "#999966" }}>
+                  {this.state.username}
+                </div>
+                <div className="meta">You are {this.state.userType}</div>
+              </div>
+              <div className="extra content">
+                <a href={etherscanAddress} target="_blank">
+                  <i className="ethereum icon" style={{ color: "#b8b894" }}>
+                    {this.state.ethAddress}
+                  </i>
+                </a>
+              </div>
+            </div>
+          </Container>
+        </div>
       </Layout>
     );
   }

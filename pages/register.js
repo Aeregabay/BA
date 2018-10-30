@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Button, Form, Container, Message } from "semantic-ui-react";
+import { Button, Form, Container, Message, Icon } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
 
@@ -31,9 +31,13 @@ class register extends Component {
   render() {
     return (
       <Layout>
-        <Container>
+        <Container style={{ margin: "20px" }}>
           <div>
-            <Message attached header="Register here to trade!" />
+            <Message
+              attached
+              header="Register here to trade!"
+              style={{ color: "#999966" }}
+            />
             <Form onSubmit={this.onSubmit} className="attached fluid segment">
               <Form.Group>
                 <Form.Input
@@ -53,7 +57,10 @@ class register extends Component {
                   required
                 />
               </Form.Group>
-              <Button content="Register now" color="google plus" />
+              <Button style={{ color: "white", backgroundColor: "tomato" }}>
+                Register
+                <Icon name="signup" style={{ marginLeft: "5px" }} />
+              </Button>
             </Form>
           </div>
         </Container>

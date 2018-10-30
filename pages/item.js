@@ -97,7 +97,7 @@ class item extends Component {
         tagsToReturn.push(
           <a
             key={i}
-            style={{ cursor: "pointer", marginLeft: 15, color: "#f2711c" }}
+            style={{ cursor: "pointer", marginLeft: 15, color: "#b8b894" }}
             onClick={() => this.onTagClick(response.data.tags[i].content)}
           >
             <Icon name="tag" size="small" />
@@ -149,8 +149,10 @@ class item extends Component {
           />
         </head>
         <Layout>
-          <Container textAlign="center">
-            <Header size="huge">{this.state.title}</Header>
+          <Container textAlign="center" style={{ margin: "20px" }}>
+            <Header size="huge" style={{ color: "#999966" }}>
+              {this.state.title}
+            </Header>
             <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
 
             {/* Slider from react-slick and map all the pics into the Slider */}
@@ -174,7 +176,7 @@ class item extends Component {
             >
               <Grid.Row>
                 <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header>
+                  <Header style={{ color: "#999966" }}>
                     Description
                     <Icon
                       style={{ marginLeft: 10 }}
@@ -187,7 +189,7 @@ class item extends Component {
                   </p>
                 </Grid.Column>
                 <Grid.Column width={8} style={{ textAlign: "right" }}>
-                  <Header>
+                  <Header style={{ color: "#999966" }}>
                     Price
                     <Icon name="usd" size="mini" style={{ marginLeft: 10 }} />
                   </Header>
@@ -199,7 +201,7 @@ class item extends Component {
 
               <Grid.Row>
                 <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header>
+                  <Header style={{ color: "#999966" }}>
                     Category
                     <Icon
                       style={{ marginLeft: 10 }}
@@ -211,7 +213,7 @@ class item extends Component {
                     style={{
                       cursor: "pointer",
                       marginLeft: 15,
-                      color: "#f2711c"
+                      color: "#b8b894"
                     }}
                     onClick={this.onCategoryClick}
                   >
@@ -219,7 +221,7 @@ class item extends Component {
                   </a>
                 </Grid.Column>
                 <Grid.Column width={8} style={{ textAlign: "right" }}>
-                  <Header>
+                  <Header style={{ color: "#999966" }}>
                     Owner
                     <Icon
                       name="user secret"
@@ -231,7 +233,7 @@ class item extends Component {
                     style={{
                       cursor: "pointer",
                       marginRight: 30,
-                      color: "#f2711c"
+                      color: "#b8b894"
                     }}
                     onClick={this.onSellerClick}
                   >
@@ -241,14 +243,14 @@ class item extends Component {
               </Grid.Row>
               <Grid.Row>
                 <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header>
+                  <Header style={{ color: "#999966" }}>
                     Tags
                     <Icon style={{ marginLeft: 10 }} name="tags" size="mini" />
                   </Header>
                   {this.state.tags}
                 </Grid.Column>
                 <Grid.Column width={8} style={{ textAlign: "right" }}>
-                  <Header>
+                  <Header style={{ color: "#999966" }}>
                     Buy Item
                     <Icon
                       name="handshake"
@@ -257,13 +259,20 @@ class item extends Component {
                     />
                   </Header>
                   <Button
+                    style={{
+                      maxWidth: "85.5%",
+                      margin: "auto",
+                      marginTop: "5px",
+                      border: "1px solid #999966"
+                    }}
                     basic
                     size="small"
-                    style={{}}
-                    color="orange"
                     onClick={this.purchaseItem}
                   >
-                    Purchase for {this.state.price}
+                    <span style={{ color: "#b8b894" }}>
+                      {" "}
+                      Purchase for {this.state.price}
+                    </span>
                   </Button>
                 </Grid.Column>
               </Grid.Row>
@@ -290,7 +299,8 @@ function CustomNextArrow(props) {
           background: "transparent",
           opacity: 1,
           marginTop: "-210%",
-          marginLeft: "-480%"
+          marginLeft: "-480%",
+          color: "#b8b894"
         }}
         onClick={onClick}
       >
@@ -312,7 +322,8 @@ function CustomPrevArrow(props) {
           opacity: 1,
           marginTop: "-210%",
           marginLeft: "250%",
-          zIndex: "2"
+          zIndex: "2",
+          color: "#b8b894"
         }}
         onClick={onClick}
       >

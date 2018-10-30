@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import Router from "../routes";
-import { Header, Container, Divider, List, Icon } from "semantic-ui-react";
+import {
+  Header,
+  Container,
+  Divider,
+  List,
+  Icon,
+  Segment
+} from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
 
@@ -80,96 +87,126 @@ class Layout extends Component {
             href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css"
           />
         </Head>
-        <Container>
-          <Header
-            size="huge"
-            style={{ marginTop: "15px", textAlign: "center" }}
-          >
-            EthTrade <Icon name="ethereum" />
-            Decentralized Trading
-          </Header>
+        <style jsx global>{`
+          body {
+            background: #e6e6e6;
+          }
+        `}</style>
+        <Segment style={{ width: "90%", margin: "auto", marginBottom: "30px" }}>
+          <Container>
+            <Header
+              size="huge"
+              style={{
+                marginTop: "15px",
+                textAlign: "center",
+                color: "#999966"
+              }}
+            >
+              EthTrade <Icon name="ethereum" />
+              Decentralized Trading
+            </Header>
 
-          <div
-            //Navbar menu
-            className="ui menu"
-            style={{ marginTop: "30px", marginBottom: "40px" }}
-          >
-            <a className="header item" onClick={this.toIndex}>
-              <Icon name="home" />
-              Home
-            </a>
-            <a className="item" onClick={this.toBrowse}>
-              <Icon name="search" />
-              Browse
-            </a>
-            <a className="item" onClick={this.toSell}>
-              <Icon name="dollar sign" />
-              Sell
-            </a>
-            <a className="item" onClick={this.toProfile}>
-              <Icon name="user" />
-              My Profile
-            </a>
-            <a className="item" onClick={this.toSettings}>
-              <Icon name="settings" />
-              Settings
-            </a>
-            <div className="right menu">
-              {this.state.currentUser.length < 1 ? (
-                <a
-                  className="ui item"
-                  onClick={this.toRegister}
-                  style={{ color: "tomato" }}
-                >
-                  <Icon name="write" />
-                  Register
-                </a>
-              ) : (
-                ""
-              )}
-              {this.state.currentUser.length > 0 ? (
-                <a
-                  className="ui item"
-                  onClick={this.logout}
-                  style={{ color: "tomato" }}
-                >
-                  <Icon name="shutdown" />
-                  Logout
-                </a>
-              ) : (
-                <a
-                  className="ui item"
-                  onClick={this.toLogin}
-                  style={{ color: "MediumSeaGreen" }}
-                >
-                  <Icon name="key" />
-                  Login
-                </a>
-              )}
-              {/* <a
-                className="ui item"
-                onClick={this.toLogin}
-                style={{ color: "MediumSeaGreen" }}
-                color="green"
+            <div
+              //Navbar menu
+              className="ui menu"
+              style={{ marginTop: "30px", marginBottom: "20px" }}
+            >
+              <a
+                className="header item"
+                onClick={this.toIndex}
+                style={{ color: "#999966" }}
               >
-                Login
-              </a> */}
+                <Icon name="home" />
+                Home
+              </a>
+              <a
+                className="item"
+                onClick={this.toBrowse}
+                style={{ color: "#999966" }}
+              >
+                <Icon name="search" />
+                Browse
+              </a>
+              <a
+                className="item"
+                onClick={this.toSell}
+                style={{ color: "#999966" }}
+              >
+                <Icon name="dollar sign" />
+                Sell
+              </a>
+              <a
+                className="item"
+                onClick={this.toProfile}
+                style={{ color: "#999966" }}
+              >
+                <Icon name="user" />
+                My Profile
+              </a>
+              <a
+                className="item"
+                onClick={this.toSettings}
+                style={{ color: "#999966" }}
+              >
+                <Icon name="settings" />
+                Settings
+              </a>
+              <div className="right menu">
+                {this.state.currentUser.length < 1 ? (
+                  <a
+                    className="ui item"
+                    onClick={this.toRegister}
+                    style={{ color: "tomato" }}
+                  >
+                    <Icon name="signup" />
+                    Register
+                  </a>
+                ) : (
+                  ""
+                )}
+                {this.state.currentUser.length > 0 ? (
+                  <a
+                    className="ui item"
+                    onClick={this.logout}
+                    style={{ color: "tomato" }}
+                  >
+                    <Icon name="shutdown" />
+                    Logout
+                  </a>
+                ) : (
+                  <a
+                    className="ui item"
+                    onClick={this.toLogin}
+                    style={{ color: "#00cc7a" }}
+                  >
+                    <Icon name="key" />
+                    Login
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
-        </Container>
-        {this.props.children}
-        <Container>
-          <Divider fitted style={{ marginTop: "300px" }} />
-          <p>
-            <b>Links</b>
-          </p>
-          <List bulleted horizontal>
-            <List.Item as="a" href="https://github.com/Aeregabay/BA">
-              <List.Icon name="github" />
-              GitHub Repo
-            </List.Item>
-          </List>
-        </Container>
+          </Container>
+        </Segment>
+        <Segment style={{ width: "90%", margin: "auto", marginBottom: "30px" }}>
+          {this.props.children}
+        </Segment>
+        <Segment style={{ width: "90%", margin: "auto", marginBottom: "30px" }}>
+          <Container>
+            <p>
+              <b style={{ color: "#999966" }}>Links</b>
+            </p>
+            <List bulleted horizontal>
+              <List.Item
+                as="a"
+                href="https://github.com/Aeregabay/BA"
+                style={{ color: "#b8b894" }}
+              >
+                <List.Icon name="github" />
+                GitHub Repo
+              </List.Item>
+            </List>
+          </Container>
+        </Segment>
       </div>
     );
   }

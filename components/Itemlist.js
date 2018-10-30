@@ -171,7 +171,7 @@ class Itemlist extends Component {
               />
             </div>
             <Card.Content href={`item/${id}`}>
-              <Card.Header>{title}</Card.Header>
+              <Card.Header style={{ color: "#999966" }}>{title}</Card.Header>
               <Card.Meta>{price}</Card.Meta>
               <Card.Description>
                 <span
@@ -186,17 +186,17 @@ class Itemlist extends Component {
             </Card.Content>
             <Card.Content extra>
               <a>
-                <Icon name="user secret" />
+                <Icon name="user secret" style={{ color: "#999966" }} />
                 {owner}
               </a>
               <p />
               <a>
-                <Icon name="filter" />
+                <Icon name="filter" style={{ color: "#999966" }} />
                 {category}
               </a>
               <p />
               <a>
-                <Icon name="tags" />
+                <Icon name="tags" style={{ color: "#999966" }} />
                 {this.truncateTags(tags)}
               </a>
             </Card.Content>

@@ -11,8 +11,10 @@ class settings extends Component {
   render() {
     return (
       <Layout>
-        <Container style={{ textAlign: "center" }}>
-          <Header size="huge">this is the settings page</Header>
+        <Container style={{ textAlign: "center", margin: "20px" }}>
+          <Header size="huge" style={{ color: "#999966 " }}>
+            this is the settings page
+          </Header>
         </Container>
       </Layout>
     );

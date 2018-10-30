@@ -56,6 +56,7 @@ class SearchBar extends Component {
                 link
                 name="search"
                 onClick={this.onIconClick.bind(this)}
+                style={{ color: "#b8b894" }}
               />
             }
             fluid
@@ -72,9 +73,16 @@ class SearchBar extends Component {
             onClick={() => {
               this.clearFilters();
             }}
-            style={{ maxWidth: "85.5%", margin: "auto", marginTop: "5px" }}
-            content="Clear Filters"
-          />
+            style={{
+              maxWidth: "85.5%",
+              margin: "auto",
+              marginTop: "5px",
+              border: "1px solid #999966"
+            }}
+            basic
+          >
+            <span style={{ color: "#999966" }}> Clear Filters</span>
+          </Button>
         </Container>
       </div>
     );

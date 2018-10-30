@@ -25,9 +25,12 @@ class browse extends Component {
     return (
       <Layout>
         <div>
-          <Container style={{ align: "center" }}>
+          <Container style={{ align: "center", margin: "20px" }}>
             <div>
-              <Header size="large" style={{ textAlign: "center" }}>
+              <Header
+                size="large"
+                style={{ textAlign: "center", color: "#999966" }}
+              >
                 Browse for products
               </Header>
               <SearchBar passObjectIds={this.passObjectIds.bind(this)} />
