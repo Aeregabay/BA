@@ -13,17 +13,17 @@ class App extends Component {
       <Layout>
         <Container
           style={{
-            margin: "20px",
-            textAlign: "left"
+            margin: "20px"
           }}
         >
           <Header
-            as="h2"
+            size="huge"
             content="Welcome to my beautiful page"
             style={{ textAlign: "center", color: "#7a7a52" }}
           />
-          <Button floated="right" content="doing nothing" color="blue" />
-          <p>
+          <p
+            style={{ color: "#ccccb3", fontSize: "12pt", textAlign: "justify" }}
+          >
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
             commodo ligula eget dolor. Aenean massa strong. Cum sociis natoque
             penatibus et magnis dis parturient montes, nascetur ridiculus mus.
