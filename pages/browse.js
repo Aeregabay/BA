@@ -29,7 +29,7 @@ class browse extends Component {
             <div>
               <Header
                 size="large"
-                style={{ textAlign: "center", color: "#999966" }}
+                style={{ textAlign: "center", color: "#7a7a52" }}
               >
                 Browse for products
               </Header>

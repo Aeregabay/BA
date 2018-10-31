@@ -47,7 +47,7 @@ class login extends Component {
         <div>
           <Container style={{ margin: "20px" }}>
             <Message
-              style={{ color: "#999966" }}
+              style={{ color: "#7a7a52" }}
               attached
               header="Login using your personal information."
             />

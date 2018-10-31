@@ -89,7 +89,7 @@ class Layout extends Component {
         </Head>
         <style jsx global>{`
           body {
-            background: #e6e6e6;
+            background: #f5f5f0;
           }
         `}</style>
         <Segment style={{ width: "90%", margin: "auto", marginBottom: "30px" }}>
@@ -99,7 +99,7 @@ class Layout extends Component {
               style={{
                 marginTop: "15px",
                 textAlign: "center",
-                color: "#999966"
+                color: "#7a7a52"
               }}
             >
               EthTrade <Icon name="ethereum" />
@@ -114,7 +114,7 @@ class Layout extends Component {
               <a
                 className="header item"
                 onClick={this.toIndex}
-                style={{ color: "#999966" }}
+                style={{ color: "#7a7a52" }}
               >
                 <Icon name="home" />
                 Home
@@ -122,7 +122,7 @@ class Layout extends Component {
               <a
                 className="item"
                 onClick={this.toBrowse}
-                style={{ color: "#999966" }}
+                style={{ color: "#7a7a52" }}
               >
                 <Icon name="search" />
                 Browse
@@ -130,7 +130,7 @@ class Layout extends Component {
               <a
                 className="item"
                 onClick={this.toSell}
-                style={{ color: "#999966" }}
+                style={{ color: "#7a7a52" }}
               >
                 <Icon name="dollar sign" />
                 Sell
@@ -138,7 +138,7 @@ class Layout extends Component {
               <a
                 className="item"
                 onClick={this.toProfile}
-                style={{ color: "#999966" }}
+                style={{ color: "#7a7a52" }}
               >
                 <Icon name="user" />
                 My Profile
@@ -146,7 +146,7 @@ class Layout extends Component {
               <a
                 className="item"
                 onClick={this.toSettings}
-                style={{ color: "#999966" }}
+                style={{ color: "#7a7a52" }}
               >
                 <Icon name="settings" />
                 Settings
@@ -193,13 +193,13 @@ class Layout extends Component {
         <Segment style={{ width: "90%", margin: "auto", marginBottom: "30px" }}>
           <Container>
             <p>
-              <b style={{ color: "#999966" }}>Links</b>
+              <b style={{ color: "#7a7a52" }}>Links</b>
             </p>
             <List bulleted horizontal>
               <List.Item
                 as="a"
                 href="https://github.com/Aeregabay/BA"
-                style={{ color: "#b8b894" }}
+                style={{ color: "#adad85" }}
               >
                 <List.Icon name="github" />
                 GitHub Repo

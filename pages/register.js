@@ -36,7 +36,7 @@ class register extends Component {
             <Message
               attached
               header="Register here to trade!"
-              style={{ color: "#999966" }}
+              style={{ color: "#7a7a52" }}
             />
             <Form onSubmit={this.onSubmit} className="attached fluid segment">
               <Form.Group>

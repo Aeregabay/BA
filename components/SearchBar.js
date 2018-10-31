@@ -56,7 +56,7 @@ class SearchBar extends Component {
                 link
                 name="search"
                 onClick={this.onIconClick.bind(this)}
-                style={{ color: "#b8b894" }}
+                style={{ color: "#adad85" }}
               />
             }
             fluid
@@ -77,11 +77,11 @@ class SearchBar extends Component {
               maxWidth: "85.5%",
               margin: "auto",
               marginTop: "5px",
-              border: "1px solid #999966"
+              border: "1px solid #7a7a52"
             }}
             basic
           >
-            <span style={{ color: "#999966" }}> Clear Filters</span>
+            <span style={{ color: "#7a7a52" }}> Clear Filters</span>
           </Button>
         </Container>
       </div>

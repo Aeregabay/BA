@@ -12,7 +12,7 @@ class settings extends Component {
     return (
       <Layout>
         <Container style={{ textAlign: "center", margin: "20px" }}>
-          <Header size="huge" style={{ color: "#999966 " }}>
+          <Header size="huge" style={{ color: "#7a7a52 " }}>
             this is the settings page
           </Header>
         </Container>

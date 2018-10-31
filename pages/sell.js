@@ -193,13 +193,13 @@ class sell extends Component {
       <Layout>
         <Container style={{ margin: "20px" }}>
           <div>
-            <Header style={{ color: "#999966" }} textAlign="center" size="huge">
+            <Header style={{ color: "#7a7a52" }} textAlign="center" size="huge">
               Welcome to the selling page
             </Header>
             <Header
               textAlign="center"
               size="medium"
-              style={{ marginBottom: "70px", color: "#999966" }}
+              style={{ marginBottom: "70px", color: "#7a7a52" }}
             >
               Please enter all the information about your item below
             </Header>

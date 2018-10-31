@@ -20,7 +20,7 @@ class App extends Component {
           <Header
             as="h2"
             content="Welcome to my beautiful page"
-            style={{ textAlign: "center", color: "#999966" }}
+            style={{ textAlign: "center", color: "#7a7a52" }}
           />
           <Button floated="right" content="doing nothing" color="blue" />
           <p>

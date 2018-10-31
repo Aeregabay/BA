@@ -82,7 +82,7 @@ class ProfileBody extends Component {
                 style={{
                   marginBottom: "30px",
                   textAlign: "center",
-                  color: "#999966"
+                  color: "#7a7a52"
                 }}
                 hidden={!this.state.admin}
               >
@@ -94,7 +94,7 @@ class ProfileBody extends Component {
                 style={{
                   marginBottom: "30px",
                   textAlign: "center",
-                  color: "#999966"
+                  color: "#7a7a52"
                 }}
               >
                 Welcome to your profile, {this.state.username}
@@ -109,11 +109,11 @@ class ProfileBody extends Component {
                 hidden={!this.state.admin}
                 style={{
                   marginBottom: "30px",
-                  border: "1px solid #999966"
+                  border: "1px solid #7a7a52"
                 }}
                 onClick={this.toAdmin}
               >
-                <span style={{ color: "#999966" }}> Go to Admin page</span>
+                <span style={{ color: "#7a7a52" }}> Go to Admin page</span>
               </div>
             ) : (
               ""
@@ -134,14 +134,16 @@ class ProfileBody extends Component {
                 />
               </div>
               <div className="content">
-                <div className="header" style={{ color: "#999966" }}>
+                <div className="header" style={{ color: "#7a7a52" }}>
                   {this.state.username}
                 </div>
-                <div className="meta">You are {this.state.userType}</div>
+                <div className="meta" style={{ color: "#ccccb3" }}>
+                  You are {this.state.userType}
+                </div>
               </div>
               <div className="extra content">
                 <a href={etherscanAddress} target="_blank">
-                  <i className="ethereum icon" style={{ color: "#b8b894" }}>
+                  <i className="ethereum icon" style={{ color: "#adad85" }}>
                     {this.state.ethAddress}
                   </i>
                 </a>
