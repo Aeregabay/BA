@@ -184,7 +184,11 @@ class item extends Component {
                       size="mini"
                     />
                   </Header>
-                  <p align="justify" size="big" style={{ marginLeft: 15 }}>
+                  <p
+                    align="justify"
+                    size="big"
+                    style={{ marginLeft: 15, color: "#ccccb3" }}
+                  >
                     {this.state.description}
                   </p>
                 </Grid.Column>
@@ -193,7 +197,7 @@ class item extends Component {
                     Price
                     <Icon name="usd" size="mini" style={{ marginLeft: 10 }} />
                   </Header>
-                  <p size="big" style={{ marginRight: 30 }}>
+                  <p size="big" style={{ marginRight: 30, color: "#ccccb3" }}>
                     {this.state.price}
                   </p>
                 </Grid.Column>
