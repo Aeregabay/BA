@@ -18,7 +18,7 @@ class App extends Component {
         >
           <Header
             size="huge"
-            content="Welcome to my beautiful page"
+            content="Welcome to EthTrade, a decentralized Marketplace"
             style={{ textAlign: "center", color: "#7a7a52" }}
           />
           <p
