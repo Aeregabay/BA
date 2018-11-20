@@ -13,9 +13,15 @@ class SearchBar extends Component {
 
   //pass search query to server and obtain object ids
   //pass those object ids to Itemlist to render items to display after search
-  async getObjectIds() {
+  //the boolean shouldClear comes into play when the clear filters button is pressed
+  async getObjectIds(shouldClear) {
+    let newQuery;
+    //if the shouldClear boolean is passed, the query will be set to "" and will therefore return
+    //the default items to the itemlist
+    //else, the search query that was entered into the searchbar will be executed
+    shouldClear ? (newQuery = "") : (newQuery = this.state.query);
     let result = await axios.post(window.location.origin + "/search", {
-      query: this.state.query
+      query: newQuery
     });
     if (result.data.success) {
       this.props.passObjectIds(result.data.ids);
@@ -42,7 +48,7 @@ class SearchBar extends Component {
   //clearFilters function for button underneath the searchBar
   clearFilters() {
     this.setState({ query: "" });
-    this.getObjectIds();
+    this.getObjectIds(true);
   }
 
   render() {
