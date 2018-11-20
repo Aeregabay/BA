@@ -15,11 +15,7 @@ class admin extends Component {
   }
 
   render() {
-    return (
-      <Container>
-        <ProfileBody ref={this.child} />
-      </Container>
-    );
+    return <ProfileBody ref={this.child} />;
   }
 }
 
