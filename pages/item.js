@@ -7,7 +7,8 @@ import {
   Button,
   Icon,
   Grid,
-  Divider
+  Divider,
+  Form
 } from "semantic-ui-react";
 import Slider from "react-slick";
 import Router from "../routes";
@@ -23,7 +24,9 @@ class item extends Component {
       owner: "",
       price: "",
       tags: [],
-      pics: []
+      pics: [],
+      descriptionEdit: false,
+      currentUser: ""
     };
   }
 
@@ -51,6 +54,31 @@ class item extends Component {
       console.log("the search has failed");
     }
   }
+
+  //if any change to a content field is made, submit that change to DB
+  submitChange = async () => {
+    this.setState({ descriptionEdit: false });
+
+    let objectInfo = {
+      id: this.state.id,
+      title: this.state.title,
+      category: this.state.category,
+      description: this.state.description,
+      owner: this.state.owner,
+      price: this.state.price,
+      tags: this.state.tags,
+      pics: this.state.pics
+    };
+    let result = await axios.post(
+      window.location.origin + "/updateContent",
+      objectInfo
+    );
+    if (result.data.success) {
+      console.log("hurray");
+    } else {
+      console.log("failfail");
+    }
+  };
 
   onCategoryClick = () => {
     //shows browse page with object already prefiltered by searchterm === this.state.category
@@ -117,6 +145,12 @@ class item extends Component {
         pics: picsTemp
       });
     }
+
+    //fetch currentUser from cookie
+    let resultTwo = await axios.post(window.location.origin + "/getCookie");
+    if (resultTwo.data.success) {
+      this.setState({ currentUser: resultTwo.data.username });
+    }
   }
 
   render() {
@@ -176,21 +210,56 @@ class item extends Component {
             >
               <Grid.Row>
                 <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header style={{ color: "#7a7a52" }}>
-                    Description
-                    <Icon
-                      style={{ marginLeft: 10 }}
-                      name="file text"
-                      size="mini"
-                    />
-                  </Header>
-                  <p
-                    align="justify"
-                    size="big"
-                    style={{ marginLeft: 15, color: "#ccccb3" }}
-                  >
-                    {this.state.description}
-                  </p>
+                  {/* if edit button is clicked, editable textarea and save button are displayed */}
+                  {this.state.descriptionEdit ? (
+                    <div>
+                      <Form.Input
+                        style={{ width: "100%", height: "250px" }}
+                        control="textarea"
+                        value={this.state.description}
+                        onChange={event =>
+                          this.setState({ description: event.target.value })
+                        }
+                      />
+                      <Button
+                        color="green"
+                        content="save"
+                        onClick={this.submitChange}
+                        style={{ float: "right" }}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Header style={{ color: "#7a7a52" }}>
+                        Description
+                        <Icon
+                          style={{ marginLeft: 10 }}
+                          name="file text"
+                          size="mini"
+                        />
+                      </Header>
+                      <p
+                        align="justify"
+                        size="big"
+                        style={{ marginLeft: 15, color: "#ccccb3" }}
+                      >
+                        {this.state.description}
+                      </p>
+                      {/* if currentUser is also owner of the object, edit button is visible */}
+                      {this.state.currentUser === this.state.owner ? (
+                        <Button
+                          basic
+                          content="edit"
+                          style={{ float: "right" }}
+                          onClick={() => {
+                            this.setState({ descriptionEdit: true });
+                          }}
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  )}
                 </Grid.Column>
                 <Grid.Column width={8} style={{ textAlign: "right" }}>
                   <Header style={{ color: "#7a7a52" }}>
