@@ -527,6 +527,30 @@ app
       });
     });
 
+    server.post("/updateContent", (req, res) => {
+      let query = SqlString.format(
+        "UPDATE objects SET title = ?, description = ?, price = ?, category = ? WHERE id = ?",
+        [
+          req.body.title,
+          req.body.description,
+          req.body.price,
+          req.body.category,
+          req.body.id
+        ]
+      );
+      console.log(query);
+      database.connection.query(query, (err, result) => {
+        if (err) {
+          console.log("updating of object failed");
+        } else {
+          console.log(
+            "update of object with id " + req.body.id + " has been successful"
+          );
+        }
+      });
+      res.status(200).send({ success: true });
+    });
+
     //searchterm entry on browse page
     server.post("/search", (req, res) => {
       //take query from client and split into single terms to search individually
