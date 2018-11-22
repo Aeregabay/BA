@@ -527,6 +527,7 @@ app
       });
     });
 
+    //updates items in the DB
     server.post("/updateContent", (req, res) => {
       let query = SqlString.format(
         "UPDATE objects SET title = ?, description = ?, price = ?, category = ? WHERE id = ?",
@@ -538,7 +539,6 @@ app
           req.body.id
         ]
       );
-      console.log(query);
       database.connection.query(query, (err, result) => {
         if (err) {
           console.log("updating of object failed");
@@ -546,6 +546,26 @@ app
           console.log(
             "update of object with id " + req.body.id + " has been successful"
           );
+        }
+      });
+
+      //removes old tags to avoid duplicates
+      let tagQuery =
+        "DELETE FROM tags WHERE corresp_obj_id = '" + req.body.id + "';";
+
+      //adds new tags to the tags table
+      for (let i = 0; i < req.body.tags[0].length; i++) {
+        tagQuery += SqlString.format(
+          "INSERT INTO tags (corresp_obj_id, content) VALUES (?, ?);",
+          [req.body.id, req.body.tags[0][i]]
+        );
+      }
+      database.connection.query(tagQuery, (err, tagResult) => {
+        if (err) {
+          console.log("tag updating failed");
+          console.log(err);
+        } else {
+          console.log("tag updating success");
         }
       });
       res.status(200).send({ success: true });
