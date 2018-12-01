@@ -292,7 +292,7 @@ app
                 console.log("tag insertion success");
 
                 //PICS INSERTION BLOCK
-                //create pics array to write req.files.currentValues into it (tags from client side)
+                //create pics array to write req.files into it (pics from client side)
                 let pics = [];
                 let picKeys = Object.keys(req.files);
 
@@ -527,6 +527,68 @@ app
       });
     });
 
+    //delete picture from DB
+    server.post("/deletePicture", (req, res) => {
+      let picture = req.body.picture;
+      let query = SqlString.format("DELETE FROM pics WHERE name = ?", [
+        picture
+      ]);
+
+      database.connection.query(query, (err, result) => {
+        if (err) {
+          console.log(err);
+          console.log("picture deleting has failed");
+        } else {
+          console.log("picture deleting sucessful");
+          res.status(200).send({ success: true });
+        }
+      });
+    });
+
+    //add new pictures to DB after item edit
+    server.post("/addNewPictures", (req, res) => {
+      let username = req.body.username;
+      let objectId = req.body.objectId;
+      let pics = [];
+      let picKeys = Object.keys(req.files);
+
+      picKeys.forEach(function(key) {
+        pics.push(req.files[key]);
+      });
+      //Just like with the tags, create concattenated SQL statement to insert each pic
+      //in pics array into DB
+      let picsSql = "";
+      for (let i = 0; i < pics.length; i++) {
+        let picName = username + "_" + pics[i].name;
+        picsSql +=
+          "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
+          objectId +
+          "', '" +
+          picName +
+          "');";
+      }
+
+      database.connection.query(picsSql, (err, result) => {
+        if (err) {
+          console.log(
+            "there was an error while inserting the pictures into the DB"
+          );
+        } else {
+          console.log("the picture insertion into the DB was successful");
+
+          for (let i = 0; i < pics.length; i++) {
+            pics[i].mv("static/" + username + "_" + pics[i].name, function(
+              err
+            ) {
+              if (err) {
+                return res.status(500).send(err);
+              }
+            });
+          }
+        }
+      });
+      res.status(200).send({ success: true });
+    });
     //updates items in the DB
     server.post("/updateContent", (req, res) => {
       let query = SqlString.format(

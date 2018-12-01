@@ -9,7 +9,8 @@ import {
   Grid,
   Divider,
   Form,
-  Input
+  Input,
+  Segment
 } from "semantic-ui-react";
 import Slider from "react-slick";
 import Router from "../routes";
@@ -82,6 +83,7 @@ const categories = [
 let options = [];
 let currentValues = [];
 let currentTags = [];
+let picsToAdd = [];
 
 class item extends Component {
   constructor(props) {
@@ -99,9 +101,19 @@ class item extends Component {
       priceEdit: false,
       categoryEdit: false,
       tagEdit: false,
-      currentUser: ""
+      currentUser: "",
+      pictureEdit: false
     };
   }
+
+  handleFiles = e => {
+    picsToAdd = [];
+    let i;
+    let tempFiles = e.target.files;
+    for (i = 0; i < tempFiles.length; i++) {
+      picsToAdd.push(tempFiles[i]);
+    }
+  };
 
   //fetches objectIds to display from server
   async getObjectIds(searchTerm) {
@@ -128,14 +140,53 @@ class item extends Component {
     }
   }
 
+  deletePicture = async (picture, picNumber) => {
+    let tempPics = this.state.pics;
+    tempPics.splice(picNumber, 1);
+    this.setState({ pics: tempPics });
+
+    let result = await axios.post(window.location.origin + "/deletePicture", {
+      picture
+    });
+    if (result.data.success) {
+      console.log("picture " + picture + " has successfully been deleted");
+    } else {
+      console.log("picture deleting failed for " + picture);
+    }
+  };
+
+  addPictures = async () => {
+    let formData = new FormData();
+    for (let i = 0; i < picsToAdd.length; i++) {
+      formData.append("pic" + i, picsToAdd[i]);
+    }
+    formData.append("username", this.state.owner);
+    formData.append("objectId", this.state.id);
+
+    this.setState({ pictureEdit: false });
+
+    let result = await axios.post(
+      window.location.origin + "/addNewPictures",
+      formData
+    );
+
+    if (result.data.success) {
+      console.log("new pictures have been added to the DB");
+    } else {
+      console.log("the addition of new pictures has failed");
+      alert("Picture upload failed, no changes made");
+    }
+    location.reload();
+  };
+
   //if any change to a content field is made, submit that change to DB
   submitChange = async () => {
-    alert("Please refresh the page to view your changes");
     this.setState({
       descriptionEdit: false,
       priceEdit: false,
       categoryEdit: false,
-      tagEdit: false
+      tagEdit: false,
+      pictureEdit: false
     });
 
     let objectInfo = {
@@ -158,6 +209,7 @@ class item extends Component {
     } else {
       console.log("object update has failed");
     }
+    location.reload();
   };
 
   //change handler if category is edited
@@ -314,18 +366,82 @@ class item extends Component {
             </Header>
             <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
 
-            {/* Slider from react-slick and map all the pics into the Slider */}
-            <Slider {...settings} style={{ margin: "auto" }}>
-              {this.state.pics.map((pic, i) => (
-                <div>
-                  <img
-                    key={`pic${i}`}
-                    src={`../static/${pic}`}
-                    style={{ maxWidth: "90%", margin: "auto", zIndex: "1" }}
-                  />
+            {this.state.pictureEdit ? (
+              <Segment style={{ maxWidth: "85%", margin: "auto" }}>
+                <div className="ui internally celled grid">
+                  {this.state.pics.map((pic, i) => (
+                    <div className="row">
+                      <div className="five wide column">
+                        <img src={`../static/${pic}`} className="ui image" />
+                      </div>
+                      <div className="eight wide column">
+                        <a>{pic}</a>
+                      </div>
+                      <div className="three wide column">
+                        <Button
+                          content="delete"
+                          style={{ textAlign: "center" }}
+                          onClick={() => {
+                            this.deletePicture(pic, i);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ margin: "auto", marginTop: "30px" }}>
+                    <Form.Input
+                      fluid
+                      type="file"
+                      label="Upload your new pictures here"
+                      name="file"
+                      id="file"
+                      multiple
+                      onChange={this.handleFiles}
+                    />
+                    <Button
+                      color="green"
+                      content="Save new Pictures"
+                      onClick={this.addPictures}
+                      fluid
+                      style={{ marginTop: "5px" }}
+                    />
+                  </div>
                 </div>
-              ))}
-            </Slider>
+              </Segment>
+            ) : (
+              <div>
+                {/* Slider from react-slick and map all the pics into the Slider */}
+                <Slider {...settings} style={{ margin: "auto" }}>
+                  {this.state.pics.map((pic, i) => (
+                    <div>
+                      <img
+                        key={`pic${i}`}
+                        src={`../static/${pic}`}
+                        style={{ maxWidth: "90%", margin: "auto", zIndex: "1" }}
+                      />
+                    </div>
+                  ))}
+                </Slider>
+                {this.state.currentUser === this.state.owner ? (
+                  <Button
+                    basic
+                    fluid
+                    content="Edit Pictures"
+                    style={{
+                      marginTop: "40px",
+                      maxWidth: "30%",
+                      marginLeft: "35%"
+                    }}
+                    onClick={() => {
+                      this.setState({ pictureEdit: true });
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
+            )}
+
             <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
 
             <Grid
@@ -374,8 +490,9 @@ class item extends Component {
                       {this.state.currentUser === this.state.owner ? (
                         <Button
                           basic
-                          content="edit"
-                          style={{ float: "right" }}
+                          fluid
+                          content="Edit Description"
+                          style={{ float: "right", maxWidth: "40%" }}
                           onClick={() => {
                             this.setState({ descriptionEdit: true });
                           }}
@@ -427,8 +544,9 @@ class item extends Component {
                       {this.state.currentUser === this.state.owner ? (
                         <Button
                           basic
-                          content="edit"
-                          style={{ float: "right" }}
+                          fluid
+                          content="Edit Price"
+                          style={{ float: "right", maxWidth: "40%" }}
                           onClick={() => {
                             this.setState({ priceEdit: true });
                           }}
@@ -486,8 +604,9 @@ class item extends Component {
                       {this.state.currentUser === this.state.owner ? (
                         <Button
                           basic
-                          content="edit"
-                          style={{ float: "right" }}
+                          fluid
+                          content="Edit Category"
+                          style={{ float: "right", maxWidth: "40%" }}
                           onClick={() => {
                             this.setState({ categoryEdit: true });
                           }}
@@ -557,8 +676,13 @@ class item extends Component {
                       {this.state.currentUser === this.state.owner ? (
                         <Button
                           basic
-                          content="edit"
-                          style={{ float: "right", marginTop: "10px" }}
+                          fluid
+                          content="Edit Tags"
+                          style={{
+                            float: "right",
+                            marginTop: "10px",
+                            maxWidth: "40%"
+                          }}
                           onClick={() => {
                             this.setState({ tagEdit: true });
                           }}
@@ -580,12 +704,13 @@ class item extends Component {
                   </Header>
                   <Button
                     style={{
-                      maxWidth: "85.5%",
-                      margin: "auto",
+                      maxWidth: "40%",
+                      float: "right",
                       marginTop: "5px",
                       border: "1px solid #7a7a52"
                     }}
                     basic
+                    fluid
                     size="small"
                     onClick={this.purchaseItem}
                   >
