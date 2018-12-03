@@ -13,7 +13,6 @@ class ProfileBody extends Component {
       id: "",
       username: "",
       password: "",
-      profilePic: "",
       ethAddress: "",
       admin: "",
       userType: "",
@@ -51,7 +50,6 @@ class ProfileBody extends Component {
           id: this.state.user[0].id,
           username: this.state.user[0].username,
           password: this.state.user[0].password,
-          profilePic: "../static/" + this.state.user[0].profile_pic,
           ethAddress: this.state.user[0].eth_account,
           admin: this.state.user[0].admin
         });
@@ -126,7 +124,7 @@ class ProfileBody extends Component {
             >
               <div className="image">
                 <img
-                  src={this.state.profilePic}
+                  src="../static/icon.png"
                   style={{
                     backgroundColor: "white",
                     maxWidth: "340px"

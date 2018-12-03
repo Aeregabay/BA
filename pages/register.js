@@ -5,32 +5,112 @@ import axios from "axios";
 import Router from "../routes";
 import Web3 from "web3";
 const web3 = new Web3(window.web3.currentProvider);
+const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
+const ABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: "toAddress",
+    outputs: [{ name: "", type: "address" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [{ name: "newConfirmation", type: "bool" }],
+    name: "answer",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "kycAddress",
+    outputs: [{ name: "", type: "address" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: "payKYC",
+    outputs: [],
+    payable: true,
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: "newMessage", type: "string" },
+      { name: "platformAddress", type: "address" }
+    ],
+    name: "transfer",
+    outputs: [],
+    payable: true,
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: false, name: "kycKey", type: "string" }],
+    name: "KycListen",
+    type: "event"
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: false, name: "confirmed", type: "bool" }],
+    name: "PlatformListen",
+    type: "event"
+  }
+];
+let verify;
 
 class register extends Component {
   constructor(props) {
     super(props);
-    this.state = { username: "", password: "", metaMask: false };
+    this.state = {
+      userAccount: ""
+    };
   }
 
-  async onSubmit() {
+  async componentWillMount() {
+    let accounts = await web3.eth.getAccounts();
+    this.setState({ userAccount: accounts[0] });
+    verify = new web3.eth.Contract(
+      ABI,
+      "0xB389B9E4A89f30C203143B6BF1087A5fFec12b2f"
+    );
+  }
+
+  awaitVerify(args) {
+    setTimeout(() => {
+      if (!args) this.awaitVerify;
+    }, 50);
+  }
+
+  onSubmit = async () => {
     let kycKey = document.getElementById("kycKey").value;
-    let userAddress = web3.eth.accounts[0];
 
-    let Verify = web3.eth.Contract("ABI", "address");
-
-    Verify.methods.transfer(kycKey).send({
-      from: "AdminAddress"
+    verify.methods.transfer(kycKey, adminAddress).send({
+      from: this.state.userAccount,
+      value: web3.utils.toWei(".01", "ether")
     });
 
-    let verificationEvent = Verify.PlatformListen();
-
-    verificationEvent.watch(async (err, res) => {
+    verify.events.PlatformListen({}, async (err, res) => {
+      console.log(res.args);
+      this.awaitVerify(res.args);
       if (err) {
         console.log(err);
       } else {
         if (res.args.confirmed) {
           let username = document.getElementById("username").value;
           let password = document.getElementById("password").value;
+          let userAddress = this.state.userAccount;
 
           //create JSON with user input and send it to DB
           let data = { username, password, userAddress };
@@ -56,18 +136,14 @@ class register extends Component {
         }
       }
     });
-  }
-
-  componentWillUpdate() {
-    if (web3.eth.accounts[0]) this.setState({ metaMask: true });
-  }
+  };
 
   render() {
     return (
       <Layout>
         <Container style={{ margin: "20px" }}>
           <div>
-            {this.state.metaMask ? (
+            {this.state.userAccount ? (
               <div>
                 <Message
                   attached
