@@ -51,10 +51,12 @@ app
           //hash password before writing to DB
           bcrypt.hash(req.body.password, 10, (err, hash) => {
             let sql =
-              "INSERT INTO users (username, pw) VALUES ('" +
+              "INSERT INTO users (username, pw, eth_account) VALUES ('" +
               username +
               "', '" +
               hash +
+              "', '" +
+              req.body.ethAddress +
               "')";
 
             database.connection.query(sql, (err, result) => {
@@ -105,7 +107,7 @@ app
                     username: req.body.username,
                     admin: true,
                     xsrfToken: crypto
-                      .createHash("md5")
+                      .createHash("sha256")
                       .update(req.body.username)
                       .digest("hex")
                   },
@@ -127,7 +129,7 @@ app
                     username: req.body.username,
                     admin: false,
                     xsrfToken: crypto
-                      .createHash("md5")
+                      .createHash("sha256")
                       .update(req.body.username)
                       .digest("hex")
                   },
