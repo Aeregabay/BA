@@ -79,19 +79,19 @@ class register extends Component {
     };
   }
 
-  waitForMetaMask = () => {
-    if (web3.currentProvider.selectedAddress === undefined) {
-      setTimeout(this.waitForMetaMask, 500);
-    } else {
-      this.setState({ metaMask: true });
-      this.render();
-    }
-  };
-
   async componentWillMount() {
-    this.waitForMetaMask();
-    let accounts = await web3.eth.getAccounts();
-    this.setState({ userAccount: accounts[0] });
+    setInterval(() => {
+      web3.eth.getAccounts(async (err, accounts) => {
+        if (err) console.log(err);
+        else if (accounts.length === 0) this.setState({ metaMask: false });
+        else if (accounts.length > 0) {
+          this.setState({ metaMask: true });
+          let accounts = await web3.eth.getAccounts();
+          this.setState({ userAccount: accounts[0] });
+        }
+      });
+    }, 500);
+
     verify = new web3.eth.Contract(
       ABI,
       "0xB389B9E4A89f30C203143B6BF1087A5fFec12b2f"
