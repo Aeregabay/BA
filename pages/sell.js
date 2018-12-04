@@ -166,6 +166,7 @@ class sell extends Component {
   };
 
   statusHandler = (e, { value }) => {
+    console.log(value);
     e.persist();
     switch (value) {
       case "owned":
@@ -263,8 +264,8 @@ class sell extends Component {
                   required
                 />
                 <Form.Select
-                  label="Owner"
-                  onChange={this.isOwner}
+                  label="Status"
+                  onChange={this.statusHandler}
                   options={ownerOptions}
                   placeholder="What is the status of this item?"
                   selection

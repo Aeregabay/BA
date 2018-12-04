@@ -8,17 +8,8 @@ let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
 const ABI = [
   {
-    constant: true,
-    inputs: [],
-    name: "toAddress",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function"
-  },
-  {
     constant: false,
-    inputs: [{ name: "newConfirmation", type: "bool" }],
+    inputs: [{ name: "confirmed", type: "bool" }],
     name: "answer",
     outputs: [],
     payable: false,
@@ -46,7 +37,7 @@ const ABI = [
   {
     constant: false,
     inputs: [
-      { name: "newMessage", type: "string" },
+      { name: "kycKey", type: "string" },
       { name: "platformAddress", type: "address" }
     ],
     name: "transfer",
@@ -57,7 +48,10 @@ const ABI = [
   },
   {
     anonymous: false,
-    inputs: [{ indexed: false, name: "kycKey", type: "string" }],
+    inputs: [
+      { indexed: false, name: "kycKey", type: "string" },
+      { indexed: false, name: "platformAddress", type: "address" }
+    ],
     name: "KycListen",
     type: "event"
   },
@@ -68,6 +62,7 @@ const ABI = [
     type: "event"
   }
 ];
+
 let verify;
 
 class register extends Component {
@@ -92,7 +87,7 @@ class register extends Component {
 
     verify = new web3.eth.Contract(
       ABI,
-      "0xB389B9E4A89f30C203143B6BF1087A5fFec12b2f"
+      "0xAE8432705d0F04b2034C459DcC549a66DFCB51d3"
     );
   }
 
@@ -111,11 +106,10 @@ class register extends Component {
     });
 
     await verify.events.PlatformListen({}, async (err, res) => {
-      console.log(res.args);
       if (err) {
         console.log(err);
       } else {
-        if (res.args.confirmed) {
+        if (res.returnValues.confirmed) {
           let username = document.getElementById("username").value;
           let password = document.getElementById("password").value;
           let userAddress = this.state.userAccount;

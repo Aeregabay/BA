@@ -51,12 +51,14 @@ app
           //hash password before writing to DB
           bcrypt.hash(req.body.password, 10, (err, hash) => {
             let sql =
-              "INSERT INTO users (username, pw, eth_account) VALUES ('" +
+              "INSERT INTO users (username, pw, profile_pic, eth_account) VALUES ('" +
               username +
               "', '" +
               hash +
               "', '" +
-              req.body.ethAddress +
+              "icon.png" +
+              "', '" +
+              req.body.userAddress +
               "')";
 
             database.connection.query(sql, (err, result) => {
@@ -211,6 +213,8 @@ app
       if (cookie) {
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
+
+        console.log(req.body.status);
 
         //SQL statement to insert object details into DB
         let objectSql =
