@@ -85,9 +85,7 @@ class register extends Component {
         if (err) console.log(err);
         else if (accounts.length === 0) this.setState({ metaMask: false });
         else if (accounts.length > 0) {
-          this.setState({ metaMask: true });
-          let accounts = await web3.eth.getAccounts();
-          this.setState({ userAccount: accounts[0] });
+          this.setState({ metaMask: true, userAccount: accounts[0] });
         }
       });
     }, 500);
@@ -98,11 +96,11 @@ class register extends Component {
     );
   }
 
-  awaitVerify(args) {
-    setTimeout(() => {
-      if (!args) this.awaitVerify;
-    }, 50);
-  }
+  // awaitVerify(args) {
+  //   setTimeout(() => {
+  //     if (!args) this.awaitVerify;
+  //   }, 50);
+  // }
 
   onSubmit = async () => {
     let kycKey = document.getElementById("kycKey").value;
@@ -112,9 +110,8 @@ class register extends Component {
       value: web3.utils.toWei(".01", "ether")
     });
 
-    verify.events.PlatformListen({}, async (err, res) => {
+    await verify.events.PlatformListen({}, async (err, res) => {
       console.log(res.args);
-      this.awaitVerify(res.args);
       if (err) {
         console.log(err);
       } else {

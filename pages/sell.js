@@ -71,20 +71,18 @@ const categories = [
   }
 ];
 const ownerOptions = [
-  { key: "yes", text: "Yes", value: "yes" },
-  { key: "no", text: "No", value: "no" }
+  { key: "owned", text: "owned", value: "owned" },
+  { key: "borrowed", text: "borrowed", value: "borrowed" }
 ];
 
 let options = [];
-let isOwner = false;
-let category = "";
 let currentValues = [];
 let allPics = [];
 
 class sell extends Component {
   constructor(props) {
     super(props);
-    this.state = { files: [] };
+    this.state = { files: [], status: "", category: "" };
   }
 
   //load tags from DB to choose from
@@ -105,33 +103,31 @@ class sell extends Component {
     }
   }
 
-  async onSubmit(e) {
+  onSubmit = async () => {
     //create FormData with object details to send to server
     let formData = new FormData();
-    if (isOwner) {
-      //these properties are fetchable via document.getElementById() from JSX part
-      formData.append("title", document.getElementById("title").value);
-      formData.append("price", document.getElementById("price").value);
+    //these properties are fetchable via document.getElementById() from JSX part
+    formData.append("title", document.getElementById("title").value);
+    formData.append("price", document.getElementById("price").value);
 
-      formData.append(
-        "description",
-        document.getElementById("description").value
-      );
-      //these properties were written into variables by their onChange methods and
-      //retrieved that way
-      formData.append("category", category);
-      formData.append("currentValues", currentValues);
-      formData.append("options", options);
+    formData.append(
+      "description",
+      document.getElementById("description").value
+    );
+    //these properties were written into variables by their onChange methods and
+    //retrieved that way
+    formData.append("category", this.state.category);
+    formData.append("currentValues", currentValues);
+    formData.append("options", options);
 
-      //append all pics inside allPics array to the formData individually with
-      //incrementing key names like pic$ (pic0, pic1, etc...)
-      for (let i = 0; i < allPics.length; i++) {
-        formData.append("pic" + i, allPics[i]);
-      }
-    } else {
-      alert("You have to own the item in order to sell it, try again");
-      Router.pushRoute("index");
+    //append all pics inside allPics array to the formData individually with
+    //incrementing key names like pic$ (pic0, pic1, etc...)
+    for (let i = 0; i < allPics.length; i++) {
+      formData.append("pic" + i, this.state.files[i]);
     }
+    //status entered by the user concerning the object
+    console.log(this.state.status);
+    formData.append("status", this.state.status);
 
     //send created formData to server
     try {
@@ -145,7 +141,7 @@ class sell extends Component {
     } catch (err) {
       alert("Your request has not been successful, here is the error:" + err);
     }
-  }
+  };
 
   handleAddition = (e, { value }) => {
     options.push({
@@ -164,17 +160,20 @@ class sell extends Component {
   handleCategoryChange = (e, { value }) => {
     for (let i = 0; i < categories.length; i++) {
       if (value === categories[i].value) {
-        category = categories[i].text;
+        this.setState({ category: categories[i].text });
       }
     }
   };
 
-  isOwner = (e, { value }) => {
+  statusHandler = (e, { value }) => {
     e.persist();
-    if (value === "yes") {
-      isOwner = true;
-    } else {
-      isOwner = false;
+    switch (value) {
+      case "owned":
+        this.setState({ status: "owned" });
+        break;
+      case "borrowed":
+        this.setState({ status: "borrowed" });
+        break;
     }
   };
 
@@ -267,7 +266,7 @@ class sell extends Component {
                   label="Owner"
                   onChange={this.isOwner}
                   options={ownerOptions}
-                  placeholder="Do you own this item?"
+                  placeholder="What is the status of this item?"
                   selection
                   search
                   required

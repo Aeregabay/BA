@@ -214,7 +214,7 @@ app
 
         //SQL statement to insert object details into DB
         let objectSql =
-          "INSERT INTO objects (title, description, price, owner, category) VALUES ('" +
+          "INSERT INTO objects (title, description, price, owner, category, status) VALUES ('" +
           req.body.title +
           "', " +
           SqlString.escape(req.body.description) +
@@ -224,6 +224,8 @@ app
           username +
           "', '" +
           req.body.category +
+          "', '" +
+          req.body.status +
           "')";
 
         //write object to DB
@@ -250,6 +252,8 @@ app
           username +
           "' AND category = '" +
           req.body.category +
+          "' AND status = '" +
+          req.body.status +
           "'";
 
         //create objectId variable to write SQL response into it
@@ -394,7 +398,7 @@ app
       } else {
         //select statement for 10 objects from DB to display
         //this is done on browse page startup (without search query)
-        objectSql = "SELECT * FROM objects LIMIT 10;";
+        objectSql = "SELECT * FROM objects LIMIT 12;";
       }
 
       //arrays to return in the final statement

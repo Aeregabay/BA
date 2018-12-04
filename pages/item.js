@@ -95,6 +95,7 @@ class item extends Component {
       description: "",
       owner: "",
       price: "",
+      status: "",
       tags: [],
       pics: [],
       descriptionEdit: false,
@@ -102,7 +103,8 @@ class item extends Component {
       categoryEdit: false,
       tagEdit: false,
       currentUser: "",
-      pictureEdit: false
+      pictureEdit: false,
+      titleEdit: false
     };
   }
 
@@ -186,7 +188,8 @@ class item extends Component {
       priceEdit: false,
       categoryEdit: false,
       tagEdit: false,
-      pictureEdit: false
+      pictureEdit: false,
+      titleEdit: false
     });
 
     let objectInfo = {
@@ -300,6 +303,7 @@ class item extends Component {
         description: thisObject[0].description,
         owner: thisObject[0].owner,
         price: thisObject[0].price,
+        status: thisObject[0].status,
         tags: tagsToReturn,
         pics: picsTemp
       });
@@ -361,9 +365,47 @@ class item extends Component {
         </head>
         <Layout>
           <Container textAlign="center" style={{ margin: "20px" }}>
-            <Header size="huge" style={{ color: "#7a7a52" }}>
-              {this.state.title}
-            </Header>
+            {this.state.titleEdit ? (
+              <div>
+                <Form.Input
+                  style={{ width: "100%" }}
+                  control="textarea"
+                  value={this.state.title}
+                  onChange={event =>
+                    this.setState({ title: event.target.value })
+                  }
+                />
+                <Button
+                  color="green"
+                  content="save"
+                  onClick={this.submitChange}
+                  fluid
+                />
+              </div>
+            ) : (
+              <div>
+                <Header size="huge" style={{ color: "#7a7a52" }}>
+                  {this.state.title}
+                </Header>
+                {/* if currentUser is also owner of the object, edit button is visible */}
+                {this.state.currentUser === this.state.owner ? (
+                  <Button
+                    basic
+                    fluid
+                    content="Edit Title"
+                    style={{
+                      maxWidth: "30%",
+                      margin: "auto"
+                    }}
+                    onClick={() => {
+                      this.setState({ titleEdit: true });
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
+            )}
             <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
 
             {this.state.pictureEdit ? (
@@ -558,7 +600,6 @@ class item extends Component {
                   )}
                 </Grid.Column>
               </Grid.Row>
-
               <Grid.Row>
                 <Grid.Column width={8} style={{ textAlign: "left" }}>
                   <Header style={{ color: "#7a7a52" }}>
@@ -695,33 +736,45 @@ class item extends Component {
                 </Grid.Column>
                 <Grid.Column width={8} style={{ textAlign: "right" }}>
                   <Header style={{ color: "#7a7a52" }}>
-                    Buy Item
-                    <Icon
-                      name="handshake"
-                      size="mini"
-                      style={{ marginLeft: 10 }}
-                    />
+                    Status
+                    <Icon name="info" size="mini" style={{ marginLeft: 10 }} />
                   </Header>
-                  <Button
+                  <a
                     style={{
-                      maxWidth: "40%",
-                      float: "right",
-                      marginTop: "5px",
-                      border: "1px solid #7a7a52"
+                      cursor: "pointer",
+                      marginRight: 30,
+                      color: "#adad85"
                     }}
-                    basic
-                    fluid
-                    size="small"
-                    onClick={this.purchaseItem}
                   >
-                    <span style={{ color: "#adad85" }}>
-                      {" "}
-                      Purchase for {this.state.price}
-                    </span>
-                  </Button>
+                    {this.state.status}
+                  </a>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
+            <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
+            <div style={{ margin: "auto", marginTop: "20px" }}>
+              <Header style={{ color: "#7a7a52" }}>
+                Buy Item
+                <Icon name="handshake" size="mini" style={{ marginLeft: 10 }} />
+              </Header>
+              <Button
+                style={{
+                  maxWidth: "20%",
+                  marginTop: "5px",
+                  border: "1px solid #7a7a52",
+                  margin: "auto"
+                }}
+                basic
+                fluid
+                size="small"
+                onClick={this.purchaseItem}
+              >
+                <span style={{ color: "#adad85" }}>
+                  {" "}
+                  Purchase for {this.state.price}
+                </span>
+              </Button>
+            </div>
           </Container>
         </Layout>
       </div>
