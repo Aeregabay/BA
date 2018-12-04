@@ -4,7 +4,7 @@ import { Button, Form, Container, Message, Icon } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
 import Web3 from "web3";
-const web3 = new Web3(window.web3.currentProvider);
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
 const ABI = [
   {
@@ -74,11 +74,22 @@ class register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userAccount: ""
+      userAccount: "",
+      metaMask: false
     };
   }
 
+  waitForMetaMask = () => {
+    if (web3.currentProvider.selectedAddress === undefined) {
+      setTimeout(this.waitForMetaMask, 500);
+    } else {
+      this.setState({ metaMask: true });
+      this.render();
+    }
+  };
+
   async componentWillMount() {
+    this.waitForMetaMask();
     let accounts = await web3.eth.getAccounts();
     this.setState({ userAccount: accounts[0] });
     verify = new web3.eth.Contract(
@@ -114,6 +125,7 @@ class register extends Component {
 
           //create JSON with user input and send it to DB
           let data = { username, password, userAddress };
+
           const res = await axios.post(
             window.location.origin + "/register",
             data
@@ -143,7 +155,7 @@ class register extends Component {
       <Layout>
         <Container style={{ margin: "20px" }}>
           <div>
-            {this.state.userAccount ? (
+            {this.state.metaMask ? (
               <div>
                 <Message
                   attached
