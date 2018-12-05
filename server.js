@@ -207,14 +207,14 @@ app
 
     //insert object details into DB (different tables)
     server.post("/sell", urlEncodedParser, (req, res) => {
+      //create objectId variable to write SQL response into it
+      let objectId;
       //cookie check, again, user is blocked from client side if not logged in
       //therefore error check on server side not necessary
       let cookie = req.cookies["x-access-token"];
       if (cookie) {
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
-
-        console.log(req.body.status);
 
         //SQL statement to insert object details into DB
         let objectSql =
@@ -230,7 +230,7 @@ app
           req.body.category +
           "', '" +
           req.body.status +
-          "')";
+          "'); SELECT LAST_INSERT_ID();";
 
         //write object to DB
         database.connection.query(objectSql, (err, objectResult) => {
@@ -240,6 +240,7 @@ app
             console.log(err);
           } else {
             console.log("object success");
+            objectId = objectResult[0].insertId;
           }
         });
 
@@ -260,99 +261,104 @@ app
           req.body.status +
           "'";
 
-        //create objectId variable to write SQL response into it
-        let objectId;
+        // //SQL query to obtain objectId
+        // database.connection.query(objectIdSql, (err, objectIdResult) => {
+        //   //if query fails
+        //   if (err) {
+        //     console.log("The objectIdSearch has failed");
+        //     console.log(err);
+        //   } else {
+        //     //set objectIt to query result
+        //     objectId = objectIdResult[0].id;
+        //     console.log("objectId retrieval success");
 
-        //SQL query to obtain objectId
-        database.connection.query(objectIdSql, (err, objectIdResult) => {
+        //     //TAGS INSERTION BLOCK
+        //     //this block transforms req.body.currentValues into the array we need to
+        //     //insert into the INSERT statement
+        //     let tags = req.body.currentValues;
+        //     let finalTags = tags.split(",");
+
+        //initiate the statement and append the statement for each tag inside the tags array
+        //for this, multiple execution has to be enabled in MySQL
+        let tagsSql = "";
+        for (let i = 0; i < finalTags.length; i++) {
+          tagsSql +=
+            "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
+            objectId +
+            "', '" +
+            finalTags[i] +
+            "');";
+        }
+
+        //actual insertion of tags to DB
+        database.connection.query(tagsSql, (err, tagsResult) => {
           //if query fails
           if (err) {
-            console.log("The objectIdSearch has failed");
+            console.log("The tags insertion has failed");
             console.log(err);
           } else {
-            //set objectIt to query result
-            objectId = objectIdResult[0].id;
-            console.log("objectId retrieval success");
+            console.log("tag insertion success");
 
-            //TAGS INSERTION BLOCK
-            //this block transforms req.body.currentValues into the array we need to
-            //insert into the INSERT statement
-            let tags = req.body.currentValues;
-            let finalTags = tags.split(",");
+            //PICS INSERTION BLOCK
+            //create pics array to write req.files into it (pics from client side)
+            let pics = [];
+            let picKeys = Object.keys(req.files);
 
-            //initiate the statement and append the statement for each tag inside the tags array
-            //for this, multiple execution has to be enabled in MySQL
-            let tagsSql = "";
-            for (let i = 0; i < finalTags.length; i++) {
-              tagsSql +=
-                "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
+            picKeys.forEach(function(key) {
+              pics.push(req.files[key]);
+            });
+            //Just like with the tags, create concattenated SQL statement to insert each pic
+            //in pics array into DB
+            let picsSql = "";
+            for (let i = 0; i < pics.length; i++) {
+              let picName = username + "_" + pics[i].name;
+              picsSql +=
+                "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
                 objectId +
                 "', '" +
-                finalTags[i] +
+                picName +
                 "');";
             }
-
-            //actual insertion of tags to DB
-            database.connection.query(tagsSql, (err, tagsResult) => {
+            //actual SQL query to insert pics into DB
+            database.connection.query(picsSql, (err, picsResult) => {
               //if query fails
               if (err) {
-                console.log("The tags insertion has failed");
+                console.log("The pics insertion has failed");
                 console.log(err);
               } else {
-                console.log("tag insertion success");
+                console.log("Pic insertion success");
 
-                //PICS INSERTION BLOCK
-                //create pics array to write req.files into it (pics from client side)
-                let pics = [];
-                let picKeys = Object.keys(req.files);
-
-                picKeys.forEach(function(key) {
-                  pics.push(req.files[key]);
-                });
-                //Just like with the tags, create concattenated SQL statement to insert each pic
-                //in pics array into DB
-                let picsSql = "";
+                //if successfully inserted into DB, move Pics to local static folder
                 for (let i = 0; i < pics.length; i++) {
-                  let picName = username + "_" + pics[i].name;
-                  picsSql +=
-                    "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
-                    objectId +
-                    "', '" +
-                    picName +
-                    "');";
-                }
-                //actual SQL query to insert pics into DB
-                database.connection.query(picsSql, (err, picsResult) => {
-                  //if query fails
-                  if (err) {
-                    console.log("The pics insertion has failed");
-                    console.log(err);
-                  } else {
-                    console.log("Pic insertion success");
-
-                    //if successfully inserted into DB, move Pics to local static folder
-                    for (let i = 0; i < pics.length; i++) {
-                      pics[i].mv(
-                        "static/" + username + "_" + pics[i].name,
-                        function(err) {
-                          if (err) {
-                            return res.status(500).send(err);
-                          }
-                        }
-                      );
+                  pics[i].mv(
+                    "static/" + username + "_" + pics[i].name,
+                    function(err) {
+                      if (err) {
+                        return res.status(500).send(err);
+                      }
                     }
-                  }
-                });
+                  );
+                }
               }
             });
           }
         });
+        //   }
+        // });
       }
+      let interval = setInterval(() => {
+        if (objectId !== undefined) {
+          res.status(200).json({
+            success: true,
+            message: "The object has successfully been inserted into the DB",
+            objectId: objectId
+          });
+          console.log(objectId);
+          clearInterval(interval);
+        }
+      }, 50);
+      // console.log(objectResult[0].insertId);
       //if everything succeeded, send confirmation to client side
-      res.status(200).json({
-        success: true,
-        message: "The object has successfully been inserted into the DB"
-      });
     });
 
     server.post("/getCookie", urlEncodedParser, (req, res) => {

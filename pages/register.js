@@ -6,62 +6,7 @@ import Router from "../routes";
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
-const ABI = [
-  {
-    constant: false,
-    inputs: [{ name: "confirmed", type: "bool" }],
-    name: "answer",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "kycAddress",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: "payKYC",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function"
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "kycKey", type: "string" },
-      { name: "platformAddress", type: "address" }
-    ],
-    name: "transfer",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function"
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: false, name: "kycKey", type: "string" },
-      { indexed: false, name: "platformAddress", type: "address" }
-    ],
-    name: "KycListen",
-    type: "event"
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: false, name: "confirmed", type: "bool" }],
-    name: "PlatformListen",
-    type: "event"
-  }
-];
+import { ABI, contractAddress } from "../ethereum/deployedContract";
 
 let verify;
 
@@ -85,10 +30,7 @@ class register extends Component {
       });
     }, 500);
 
-    verify = new web3.eth.Contract(
-      ABI,
-      "0xAE8432705d0F04b2034C459DcC549a66DFCB51d3"
-    );
+    verify = new web3.eth.Contract(ABI, contractAddress);
   }
 
   // awaitVerify(args) {

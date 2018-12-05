@@ -4,6 +4,10 @@ import Router from "../routes";
 import { Container, Form, Button, Header, FormInput } from "semantic-ui-react";
 import axios from "axios";
 import NumberFormat from "react-number-format";
+import { ABI, contractAddress } from "../ethereum/deployedContract";
+
+import Web3 from "web3";
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -82,8 +86,27 @@ let allPics = [];
 class sell extends Component {
   constructor(props) {
     super(props);
-    this.state = { files: [], status: "", category: "" };
+    this.state = {
+      files: [],
+      status: "",
+      category: "",
+      userAddress: "",
+      objectId: ""
+    };
   }
+
+  pushToChain = () => {
+    let register = new web3.eth.Contract(ABI, contractAddress);
+    register.methods
+      .registerObject(
+        parseInt(this.state.objectId),
+        this.state.userAddress,
+        this.state.status
+      )
+      .send({
+        from: this.state.userAddress
+      });
+  };
 
   //load tags from DB to choose from
   async componentWillMount() {
@@ -101,6 +124,14 @@ class sell extends Component {
     } else {
       alert("The tag retrieval was not successfull on the client side");
     }
+
+    await web3.eth.getAccounts((err, accounts) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.setState({ userAddress: accounts[0] });
+      }
+    });
   }
 
   onSubmit = async () => {
@@ -118,7 +149,8 @@ class sell extends Component {
     //retrieved that way
     formData.append("category", this.state.category);
     formData.append("currentValues", currentValues);
-    formData.append("options", options);
+    let uniqueOptions = new Set(options);
+    formData.append("options", uniqueOptions);
 
     //append all pics inside allPics array to the formData individually with
     //incrementing key names like pic$ (pic0, pic1, etc...)
@@ -126,7 +158,6 @@ class sell extends Component {
       formData.append("pic" + i, this.state.files[i]);
     }
     //status entered by the user concerning the object
-    console.log(this.state.status);
     formData.append("status", this.state.status);
 
     //send created formData to server
@@ -136,6 +167,8 @@ class sell extends Component {
       //when successful, redirect to /browse page
       if (res.data.success) {
         alert("Your item has successfully submitted");
+        this.setState({ objectId: res.data.objectId });
+        this.pushToChain();
         Router.pushRoute("browse");
       }
     } catch (err) {
@@ -166,7 +199,6 @@ class sell extends Component {
   };
 
   statusHandler = (e, { value }) => {
-    console.log(value);
     e.persist();
     switch (value) {
       case "owned":

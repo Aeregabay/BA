@@ -10,11 +10,16 @@ import {
   Divider,
   Form,
   Input,
-  Segment
+  Segment,
+  Modal
 } from "semantic-ui-react";
 import Slider from "react-slick";
 import Router from "../routes";
 import NumberFormat from "react-number-format";
+import Web3 from "web3";
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
+import { ABI, contractAddress } from "../ethereum/deployedContract";
+
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
   { key: "audioVideoTv", text: "Audio, Video & TV", value: "audioVideoTv" },
@@ -104,9 +109,21 @@ class item extends Component {
       tagEdit: false,
       currentUser: "",
       pictureEdit: false,
-      titleEdit: false
+      titleEdit: false,
+      modalOpen: false,
+      verifiedStatus: "",
+      verifiedOwner: ""
     };
   }
+
+  verifyItem = async () => {
+    this.setState({ modalOpen: true });
+
+    let verify = await new web3.eth.Contract(ABI, contractAddress);
+
+    let result = await verify.methods.getObject(this.state.id).call();
+    this.setState({ verifiedStatus: result[1], verifiedOwner: result[0] });
+  };
 
   handleFiles = e => {
     picsToAdd = [];
@@ -350,7 +367,7 @@ class item extends Component {
     return (
       <div>
         {/* import stylesheets for react-slick plugin */}
-        <head>
+        <div>
           <link
             rel="stylesheet"
             type="text/css"
@@ -362,12 +379,17 @@ class item extends Component {
             type="text/css"
             href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
           />
-        </head>
+        </div>
         <Layout>
-          <Container textAlign="center" style={{ margin: "20px" }}>
+          <Container
+            key="objectInfo"
+            textAlign="center"
+            style={{ margin: "20px" }}
+          >
             {this.state.titleEdit ? (
-              <div>
+              <div key="titleEdit">
                 <Form.Input
+                  key="title_edit"
                   style={{ width: "100%" }}
                   control="textarea"
                   value={this.state.title}
@@ -376,6 +398,7 @@ class item extends Component {
                   }
                 />
                 <Button
+                  key="titleSaveButton"
                   color="green"
                   content="save"
                   onClick={this.submitChange}
@@ -383,13 +406,18 @@ class item extends Component {
                 />
               </div>
             ) : (
-              <div>
-                <Header size="huge" style={{ color: "#7a7a52" }}>
+              <div key="titleNonEdit">
+                <Header
+                  key="titleHeader"
+                  size="huge"
+                  style={{ color: "#7a7a52" }}
+                >
                   {this.state.title}
                 </Header>
                 {/* if currentUser is also owner of the object, edit button is visible */}
                 {this.state.currentUser === this.state.owner ? (
                   <Button
+                    key="titleEditButton"
                     basic
                     fluid
                     content="Edit Title"
@@ -406,21 +434,36 @@ class item extends Component {
                 )}
               </div>
             )}
-            <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
+            <Divider
+              key="firstDivider"
+              section
+              style={{ maxWidth: "90%", marginLeft: "5%" }}
+            />
 
             {this.state.pictureEdit ? (
-              <Segment style={{ maxWidth: "85%", margin: "auto" }}>
-                <div className="ui internally celled grid">
+              <Segment
+                key="firstSegment"
+                style={{ maxWidth: "85%", margin: "auto" }}
+              >
+                <div key="pictureGrid" className="ui internally celled grid">
                   {this.state.pics.map((pic, i) => (
-                    <div className="row">
-                      <div className="five wide column">
-                        <img src={`../static/${pic}`} className="ui image" />
+                    <div key={`pictureRow${i}`} className="row">
+                      <div key="pictureColumnOne" className="five wide column">
+                        <img
+                          key={`editPicture${i}`}
+                          src={`../static/${pic}`}
+                          className="ui image"
+                        />
                       </div>
-                      <div className="eight wide column">
+                      <div key="pictureColumnTwo" className="eight wide column">
                         <a>{pic}</a>
                       </div>
-                      <div className="three wide column">
+                      <div
+                        key="pictureColumnThree"
+                        className="three wide column"
+                      >
                         <Button
+                          key="pictureDeleteButton"
                           content="delete"
                           style={{ textAlign: "center" }}
                           onClick={() => {
@@ -430,8 +473,12 @@ class item extends Component {
                       </div>
                     </div>
                   ))}
-                  <div style={{ margin: "auto", marginTop: "30px" }}>
+                  <div
+                    key="pictureEditUpload"
+                    style={{ margin: "auto", marginTop: "30px" }}
+                  >
                     <Form.Input
+                      key="pictureEditUploader"
                       fluid
                       type="file"
                       label="Upload your new pictures here"
@@ -441,6 +488,7 @@ class item extends Component {
                       onChange={this.handleFiles}
                     />
                     <Button
+                      key="pictureEditSaveBtn"
                       color="green"
                       content="Save new Pictures"
                       onClick={this.addPictures}
@@ -453,9 +501,9 @@ class item extends Component {
             ) : (
               <div>
                 {/* Slider from react-slick and map all the pics into the Slider */}
-                <Slider {...settings} style={{ margin: "auto" }}>
+                <Slider key="slider" {...settings} style={{ margin: "auto" }}>
                   {this.state.pics.map((pic, i) => (
-                    <div>
+                    <div key="picturesMap">
                       <img
                         key={`pic${i}`}
                         src={`../static/${pic}`}
@@ -466,6 +514,7 @@ class item extends Component {
                 </Slider>
                 {this.state.currentUser === this.state.owner ? (
                   <Button
+                    key="pictureEditBtn"
                     basic
                     fluid
                     content="Edit Pictures"
@@ -484,18 +533,28 @@ class item extends Component {
               </div>
             )}
 
-            <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
+            <Divider
+              key="secondDivider"
+              section
+              style={{ maxWidth: "90%", marginLeft: "5%" }}
+            />
 
             <Grid
+              key="infoGrid"
               stackable
               columns={2}
               style={{ maxWidth: "85%", margin: "auto", marginTop: 30 }}
             >
-              <Grid.Row>
-                <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header style={{ color: "#7a7a52" }}>
+              <Grid.Row key="gridRowOne">
+                <Grid.Column
+                  key="gridCellOne"
+                  width={8}
+                  style={{ textAlign: "left" }}
+                >
+                  <Header key="descriptionHeader" style={{ color: "#7a7a52" }}>
                     Description
                     <Icon
+                      key="descriptionIcon"
                       style={{ marginLeft: 10 }}
                       name="file text"
                       size="mini"
@@ -505,6 +564,7 @@ class item extends Component {
                   {this.state.descriptionEdit ? (
                     <div>
                       <Form.Input
+                        key="descriptionEdit"
                         style={{ width: "100%", height: "250px" }}
                         control="textarea"
                         value={this.state.description}
@@ -513,6 +573,7 @@ class item extends Component {
                         }
                       />
                       <Button
+                        key="descriptionEditSaveBtn"
                         color="green"
                         content="save"
                         onClick={this.submitChange}
@@ -522,6 +583,7 @@ class item extends Component {
                   ) : (
                     <div>
                       <p
+                        key="description"
                         align="justify"
                         size="big"
                         style={{ marginLeft: 15, color: "#ccccb3" }}
@@ -531,6 +593,7 @@ class item extends Component {
                       {/* if currentUser is also owner of the object, edit button is visible */}
                       {this.state.currentUser === this.state.owner ? (
                         <Button
+                          key="editDescriptionBtn"
                           basic
                           fluid
                           content="Edit Description"
@@ -545,15 +608,25 @@ class item extends Component {
                     </div>
                   )}
                 </Grid.Column>
-                <Grid.Column width={8} style={{ textAlign: "right" }}>
-                  <Header style={{ color: "#7a7a52" }}>
+                <Grid.Column
+                  key="gridCellTwo"
+                  width={8}
+                  style={{ textAlign: "right" }}
+                >
+                  <Header key="priceHeader" style={{ color: "#7a7a52" }}>
                     Price
-                    <Icon name="usd" size="mini" style={{ marginLeft: 10 }} />
+                    <Icon
+                      key="priceIcon"
+                      name="usd"
+                      size="mini"
+                      style={{ marginLeft: 10 }}
+                    />
                   </Header>
                   {this.state.priceEdit ? (
                     <div>
-                      <Input fluid>
+                      <Input key="priceEditInputParent" fluid>
                         <NumberFormat
+                          key="priceEditInputChild"
                           style={{ textAlign: "right" }}
                           value={this.state.price}
                           thousandSeparator="´"
@@ -565,6 +638,7 @@ class item extends Component {
                         />
                       </Input>
                       <Button
+                        key="priceEditSaveBtn"
                         color="green"
                         content="save"
                         onClick={this.submitChange}
@@ -577,6 +651,7 @@ class item extends Component {
                   ) : (
                     <div>
                       <p
+                        key="price"
                         size="big"
                         style={{ marginRight: 30, color: "#ccccb3" }}
                       >
@@ -585,6 +660,7 @@ class item extends Component {
                       {/* if currentUser is also owner of the object, edit button is visible */}
                       {this.state.currentUser === this.state.owner ? (
                         <Button
+                          key="priceEditBtn"
                           basic
                           fluid
                           content="Edit Price"
@@ -600,11 +676,16 @@ class item extends Component {
                   )}
                 </Grid.Column>
               </Grid.Row>
-              <Grid.Row>
-                <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header style={{ color: "#7a7a52" }}>
+              <Grid.Row key="gridRowTwo">
+                <Grid.Column
+                  key="gridCellThree"
+                  width={8}
+                  style={{ textAlign: "left" }}
+                >
+                  <Header key="categoryHeader" style={{ color: "#7a7a52" }}>
                     Category
                     <Icon
+                      key="categoryIcon"
                       style={{ marginLeft: 10 }}
                       name="filter"
                       size="mini"
@@ -614,11 +695,13 @@ class item extends Component {
                   {this.state.categoryEdit ? (
                     <div>
                       <Form.Select
+                        key="categoryEdit"
                         options={categories}
                         placeholder={this.state.category}
                         onChange={this.handleCategoryChange}
                       />
                       <Button
+                        key="categoryEditSaveBtn"
                         color="green"
                         fluid
                         content="save"
@@ -633,6 +716,7 @@ class item extends Component {
                   ) : (
                     <div>
                       <a
+                        key="category"
                         style={{
                           cursor: "pointer",
                           marginLeft: 15,
@@ -644,6 +728,7 @@ class item extends Component {
                       </a>
                       {this.state.currentUser === this.state.owner ? (
                         <Button
+                          key="categoryEditBtn"
                           basic
                           fluid
                           content="Edit Category"
@@ -658,16 +743,22 @@ class item extends Component {
                     </div>
                   )}
                 </Grid.Column>
-                <Grid.Column width={8} style={{ textAlign: "right" }}>
-                  <Header style={{ color: "#7a7a52" }}>
+                <Grid.Column
+                  key="gridCellFour"
+                  width={8}
+                  style={{ textAlign: "right" }}
+                >
+                  <Header key="ownerHeader" style={{ color: "#7a7a52" }}>
                     Owner
                     <Icon
+                      key="ownerIcon"
                       name="user secret"
                       size="mini"
                       style={{ marginLeft: 10 }}
                     />
                   </Header>
                   <a
+                    key="owner"
                     style={{
                       cursor: "pointer",
                       marginRight: 30,
@@ -679,15 +770,25 @@ class item extends Component {
                   </a>
                 </Grid.Column>
               </Grid.Row>
-              <Grid.Row>
-                <Grid.Column width={8} style={{ textAlign: "left" }}>
-                  <Header style={{ color: "#7a7a52" }}>
+              <Grid.Row key="gridRowThree">
+                <Grid.Column
+                  key="gridCellFive"
+                  width={8}
+                  style={{ textAlign: "left" }}
+                >
+                  <Header key="tagHeader" style={{ color: "#7a7a52" }}>
                     Tags
-                    <Icon style={{ marginLeft: 10 }} name="tags" size="mini" />
+                    <Icon
+                      key="tagIcon"
+                      style={{ marginLeft: 10 }}
+                      name="tags"
+                      size="mini"
+                    />
                   </Header>
                   {this.state.tagEdit ? (
                     <div>
                       <Form.Select
+                        key="tagEdit"
                         options={options}
                         search
                         selection
@@ -700,11 +801,14 @@ class item extends Component {
                         onChange={this.handleChange}
                         width={12}
                       />
-                      <span style={{ color: "#7a7a52" }}>
-                        Your old tags were:{" "}
+                      <span key="oldTags" style={{ color: "#7a7a52" }}>
+                        Your old tags were:
                       </span>
-                      <p style={{ color: "#7a7a52" }}>{currentTags}</p>
+                      <p key="currentTags" style={{ color: "#7a7a52" }}>
+                        {currentTags}
+                      </p>
                       <Button
+                        key="tagEditSaveBtn"
                         color="green"
                         content="save"
                         fluid
@@ -716,6 +820,7 @@ class item extends Component {
                       {this.state.tags}
                       {this.state.currentUser === this.state.owner ? (
                         <Button
+                          key="tagEditBtn"
                           basic
                           fluid
                           content="Edit Tags"
@@ -734,30 +839,115 @@ class item extends Component {
                     </div>
                   )}
                 </Grid.Column>
-                <Grid.Column width={8} style={{ textAlign: "right" }}>
-                  <Header style={{ color: "#7a7a52" }}>
+                <Grid.Column
+                  key="gridCellSix"
+                  width={8}
+                  style={{ textAlign: "right" }}
+                >
+                  <Header key="statusHeader" style={{ color: "#7a7a52" }}>
                     Status
-                    <Icon name="info" size="mini" style={{ marginLeft: 10 }} />
+                    <Icon
+                      key="statusIcon"
+                      name="info"
+                      size="mini"
+                      style={{ marginLeft: 10 }}
+                    />
                   </Header>
-                  <a
+                  <p>
+                    <a
+                      key="status"
+                      style={{
+                        cursor: "pointer",
+                        marginRight: 30,
+                        color: "#adad85"
+                      }}
+                    >
+                      {this.state.status}
+                    </a>
+                  </p>
+                  <Button
+                    key="verifyStatusBtn"
+                    basic
+                    fluid
+                    content="Verify Status"
                     style={{
-                      cursor: "pointer",
-                      marginRight: 30,
-                      color: "#adad85"
+                      float: "right",
+                      maxWidth: "40%"
                     }}
+                    onClick={this.verifyItem}
+                  />
+                  <Modal
+                    key="verifyModal"
+                    dimmer="blurring"
+                    open={this.state.modalOpen}
+                    onClose={() => this.setState({ modalOpen: false })}
+                    basic
+                    style={{ textAlign: "center" }}
                   >
-                    {this.state.status}
-                  </a>
+                    <Modal.Header>
+                      <Header size="huge" style={{ color: "white" }}>
+                        Status verification on the Etherchain
+                      </Header>
+                    </Modal.Header>
+                    <Modal.Content>
+                      <Modal.Description>
+                        <Grid.Row>
+                          <Grid.Column>
+                            <Header
+                              size="large"
+                              style={{ color: "white", marginBottom: "5px" }}
+                            >
+                              Owner
+                            </Header>
+                            {this.state.verifiedOwner}
+                          </Grid.Column>
+                          <Grid.Column>
+                            <Header
+                              size="large"
+                              style={{
+                                color: "white",
+                                marginTop: "15px",
+                                marginBottom: "5px"
+                              }}
+                            >
+                              Status
+                            </Header>
+                            {this.state.verifiedStatus}
+                          </Grid.Column>
+                        </Grid.Row>
+                      </Modal.Description>
+                    </Modal.Content>
+                    <Modal.Actions>
+                      <Button
+                        key="verifyOkay"
+                        positive
+                        icon="checkmark"
+                        labelPosition="right"
+                        content="Okay"
+                        onClick={() => this.setState({ modalOpen: false })}
+                      />
+                    </Modal.Actions>
+                  </Modal>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
-            <Divider section style={{ maxWidth: "90%", marginLeft: "5%" }} />
-            <div style={{ margin: "auto", marginTop: "20px" }}>
-              <Header style={{ color: "#7a7a52" }}>
+            <Divider
+              key="thirdDivider"
+              section
+              style={{ maxWidth: "90%", marginLeft: "5%" }}
+            />
+            <div key="buySection" style={{ margin: "auto", marginTop: "20px" }}>
+              <Header key="buyHeader" style={{ color: "#7a7a52" }}>
                 Buy Item
-                <Icon name="handshake" size="mini" style={{ marginLeft: 10 }} />
+                <Icon
+                  key="buyIcon"
+                  name="handshake"
+                  size="mini"
+                  style={{ marginLeft: 10 }}
+                />
               </Header>
               <Button
+                key="buyButton"
                 style={{
                   maxWidth: "20%",
                   marginTop: "5px",
@@ -769,8 +959,7 @@ class item extends Component {
                 size="small"
                 onClick={this.purchaseItem}
               >
-                <span style={{ color: "#adad85" }}>
-                  {" "}
+                <span key="buyBtnContent" style={{ color: "#adad85" }}>
                   Purchase for {this.state.price}
                 </span>
               </Button>
@@ -789,8 +978,9 @@ export default item;
 function CustomNextArrow(props) {
   const { className, onClick } = props;
   return (
-    <div className={className} style={{ zIndex: 2 }}>
+    <div key="fwdButton" className={className} style={{ zIndex: 2 }}>
       <Button
+        key="forwardButton"
         size="mini"
         style={{
           display: "block",
@@ -802,7 +992,7 @@ function CustomNextArrow(props) {
         }}
         onClick={onClick}
       >
-        <Icon name="forward" size="huge" />
+        <Icon key="forwardArrow" name="forward" size="huge" />
       </Button>
     </div>
   );
@@ -811,8 +1001,9 @@ function CustomNextArrow(props) {
 function CustomPrevArrow(props) {
   const { className, onClick } = props;
   return (
-    <div className={className} style={{ zIndex: 2 }}>
+    <div key="bckButton" className={className} style={{ zIndex: 2 }}>
       <Button
+        key="backButton"
         size="mini"
         style={{
           display: "block",
@@ -825,7 +1016,7 @@ function CustomPrevArrow(props) {
         }}
         onClick={onClick}
       >
-        <Icon name="backward" size="huge" />
+        <Icon key="backwardArrow" name="backward" size="huge" />
       </Button>
     </div>
   );

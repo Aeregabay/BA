@@ -1,27 +1,29 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.25;
 
 contract TradingContract {
     
     struct Object {
         address owner;
-        string tag;
+        string status;
     }
 
     mapping (uint => Object) public objects;
 
-    function tradeObject(address buyerAdd, address payable sellerAdd, uint objectId, string memory newTag) public payable {
+    function tradeObject(address buyerAdd, address sellerAdd, uint objectId, string newStatus) public payable {
         objects[objectId].owner = buyerAdd;
-        objects[objectId].tag = newTag;
+        objects[objectId].status = newStatus;
 
         sellerAdd.transfer(msg.value);
     }
 
-    function registerObject(uint objectId, address owner, string memory tag) public {
-        objects[objectId] = Object(owner, tag);
+    function registerObject(uint objectId, address owner, string status) public payable {
+        objects[objectId] = Object(owner, status);
     }
 
-    function getObject(uint objectId) public view returns (address, string memory) {
-        return (objects[objectId].owner, objects[objectId].tag);
+    function getObject(uint objectId) public view returns (address owner, string status ) {
+        owner = objects[objectId].owner;
+        status = objects[objectId].status;
+        return (owner, status);
     }
 
 }
