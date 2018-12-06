@@ -73,8 +73,7 @@ class Layout extends Component {
       window.location.origin + "/deleteCookie",
       this.state.cookie
     );
-    Router.pushRoute("index");
-    alert("You've successfully logged out");
+    this.setState({ logoutModal: true });
   };
 
   render() {
@@ -107,6 +106,37 @@ class Layout extends Component {
               onClick={() => {
                 this.setState({ loginModal: false });
                 Router.pushRoute("login");
+              }}
+            />
+          </Modal.Actions>
+        </Modal>
+        <Modal
+          key="logoutModal"
+          dimmer="blurring"
+          open={this.state.logoutModal}
+          onClose={() => {
+            this.setState({ logoutModal: false });
+            Router.pushRoute("index");
+          }}
+          basic
+          style={{ textAlign: "center" }}
+        >
+          <Modal.Header>
+            <Header size="huge" style={{ color: "white" }}>
+              You've logged out, see you soon!
+            </Header>
+            <Icon name="power off" size="huge" color="red" />
+          </Modal.Header>
+          <Modal.Actions>
+            <Button
+              key="logoutModalBtn"
+              positive
+              icon="arrow right"
+              labelPosition="right"
+              content="Proceed to index"
+              onClick={() => {
+                this.setState({ logoutModal: false });
+                Router.pushRoute("index");
               }}
             />
           </Modal.Actions>
