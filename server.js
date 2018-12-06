@@ -149,10 +149,10 @@ app
               }
               //if passwords don't match
             } else {
-              console.log(err);
-              res.status(400).json({
+              console.log("password incorrect");
+              res.status(200).json({
                 success: false,
-                message: "The password was incorrect"
+                password: false
               });
             }
           });

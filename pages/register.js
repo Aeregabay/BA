@@ -7,7 +7,9 @@ import {
   Message,
   Icon,
   Dimmer,
-  Loader
+  Loader,
+  Modal,
+  Header
 } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
@@ -70,7 +72,8 @@ class register extends Component {
     this.state = {
       userAccount: "",
       metaMask: false,
-      dimmer: false
+      dimmer: false,
+      registerModal: false
     };
   }
 
@@ -118,20 +121,13 @@ class register extends Component {
           );
           try {
             if (res.data.success) {
-              this.setState({ dimmer: false });
-              alert(
-                "Congratulations, you've successfully registred. Now proceed to the login page"
-              );
-              Router.pushRoute("login");
+              this.setState({ dimmer: false, registerModal: true });
             }
           } catch (error) {
             console.log(error);
           }
         } else {
-          alert(
-            "You are not yet registered on the KYC platform, please do so first and try again"
-          );
-          location.reload();
+          this.setState({ registerFail: true });
         }
       }
     });
@@ -147,6 +143,71 @@ class register extends Component {
               leave the page
             </Loader>
           </Dimmer>
+          <Modal
+            key="registerModal"
+            dimmer="blurring"
+            open={this.state.registerModal}
+            onClose={() => {
+              this.setState({ registerModal: false });
+              Router.pushRoute("login");
+            }}
+            basic
+            style={{ textAlign: "center" }}
+          >
+            <Modal.Header>
+              <Header size="huge" style={{ color: "white" }}>
+                Congratulations, you've successfully registered. Now proceed to
+                the login page
+              </Header>
+              <Icon name="check" size="huge" color="green" />
+            </Modal.Header>
+            <Modal.Actions>
+              <Button
+                key="registerOkay"
+                positive
+                icon="arrow right"
+                labelPosition="right"
+                content="Proceed to login"
+                onClick={() => {
+                  this.setState({ registerModal: false });
+                  Router.pushRoute("login");
+                }}
+              />
+            </Modal.Actions>
+          </Modal>
+          <Modal
+            key="registerFail"
+            dimmer="blurring"
+            open={this.state.registerFail}
+            onClose={() => {
+              this.setState({ registerFail: false });
+              location.reload();
+            }}
+            basic
+            style={{ textAlign: "center" }}
+          >
+            <Modal.Header>
+              <Header size="huge" style={{ color: "white" }}>
+                Could not retrieve your information.
+                <p>Please register on the KYC Platform first.</p>
+              </Header>
+              <Icon name="remove" size="huge" color="red" />
+            </Modal.Header>
+            <Modal.Actions>
+              <Button
+                key="registerNotOkay"
+                positive
+                icon="refresh"
+                labelPosition="right"
+                content="Try again"
+                onClick={() => {
+                  this.setState({ registerFail: false });
+                  location.reload();
+                }}
+              />
+            </Modal.Actions>
+          </Modal>
+
           <div>
             {this.state.metaMask ? (
               <div>
