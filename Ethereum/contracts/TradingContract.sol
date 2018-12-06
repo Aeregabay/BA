@@ -7,6 +7,10 @@ contract TradingContract {
         string status;
     }
 
+    event PurchaseListen(
+        bool confirmed
+    );
+
     mapping (uint => Object) public objects;
 
     function tradeObject(address buyerAdd, address sellerAdd, uint objectId, string newStatus) public payable {
@@ -14,6 +18,8 @@ contract TradingContract {
         objects[objectId].status = newStatus;
 
         sellerAdd.transfer(msg.value);
+
+        emit PurchaseListen(true);
     }
 
     function registerObject(uint objectId, address owner, string status) public payable {

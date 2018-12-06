@@ -33,12 +33,6 @@ class register extends Component {
     verify = new web3.eth.Contract(ABI, contractAddress);
   }
 
-  // awaitVerify(args) {
-  //   setTimeout(() => {
-  //     if (!args) this.awaitVerify;
-  //   }, 50);
-  // }
-
   onSubmit = async () => {
     let kycKey = document.getElementById("kycKey").value;
 

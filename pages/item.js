@@ -19,6 +19,11 @@ import NumberFormat from "react-number-format";
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 import { ABI, contractAddress } from "../ethereum/deployedContract";
+global.fetch = require("node-fetch");
+const cc = require("cryptocompare");
+cc.setApiKey(
+  "41e7dfb621809bb8dc9f905d7fa8a728389852a7d41e9e225d88e68cfe6d2b4b"
+);
 
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -89,6 +94,7 @@ let options = [];
 let currentValues = [];
 let currentTags = [];
 let picsToAdd = [];
+let verify;
 
 class item extends Component {
   constructor(props) {
@@ -112,14 +118,16 @@ class item extends Component {
       titleEdit: false,
       modalOpen: false,
       verifiedStatus: "",
-      verifiedOwner: ""
+      verifiedOwner: "",
+      buyerAddress: "",
+      sellerAddress: "",
+      ethPrice: "",
+      ownsItem: false
     };
   }
 
   verifyItem = async () => {
     this.setState({ modalOpen: true });
-
-    let verify = await new web3.eth.Contract(ABI, contractAddress);
 
     let result = await verify.methods.getObject(this.state.id).call();
     this.setState({ verifiedStatus: result[1], verifiedOwner: result[0] });
@@ -135,7 +143,7 @@ class item extends Component {
   };
 
   //fetches objectIds to display from server
-  async getObjectIds(searchTerm) {
+  getObjectIds = async searchTerm => {
     let result = await axios.post(window.location.origin + "/search", {
       query: searchTerm
     });
@@ -157,7 +165,7 @@ class item extends Component {
     } else {
       console.log("the search has failed");
     }
-  }
+  };
 
   deletePicture = async (picture, picNumber) => {
     let tempPics = this.state.pics;
@@ -273,14 +281,46 @@ class item extends Component {
     this.getObjectIds(content);
   };
 
-  purchaseItem = () => {
-    //implement purchasing of items using Ethereum wallets with extensions
-    //such as web3
-    alert("The purchasing functionality has not yet been implemented");
+  purchaseItem = async () => {
+    this.setState({ purchaseInit: false });
+
+    verify.methods
+      .tradeObject(
+        this.state.buyerAddress,
+        this.state.sellerAddress,
+        this.state.id,
+        this.state.status
+      )
+      .send({
+        from: this.state.buyerAddress,
+        value: web3.utils.toWei(this.state.ethPrice.toString(), "ether")
+      });
+
+    await verify.events.PurchaseListen({}, async (err, res) => {
+      if (err) {
+        console.log(err);
+      } else if (res.returnValues.confirmed) {
+        let purchaseRes = await axios.post(
+          window.location.origin + "/purchaseItem",
+          {
+            objectId: this.state.id,
+            buyer: this.state.currentUser
+          }
+        );
+        if (purchaseRes.data.success) {
+          alert(
+            "You have successfully purchased the item with id " + this.state.id
+          );
+        } else {
+          alert("The purchase of item " + this.state.id + " has failed.");
+        }
+      }
+    });
   };
 
   //fetch object from server and write to state
   async componentWillMount() {
+    verify = await new web3.eth.Contract(ABI, contractAddress);
     let thisObject;
 
     let pathname = window.location.pathname.split("/");
@@ -313,6 +353,12 @@ class item extends Component {
         );
       }
 
+      let ethToCHF = await cc.price("ETH", ["CHF"]);
+      let priceToNumber = Number(
+        thisObject[0].price.slice(0, this.state.price.length - 4)
+      );
+      let price = priceToNumber / ethToCHF.CHF;
+
       this.setState({
         id: response.data.id,
         title: thisObject[0].title,
@@ -322,14 +368,26 @@ class item extends Component {
         price: thisObject[0].price,
         status: thisObject[0].status,
         tags: tagsToReturn,
-        pics: picsTemp
+        pics: picsTemp,
+        ethPrice: price
       });
     }
-
     //fetch currentUser from cookie
-    let resultTwo = await axios.post(window.location.origin + "/getCookie");
+    let resultTwo = await axios.post(
+      window.location.origin + "/getEthAccounts",
+      {
+        seller: thisObject[0].owner
+      }
+    );
     if (resultTwo.data.success) {
-      this.setState({ currentUser: resultTwo.data.username });
+      this.setState({
+        currentUser: resultTwo.data.username,
+        buyerAddress: resultTwo.data.buyerAddress,
+        sellerAddress: resultTwo.data.sellerAddress
+      });
+    }
+    if (resultTwo.data.buyerAddress === resultTwo.data.sellerAddress) {
+      this.setState({ ownsItem: true });
     }
 
     //fetch tags from DB to display options when editing tags
@@ -817,7 +875,7 @@ class item extends Component {
                     </div>
                   ) : (
                     <div>
-                      {this.state.tags}
+                      <p>{this.state.tags}</p>
                       {this.state.currentUser === this.state.owner ? (
                         <Button
                           key="tagEditBtn"
@@ -826,7 +884,7 @@ class item extends Component {
                           content="Edit Tags"
                           style={{
                             float: "right",
-                            marginTop: "10px",
+                            // marginTop: "10px",
                             maxWidth: "40%"
                           }}
                           onClick={() => {
@@ -872,7 +930,8 @@ class item extends Component {
                     content="Verify Status"
                     style={{
                       float: "right",
-                      maxWidth: "40%"
+                      maxWidth: "40%",
+                      marginTop: "3px"
                     }}
                     onClick={this.verifyItem}
                   />
@@ -946,24 +1005,85 @@ class item extends Component {
                   style={{ marginLeft: 10 }}
                 />
               </Header>
-              <Button
-                key="buyButton"
-                style={{
-                  maxWidth: "20%",
-                  marginTop: "5px",
-                  border: "1px solid #7a7a52",
-                  margin: "auto"
-                }}
-                basic
-                fluid
-                size="small"
-                onClick={this.purchaseItem}
-              >
-                <span key="buyBtnContent" style={{ color: "#adad85" }}>
-                  Purchase for {this.state.price}
-                </span>
-              </Button>
+              {this.state.ownsItem ? (
+                <p
+                  key="description"
+                  align="justify"
+                  size="big"
+                  style={{
+                    marginLeft: 15,
+                    color: "#ccccb3",
+                    textAlign: "center"
+                  }}
+                >
+                  You already own this item
+                </p>
+              ) : (
+                <Button
+                  key="buyButton"
+                  style={{
+                    maxWidth: "20%",
+                    marginTop: "5px",
+                    border: "1px solid #7a7a52",
+                    margin: "auto"
+                  }}
+                  basic
+                  hidden={this.state.ownsItem}
+                  fluid
+                  size="small"
+                  onClick={() => this.setState({ purchaseInit: true })}
+                >
+                  <span key="buyBtnContent" style={{ color: "#adad85" }}>
+                    Purchase for {this.state.price}
+                  </span>
+                </Button>
+              )}
             </div>
+            <Modal
+              key="purchaseModal"
+              dimmer="blurring"
+              open={this.state.purchaseInit}
+              onClose={() => this.setState({ purchaseInit: false })}
+              basic
+              style={{ textAlign: "center" }}
+            >
+              <Modal.Header>
+                <Header size="huge" style={{ color: "white" }}>
+                  Are you sure you want to purchase this item?
+                </Header>
+              </Modal.Header>
+              <Modal.Content>
+                <Modal.Description>
+                  <Header
+                    size="large"
+                    style={{ color: "white", marginBottom: "5px" }}
+                  >
+                    Price
+                  </Header>
+                  {this.state.price}
+                  <p>~ {Number(this.state.ethPrice).toFixed(2)} ETH</p>
+                </Modal.Description>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button
+                  key="purchaseCancel"
+                  negative
+                  icon="remove"
+                  labelPosition="right"
+                  content="Cancel"
+                  onClick={() => this.setState({ purchaseInit: false })}
+                  style={{ float: "left" }}
+                />
+                <Button
+                  key="purchaseOkay"
+                  positive
+                  icon="checkmark"
+                  labelPosition="right"
+                  content="Confirm Purchase"
+                  onClick={this.purchaseItem}
+                />
+              </Modal.Actions>
+            </Modal>
           </Container>
         </Layout>
       </div>

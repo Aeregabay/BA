@@ -49,8 +49,14 @@ const ABI = [
     payable: false,
     stateMutability: "view",
     type: "function"
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: false, name: "confirmed", type: "bool" }],
+    name: "PurchaseListen",
+    type: "event"
   }
 ];
-const contractAddress = "0xbE335e67DE4eF9381e0e2C43505b531fc7C25BA9";
+const contractAddress = "0x5bf6A9bC3e17A8d7f095B2e9BBb3dF07e34DE7C4";
 
 export { ABI, contractAddress };

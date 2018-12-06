@@ -244,121 +244,156 @@ app
           }
         });
 
-        //statement to get back ObjectId that we need for
-        // statements below (tags corresponding to an object)
-        let objectIdSql =
-          "SELECT id FROM objects WHERE title = '" +
-          req.body.title +
-          "' AND description = " +
-          SqlString.escape(req.body.description) +
-          " AND price = " +
-          SqlString.escape(req.body.price) +
-          " AND owner = '" +
-          username +
-          "' AND category = '" +
-          req.body.category +
-          "' AND status = '" +
-          req.body.status +
-          "'";
+        let intervalTwo = setInterval(() => {
+          if (objectId !== undefined) {
+            //TAGS INSERTION BLOCK
+            //this block transforms req.body.currentValues into the array we need to
+            //insert into the INSERT statement
+            let tags = req.body.currentValues;
+            let finalTags = tags.split(",");
 
-        // //SQL query to obtain objectId
-        // database.connection.query(objectIdSql, (err, objectIdResult) => {
-        //   //if query fails
-        //   if (err) {
-        //     console.log("The objectIdSearch has failed");
-        //     console.log(err);
-        //   } else {
-        //     //set objectIt to query result
-        //     objectId = objectIdResult[0].id;
-        //     console.log("objectId retrieval success");
-
-        //     //TAGS INSERTION BLOCK
-        //     //this block transforms req.body.currentValues into the array we need to
-        //     //insert into the INSERT statement
-        //     let tags = req.body.currentValues;
-        //     let finalTags = tags.split(",");
-
-        //initiate the statement and append the statement for each tag inside the tags array
-        //for this, multiple execution has to be enabled in MySQL
-        let tagsSql = "";
-        for (let i = 0; i < finalTags.length; i++) {
-          tagsSql +=
-            "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
-            objectId +
-            "', '" +
-            finalTags[i] +
-            "');";
-        }
-
-        //actual insertion of tags to DB
-        database.connection.query(tagsSql, (err, tagsResult) => {
-          //if query fails
-          if (err) {
-            console.log("The tags insertion has failed");
-            console.log(err);
-          } else {
-            console.log("tag insertion success");
-
-            //PICS INSERTION BLOCK
-            //create pics array to write req.files into it (pics from client side)
-            let pics = [];
-            let picKeys = Object.keys(req.files);
-
-            picKeys.forEach(function(key) {
-              pics.push(req.files[key]);
-            });
-            //Just like with the tags, create concattenated SQL statement to insert each pic
-            //in pics array into DB
-            let picsSql = "";
-            for (let i = 0; i < pics.length; i++) {
-              let picName = username + "_" + pics[i].name;
-              picsSql +=
-                "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
+            //initiate the statement and append the statement for each tag inside the tags array
+            //for this, multiple execution has to be enabled in MySQL
+            let tagsSql = "";
+            for (let i = 0; i < finalTags.length; i++) {
+              tagsSql +=
+                "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
                 objectId +
                 "', '" +
-                picName +
+                finalTags[i] +
                 "');";
             }
-            //actual SQL query to insert pics into DB
-            database.connection.query(picsSql, (err, picsResult) => {
+
+            //actual insertion of tags to DB
+            database.connection.query(tagsSql, (err, tagsResult) => {
               //if query fails
               if (err) {
-                console.log("The pics insertion has failed");
+                console.log("The tags insertion has failed");
                 console.log(err);
               } else {
-                console.log("Pic insertion success");
+                console.log("tag insertion success");
 
-                //if successfully inserted into DB, move Pics to local static folder
+                //PICS INSERTION BLOCK
+                //create pics array to write req.files into it (pics from client side)
+                let pics = [];
+                let picKeys = Object.keys(req.files);
+
+                picKeys.forEach(function(key) {
+                  pics.push(req.files[key]);
+                });
+                //Just like with the tags, create concattenated SQL statement to insert each pic
+                //in pics array into DB
+                let picsSql = "";
                 for (let i = 0; i < pics.length; i++) {
-                  pics[i].mv(
-                    "static/" + username + "_" + pics[i].name,
-                    function(err) {
-                      if (err) {
-                        return res.status(500).send(err);
-                      }
-                    }
-                  );
+                  let picName = username + "_" + pics[i].name;
+                  picsSql +=
+                    "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
+                    objectId +
+                    "', '" +
+                    picName +
+                    "');";
                 }
+                //actual SQL query to insert pics into DB
+                database.connection.query(picsSql, (err, picsResult) => {
+                  //if query fails
+                  if (err) {
+                    console.log("The pics insertion has failed");
+                    console.log(err);
+                  } else {
+                    console.log("Pic insertion success");
+
+                    //if successfully inserted into DB, move Pics to local static folder
+                    for (let i = 0; i < pics.length; i++) {
+                      pics[i].mv(
+                        "static/" + username + "_" + pics[i].name,
+                        function(err) {
+                          if (err) {
+                            return res.status(500).send(err);
+                          }
+                        }
+                      );
+                    }
+                  }
+                });
               }
             });
+            clearInterval(intervalTwo);
           }
-        });
-        //   }
-        // });
+        }, 10);
       }
       let interval = setInterval(() => {
         if (objectId !== undefined) {
+          //if everything succeeded, send confirmation to client side
           res.status(200).json({
             success: true,
             message: "The object has successfully been inserted into the DB",
             objectId: objectId
           });
-          console.log(objectId);
           clearInterval(interval);
         }
       }, 50);
-      // console.log(objectResult[0].insertId);
-      //if everything succeeded, send confirmation to client side
+    });
+
+    server.post("/purchaseItem", urlEncodedParser, (req, res) => {
+      let buyer = req.body.buyer;
+      let objectId = req.body.objectId;
+
+      database.connection.query(
+        SqlString.format("UPDATE objects SET owner = ? WHERE id = ?", [
+          buyer,
+          objectId
+        ]),
+        (err, result) => {
+          if (err) {
+            console.log("The object transfer has failed");
+          } else {
+            console.log(
+              "The object with id " + objectId + " is now owned by " + buyer
+            );
+          }
+        }
+      );
+    });
+
+    server.post("/getEthAccounts", urlEncodedParser, (req, res) => {
+      let cookie = req.cookies["x-access-token"];
+      let buyer;
+      let seller = req.body.seller;
+
+      if (cookie) {
+        jwt.verify(cookie, secret, (err, decoded) => {
+          if (err) {
+            console.log("no cookie available");
+          } else {
+            buyer = decoded.username;
+            database.connection.query(
+              SqlString.format(
+                "SELECT eth_account FROM users WHERE username IN (?, ?)",
+                [buyer, seller]
+              ),
+              (err, result) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  let sellerAddress;
+                  if (result.length < 2) {
+                    sellerAddress = result[0].eth_account;
+                  } else {
+                    sellerAddress = result[1].eth_account;
+                  }
+                  res.status(200).json({
+                    cookie,
+                    username: buyer,
+                    buyerAddress: result[0].eth_account,
+                    sellerAddress: sellerAddress,
+                    success: true
+                  });
+                }
+              }
+            );
+          }
+        });
+      }
     });
 
     server.post("/getCookie", urlEncodedParser, (req, res) => {
@@ -482,19 +517,27 @@ app
           }
         }
       });
-      //timeout to prevent status to be sent before sql queries are returned
+      //interval to prevent status to be sent before sql queries are returned
       //without this, empty arrays are sent to client and headers will be tried to be set
       //after they've been sent, which results in an error
-      setTimeout(function() {
-        res.status(200).send({
-          objectIds,
-          objectsToSend,
-          resultingTags,
-          resultingPics,
-          message: "The object retrieval has been successful",
-          success: true
-        });
-      }, 50);
+      let interval = setInterval(() => {
+        if (
+          objectIds !== undefined &&
+          objectsToSend !== undefined &&
+          resultingTags !== undefined &&
+          resultingPics !== undefined
+        ) {
+          res.status(200).send({
+            objectIds,
+            objectsToSend,
+            resultingTags,
+            resultingPics,
+            message: "The object retrieval has been successful",
+            success: true
+          });
+          clearInterval(interval);
+        }
+      }, 10);
     });
 
     server.post("/item", (req, res) => {
