@@ -3,10 +3,11 @@ import Router from "../routes";
 import {
   Header,
   Container,
-  Divider,
   List,
   Icon,
-  Segment
+  Segment,
+  Modal,
+  Button
 } from "semantic-ui-react";
 import Head from "next/head";
 import axios from "axios";
@@ -27,7 +28,8 @@ class Layout extends Component {
       this.setState({
         cookie: response.data.cookie,
         currentUser: response.data.username,
-        isLoggedIn: true
+        isLoggedIn: true,
+        loginModal: false
       });
     }
   }
@@ -37,24 +39,21 @@ class Layout extends Component {
     if (this.state.isLoggedIn) {
       Router.pushRoute("sell");
     } else {
-      alert("You need to be logged in to access this page");
-      Router.pushRoute("login");
+      this.setState({ loginModal: true });
     }
   };
   toProfile = () => {
     if (this.state.isLoggedIn) {
       Router.pushRoute("myprofile");
     } else {
-      alert("You need to be logged in to access this page");
-      Router.pushRoute("login");
+      this.setState({ loginModal: true });
     }
   };
   toSettings = () => {
     if (this.state.isLoggedIn) {
       Router.pushRoute("settings");
     } else {
-      alert("You need to be logged in to access this page");
-      Router.pushRoute("login");
+      this.setState({ loginModal: true });
     }
   };
   toBrowse = e => {
@@ -81,6 +80,37 @@ class Layout extends Component {
   render() {
     return (
       <div>
+        <Modal
+          key="loginModal"
+          dimmer="blurring"
+          open={this.state.loginModal}
+          onClose={() => {
+            this.setState({ loginModal: false });
+            Router.pushRoute("login");
+          }}
+          basic
+          style={{ textAlign: "center" }}
+        >
+          <Modal.Header>
+            <Header size="huge" style={{ color: "white" }}>
+              You have to be logged in in order to view this page!
+            </Header>
+            <Icon name="remove" size="huge" color="red" />
+          </Modal.Header>
+          <Modal.Actions>
+            <Button
+              key="loginPromt"
+              positive
+              icon="arrow right"
+              labelPosition="right"
+              content="Proceed to login"
+              onClick={() => {
+                this.setState({ loginModal: false });
+                Router.pushRoute("login");
+              }}
+            />
+          </Modal.Actions>
+        </Modal>
         <Head>
           <link
             rel="stylesheet"

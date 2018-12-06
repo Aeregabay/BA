@@ -350,6 +350,7 @@ app
             console.log(
               "The object with id " + objectId + " is now owned by " + buyer
             );
+            res.status(200).json({ success: true });
           }
         }
       );
@@ -359,6 +360,8 @@ app
       let cookie = req.cookies["x-access-token"];
       let buyer;
       let seller = req.body.seller;
+      let buyerAddress;
+      let sellerAddress;
 
       if (cookie) {
         jwt.verify(cookie, secret, (err, decoded) => {
@@ -366,28 +369,43 @@ app
             console.log("no cookie available");
           } else {
             buyer = decoded.username;
+
             database.connection.query(
               SqlString.format(
-                "SELECT eth_account FROM users WHERE username IN (?, ?)",
-                [buyer, seller]
+                "SELECT eth_account FROM users WHERE username = ?",
+                [buyer]
               ),
-              (err, result) => {
+              (err, buyerRes) => {
                 if (err) {
                   console.log(err);
+                  console.log("buyer retrieval has failed");
                 } else {
-                  let sellerAddress;
-                  if (result.length < 2) {
-                    sellerAddress = result[0].eth_account;
-                  } else {
-                    sellerAddress = result[1].eth_account;
-                  }
-                  res.status(200).json({
-                    cookie,
-                    username: buyer,
-                    buyerAddress: result[0].eth_account,
-                    sellerAddress: sellerAddress,
-                    success: true
-                  });
+                  buyerAddress = buyerRes[0].eth_account;
+                  console.log("buyer retrieval successful");
+
+                  database.connection.query(
+                    SqlString.format(
+                      "SELECT eth_account FROM users WHERE username = ?",
+                      [seller]
+                    ),
+                    (err, sellerRes) => {
+                      if (err) {
+                        console.log(err);
+                        console.log("seller retrieval has failed");
+                      } else {
+                        sellerAddress = sellerRes[0].eth_account;
+                        console.log("seller retrieval successful");
+
+                        res.status(200).json({
+                          cookie,
+                          username: buyer,
+                          buyerAddress: buyerAddress,
+                          sellerAddress: sellerAddress,
+                          success: true
+                        });
+                      }
+                    }
+                  );
                 }
               }
             );

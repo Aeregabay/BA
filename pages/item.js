@@ -11,7 +11,9 @@ import {
   Form,
   Input,
   Segment,
-  Modal
+  Modal,
+  Dimmer,
+  Loader
 } from "semantic-ui-react";
 import Slider from "react-slick";
 import Router from "../routes";
@@ -122,7 +124,9 @@ class item extends Component {
       buyerAddress: "",
       sellerAddress: "",
       ethPrice: "",
-      ownsItem: false
+      ownsItem: false,
+      dimmer: false,
+      successModalOpen: false
     };
   }
 
@@ -282,7 +286,7 @@ class item extends Component {
   };
 
   purchaseItem = async () => {
-    this.setState({ purchaseInit: false });
+    this.setState({ purchaseInit: false, dimmer: true });
 
     verify.methods
       .tradeObject(
@@ -296,7 +300,7 @@ class item extends Component {
         value: web3.utils.toWei(this.state.ethPrice.toString(), "ether")
       });
 
-    await verify.events.PurchaseListen({}, async (err, res) => {
+    verify.events.PurchaseListen({}, async (err, res) => {
       if (err) {
         console.log(err);
       } else if (res.returnValues.confirmed) {
@@ -308,9 +312,10 @@ class item extends Component {
           }
         );
         if (purchaseRes.data.success) {
-          alert(
-            "You have successfully purchased the item with id " + this.state.id
-          );
+          // alert(
+          //   "You have successfully purchased the item with id " + this.state.id
+          // );
+          this.setState({ dimmer: false, successModalOpen: true });
         } else {
           alert("The purchase of item " + this.state.id + " has failed.");
         }
@@ -439,6 +444,12 @@ class item extends Component {
           />
         </div>
         <Layout>
+          <Dimmer inverted active={this.state.dimmer}>
+            <Loader>
+              Please wait for the transaction to complete, do not refresh or
+              leave the page
+            </Loader>
+          </Dimmer>
           <Container
             key="objectInfo"
             textAlign="center"
@@ -984,6 +995,37 @@ class item extends Component {
                         labelPosition="right"
                         content="Okay"
                         onClick={() => this.setState({ modalOpen: false })}
+                      />
+                    </Modal.Actions>
+                  </Modal>
+                  <Modal
+                    key="successModal"
+                    dimmer="blurring"
+                    open={this.state.successModalOpen}
+                    onClose={() => {
+                      this.setState({ successModalOpen: false });
+                      location.reload();
+                    }}
+                    basic
+                    style={{ textAlign: "center" }}
+                  >
+                    <Modal.Header>
+                      <Header size="huge" style={{ color: "white" }}>
+                        Congratulations, you now own this object!
+                      </Header>
+                      <Icon name="check" size="huge" color="green" />
+                    </Modal.Header>
+                    <Modal.Actions>
+                      <Button
+                        key="successOkay"
+                        positive
+                        icon="checkmark"
+                        labelPosition="right"
+                        content="Proceed"
+                        onClick={() => {
+                          this.setState({ successModalOpen: false });
+                          location.reload();
+                        }}
                       />
                     </Modal.Actions>
                   </Modal>

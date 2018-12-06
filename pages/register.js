@@ -1,13 +1,67 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { Button, Form, Container, Message, Icon } from "semantic-ui-react";
+import {
+  Button,
+  Form,
+  Container,
+  Message,
+  Icon,
+  Dimmer,
+  Loader
+} from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
-import { ABI, contractAddress } from "../ethereum/deployedContract";
 
+let ABI = [
+  {
+    constant: false,
+    inputs: [{ name: "confirmed", type: "bool" }],
+    name: "answer",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: "payKYC",
+    outputs: [],
+    payable: true,
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: "kycKey", type: "string" },
+      { name: "platformAddress", type: "address" }
+    ],
+    name: "transfer",
+    outputs: [],
+    payable: true,
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, name: "kycKey", type: "string" },
+      { indexed: false, name: "platformAddress", type: "address" }
+    ],
+    name: "KycListen",
+    type: "event"
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: false, name: "confirmed", type: "bool" }],
+    name: "PlatformListen",
+    type: "event"
+  }
+];
 let verify;
 
 class register extends Component {
@@ -15,25 +69,30 @@ class register extends Component {
     super(props);
     this.state = {
       userAccount: "",
-      metaMask: false
+      metaMask: false,
+      dimmer: false
     };
   }
 
   async componentWillMount() {
-    setInterval(() => {
+    let interval = setInterval(() => {
       web3.eth.getAccounts(async (err, accounts) => {
         if (err) console.log(err);
         else if (accounts.length === 0) this.setState({ metaMask: false });
         else if (accounts.length > 0) {
           this.setState({ metaMask: true, userAccount: accounts[0] });
+          clearInterval(interval);
         }
       });
     }, 500);
 
-    verify = new web3.eth.Contract(ABI, contractAddress);
+    verify = new web3.eth.Contract(
+      ABI,
+      "0x7bef31F17d4305A7f0AEdDC64feF61Dd6C0620C6"
+    );
   }
-
   onSubmit = async () => {
+    this.setState({ dimmer: true });
     let kycKey = document.getElementById("kycKey").value;
 
     verify.methods.transfer(kycKey, adminAddress).send({
@@ -59,6 +118,7 @@ class register extends Component {
           );
           try {
             if (res.data.success) {
+              this.setState({ dimmer: false });
               alert(
                 "Congratulations, you've successfully registred. Now proceed to the login page"
               );
@@ -81,6 +141,12 @@ class register extends Component {
     return (
       <Layout>
         <Container style={{ margin: "20px" }}>
+          <Dimmer inverted active={this.state.dimmer}>
+            <Loader>
+              Please wait for the transaction to complete, do not refresh or
+              leave the page
+            </Loader>
+          </Dimmer>
           <div>
             {this.state.metaMask ? (
               <div>
