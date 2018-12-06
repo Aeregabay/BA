@@ -537,7 +537,7 @@ app
           });
           clearInterval(interval);
         }
-      }, 10);
+      }, 50);
     });
 
     server.post("/item", (req, res) => {
