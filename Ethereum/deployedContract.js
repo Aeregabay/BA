@@ -57,6 +57,6 @@ const ABI = [
     type: "event"
   }
 ];
-const contractAddress = "0x5bf6A9bC3e17A8d7f095B2e9BBb3dF07e34DE7C4";
+const contractAddress = "0xa77d1f98D2eac9A476f4478b734De2594958fE44";
 
 export { ABI, contractAddress };
