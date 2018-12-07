@@ -69,7 +69,7 @@ class Layout extends Component {
     Router.pushRoute("index");
   };
   logout = async () => {
-    const res = await axios.post(
+    await axios.post(
       window.location.origin + "/deleteCookie",
       this.state.cookie
     );

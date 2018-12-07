@@ -4,9 +4,10 @@ contract TradingContract {
     
     struct Object {
         address owner;
-        string status;
+        string status;          //"borrowed", "owned" or "stolen"
     }
 
+    //notifies client that a transaction occurred
     event PurchaseListen(
         bool confirmed
     );
@@ -15,11 +16,11 @@ contract TradingContract {
 
     function tradeObject(address buyerAdd, address sellerAdd, uint objectId, string newStatus) public payable {
         objects[objectId].owner = buyerAdd;
-        objects[objectId].status = newStatus;
+        objects[objectId].status = newStatus;         //in case item status changes from "owned" to "borrowed"
 
-        sellerAdd.transfer(msg.value);
+        sellerAdd.transfer(msg.value);                //send ether to seller
 
-        emit PurchaseListen(true);
+        emit PurchaseListen(true);                    //notify client that transaction is complete
     }
 
     function registerObject(uint objectId, address owner, string status) public payable {

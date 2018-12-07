@@ -2,24 +2,20 @@ import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Container, Header } from "semantic-ui-react";
 import axios from "axios";
-import getCurrentUser from "../utils/UserUtils";
 import Router from "../routes";
 
 class ProfileBody extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: [],
       id: "",
       username: "",
       password: "",
       ethAddress: "",
-      admin: "",
-      userType: "",
-      //determines whether the "go to admin page" button should be visible
-      clickable: true,
-      //determines whether the admin user is on his profile page or not
-      isMyProfilePage: false
+      admin: "", //either 1 or 0
+      userType: "", //suffix for display of userType
+      clickable: true, //determines whether the "go to admin page" button should be visible
+      isMyProfilePage: false //determines whether the admin user is on his profile page or not
     };
   }
   //method to go to admin page only if user is admin and on his profile page
@@ -44,14 +40,11 @@ class ProfileBody extends Component {
     try {
       if (res.data.success) {
         this.setState({
-          user: res.data.userData
-        });
-        this.setState({
-          id: this.state.user[0].id,
-          username: this.state.user[0].username,
-          password: this.state.user[0].password,
-          ethAddress: this.state.user[0].eth_account,
-          admin: this.state.user[0].admin
+          id: res.data.userData[0].id,
+          username: res.data.userData[0].username,
+          password: res.data.userData[0].password,
+          ethAddress: res.data.userData[0].eth_account,
+          admin: res.data.userData[0].admin
         });
       }
       if (this.state.admin == 1) {
