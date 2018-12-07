@@ -22,3 +22,4 @@ yarn-error.log*
 .vscode/settings.json
 .next
 ./ethereum/deploy.js
+ethereum/deploy.js
