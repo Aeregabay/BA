@@ -79,7 +79,9 @@ class register extends Component {
   }
 
   async componentWillMount() {
-    let interval = setInterval(() => {
+    //check for metamask extension login every 500ms
+    //registration is not possible without it
+    setInterval(() => {
       web3.eth.getAccounts(async (err, accounts) => {
         if (err) console.log(err);
         else if (accounts.length === 0) this.setState({ metaMask: false });
@@ -88,32 +90,34 @@ class register extends Component {
             metaMask: true,
             userAccount: window.web3.eth.defaultAccount
           });
-          clearInterval(interval);
         }
       });
     }, 500);
 
+    //create instance of the SC that is deployed from the KYC platform's side
     verify = new web3.eth.Contract(
       ABI,
       "0xe78285A95542F415A20c46933544b0bDfCC3263B"
     );
   }
-  onSubmit = async () => {
-    Web3.givenProvider.on("error", e => console.error("WS Error", e));
-    Web3.givenProvider.on("end", e => console.error("WS End", e));
 
+  //function to verify that the user is already registered on the KYC platform
+  onSubmit = async () => {
     this.setState({ dimmer: true });
     let kycKey = document.getElementById("kycKey").value;
 
+    //send the KYC key the user got from the KYC platform to the Verify-SC, to verify the user
     verify.methods.verify(kycKey, adminAddress).send({
       from: this.state.userAccount,
       value: web3.utils.toWei(".01", "ether")
     });
 
+    //listen to the event that will be emitted from the SC as soon as the verification processed
     await verify.events.PlatformListen({}, async (err, res) => {
       if (err) {
         console.log(err);
       } else {
+        //if user is verified, write to DB
         if (res.returnValues.confirmed) {
           let username = document.getElementById("username").value;
           let password = document.getElementById("password").value;
@@ -133,6 +137,7 @@ class register extends Component {
           } catch (error) {
             console.log(error);
           }
+          //if user is not registered on the KYC platform
         } else {
           this.setState({ registerFail: true });
         }

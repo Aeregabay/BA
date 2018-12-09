@@ -30,10 +30,10 @@ app
     //Register Data (probably not used in future) in DB
     server.post("/register", urlEncodedParser, (req, res) => {
       //check whether username already exists in DB
-      let sqlSearch =
-        "SELECT username FROM users WHERE username = '" +
-        req.body.username +
-        "'";
+      let sqlSearch = SqlString.format(
+        "SELECT username FROM users WHERE username = ?;",
+        [req.body.username]
+      );
       database.connection.query(sqlSearch, (err, result) => {
         //if query fails
         if (err) {
@@ -50,17 +50,10 @@ app
           var username = req.body.username;
           //hash password before writing to DB
           bcrypt.hash(req.body.password, 10, (err, hash) => {
-            let sql =
-              "INSERT INTO users (username, pw, profile_pic, eth_account) VALUES ('" +
-              username +
-              "', '" +
-              hash +
-              "', '" +
-              "icon.png" +
-              "', '" +
-              req.body.userAddress +
-              "')";
-
+            let sql = SqlString.format(
+              "INSERT INTO users (username, pw, profile_pic, eth_account) VALUES (?, ?, 'icon.png', ?);",
+              [username, hash, req.body.userAddress]
+            );
             database.connection.query(sql, (err, result) => {
               if (err) {
                 console.log("Query Error");
@@ -79,10 +72,10 @@ app
     //if not, rederict to register
     //if yes, redirect to myprofile
     server.post("/login", urlEncodedParser, (req, res) => {
-      let sql =
-        "SELECT * FROM users WHERE users.username = '" +
-        req.body.username +
-        "'";
+      let sql = SqlString.format(
+        "SELECT * FROM users WHERE users.username = ?;",
+        [req.body.username]
+      );
 
       database.connection.query(sql, (err, result) => {
         //if query fails
@@ -187,8 +180,9 @@ app
       if (cookie) {
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
-        let sql =
-          "SELECT * FROM users WHERE users.username = '" + username + "'";
+        let sql = SqlString.format(
+          "SELECT * FROM users WHERE users.username = ?;"[username]
+        );
         database.connection.query(sql, (err, result) => {
           //This error should not be reached, since the user would already be blocked from
           //accessing the my profile page on the client side, if he is not logged in
@@ -216,21 +210,18 @@ app
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
 
-        //SQL statement to insert object details into DB
-        let objectSql =
-          "INSERT INTO objects (title, description, price, owner, category, status) VALUES ('" +
-          req.body.title +
-          "', " +
-          SqlString.escape(req.body.description) +
-          ", " +
-          SqlString.escape(req.body.price) +
-          ", '" +
-          username +
-          "', '" +
-          req.body.category +
-          "', '" +
-          req.body.status +
-          "'); SELECT LAST_INSERT_ID();";
+        //SQL statement to insert object details into DB, also retrieve the newly created objectId to use later
+        let objectSql = SqlString.format(
+          "INSERT INTO objects (title, description, price, owner, category, status) VALUES (?,?,?,?,?,?); SELECT LAST_INSERT_ID();",
+          [
+            req.body.title,
+            req.body.description,
+            req.body.price,
+            username,
+            req.body.category,
+            req.body.status
+          ]
+        );
 
         //write object to DB
         database.connection.query(objectSql, (err, objectResult) => {
@@ -244,6 +235,7 @@ app
           }
         });
 
+        //interval to prevent empty headers to be sent and methods to try and set headers after sending
         let intervalTwo = setInterval(() => {
           if (objectId !== undefined) {
             //TAGS INSERTION BLOCK
@@ -256,12 +248,10 @@ app
             //for this, multiple execution has to be enabled in MySQL
             let tagsSql = "";
             for (let i = 0; i < finalTags.length; i++) {
-              tagsSql +=
-                "INSERT INTO tags (corresp_obj_id, content) VALUES ('" +
-                objectId +
-                "', '" +
-                finalTags[i] +
-                "');";
+              tagsSql += SqlString.format(
+                "INSERT INTO tags (corresp_obj_id, content) VALUES (?, ?);",
+                [objectId, finalTags[i]]
+              );
             }
 
             //actual insertion of tags to DB
@@ -286,12 +276,10 @@ app
                 let picsSql = "";
                 for (let i = 0; i < pics.length; i++) {
                   let picName = username + "_" + pics[i].name;
-                  picsSql +=
-                    "INSERT INTO pics (corresp_obj_id, name) VALUES ('" +
-                    objectId +
-                    "', '" +
-                    picName +
-                    "');";
+                  picsSql += SqlString.format(
+                    "INSERT INTO pics (corresp_obj_id, name) VALUES (?, ?);",
+                    [objectId, picName]
+                  );
                 }
                 //actual SQL query to insert pics into DB
                 database.connection.query(picsSql, (err, picsResult) => {
@@ -317,10 +305,12 @@ app
                 });
               }
             });
+            //if successful, clear interval
             clearInterval(intervalTwo);
           }
         }, 10);
       }
+      //interval waiting for the object to be inserted before sending status back to the client
       let interval = setInterval(() => {
         if (objectId !== undefined) {
           //if everything succeeded, send confirmation to client side
@@ -334,6 +324,7 @@ app
       }, 50);
     });
 
+    //function to update the owner of an item as soon as it is purchased
     server.post("/purchaseItem", urlEncodedParser, (req, res) => {
       let buyer = req.body.buyer;
       let objectId = req.body.objectId;
@@ -356,6 +347,7 @@ app
       );
     });
 
+    //function returns the ethereum addresses of seller and buyer as they are situated on an item page
     server.post("/getEthAccounts", urlEncodedParser, (req, res) => {
       let cookie = req.cookies["x-access-token"];
       let buyer;
@@ -414,6 +406,7 @@ app
       }
     });
 
+    //decode username from browser cookie
     server.post("/getCookie", urlEncodedParser, (req, res) => {
       let cookie = req.cookies["x-access-token"];
       let username;
@@ -430,11 +423,13 @@ app
       }
     });
 
+    //delete user cookie on logout
     server.post("/deleteCookie", urlEncodedParser, (req, res) => {
       res.clearCookie("x-access-token");
       res.status(200).send({ message: "successful logout" });
     });
 
+    //fetch all tags for a specific item
     server.post("/getTags", urlEncodedParser, (req, res) => {
       let tagSql = "SELECT content FROM tags;";
 
@@ -558,13 +553,22 @@ app
       }, 50);
     });
 
+    //fetch item information
     server.post("/item", (req, res) => {
       let objectId = req.body.id;
-      let getObjectSql = "SELECT * FROM objects WHERE id ='" + objectId + "';";
-      let tagSql =
-        "SELECT content FROM tags WHERE corresp_obj_id ='" + objectId + "';";
-      let picSql =
-        "SELECT name FROM pics WHERE corresp_obj_id ='" + objectId + "';";
+      let getObjectSql = SqlString.format(
+        "SELECT * FROM objects WHERE id = ?;",
+        [objectId]
+      );
+      let tagSql = SqlString.format(
+        "SELECT content FROM tags WHERE corresp_obj_id = ?;",
+        [objectId]
+      );
+      let picSql = SqlString.format(
+        "SELECT name FROM pics WHERE corresp_obj_id = ?;",
+        [objectId]
+      );
+
       let object;
       let tags = [];
       let pics = [];
@@ -645,6 +649,7 @@ app
           "');";
       }
 
+      //insert picture names into DB and move the files to /static folder
       database.connection.query(picsSql, (err, result) => {
         if (err) {
           console.log(
@@ -666,6 +671,7 @@ app
       });
       res.status(200).send({ success: true });
     });
+
     //updates items in the DB
     server.post("/updateContent", (req, res) => {
       let query = SqlString.format(
@@ -689,8 +695,10 @@ app
       });
 
       //removes old tags to avoid duplicates
-      let tagQuery =
-        "DELETE FROM tags WHERE corresp_obj_id = '" + req.body.id + "';";
+      let tagQuery = SqlString.format(
+        "DELETE FROM tags WHERE corresp_obj_id = ?;",
+        [req.body.id]
+      );
 
       //adds new tags to the tags table
       for (let i = 0; i < req.body.tags[0].length; i++) {
@@ -762,6 +770,7 @@ app
         //if any object description contains the search term it's object id will be added
         let descriptionTerm =
           "SELECT id FROM objects WHERE description LIKE '%" + terms[i] + "%'";
+
         database.connection.query(descriptionTerm, (err, descriptionResult) => {
           if (err) {
             console.log("Term search in objects/title failed");
@@ -835,6 +844,7 @@ app
     process.exit(1);
   });
 
+//unprotected sites check
 function unless(paths, middleware) {
   return function(req, res, next) {
     let isHave = false;
@@ -852,6 +862,7 @@ function unless(paths, middleware) {
   };
 }
 
+//check for admin rights in order to access admin page
 function hasAdminRights(req, res, next) {
   const token = req.cookies["x-access-token"];
   if (token) {
@@ -871,6 +882,7 @@ function hasAdminRights(req, res, next) {
   }
 }
 
+//check for login
 function isLoggedIn(req, res, next) {
   const token = req.cookies["x-access-token"];
   if (token) {

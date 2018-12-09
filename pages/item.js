@@ -171,6 +171,7 @@ class item extends Component {
     }
   };
 
+  //query for deleting a picture if done so while editing an item
   deletePicture = async (picture, picNumber) => {
     let tempPics = this.state.pics;
     tempPics.splice(picNumber, 1);
@@ -186,6 +187,7 @@ class item extends Component {
     }
   };
 
+  //add pictures if done so while editing an item
   addPictures = async () => {
     let formData = new FormData();
     for (let i = 0; i < picsToAdd.length; i++) {
@@ -212,6 +214,7 @@ class item extends Component {
 
   //if any change to a content field is made, submit that change to DB
   submitChange = async () => {
+    //reset all edit buttons
     this.setState({
       descriptionEdit: false,
       priceEdit: false,
@@ -221,6 +224,7 @@ class item extends Component {
       titleEdit: false
     });
 
+    //create JSON to send to server
     let objectInfo = {
       id: this.state.id,
       title: this.state.title,
@@ -232,6 +236,7 @@ class item extends Component {
       pics: this.state.pics
     };
 
+    //server query to update
     let result = await axios.post(
       window.location.origin + "/updateContent",
       objectInfo
@@ -285,9 +290,11 @@ class item extends Component {
     this.getObjectIds(content);
   };
 
+  //function is executed if user confirms transaction in modal window
   purchaseItem = async () => {
     this.setState({ purchaseInit: false, dimmer: true });
 
+    //call to the Smart Contract with necessary information
     verify.methods
       .tradeObject(
         this.state.buyerAddress,
@@ -300,10 +307,13 @@ class item extends Component {
         value: web3.utils.toWei(this.state.ethPrice.toString(), "ether")
       });
 
+    //while user is promted to wait, listen for the Event that will be emitted from the
+    //Smart Contract as soon as the transaction between seller and buyer is completed.
     verify.events.PurchaseListen({}, async (err, res) => {
       if (err) {
         console.log(err);
       } else if (res.returnValues.confirmed) {
+        //if successful, write user to DB
         let purchaseRes = await axios.post(
           window.location.origin + "/purchaseItem",
           {
@@ -311,10 +321,8 @@ class item extends Component {
             buyer: this.state.currentUser
           }
         );
+        //if DB query successful, inform user of success
         if (purchaseRes.data.success) {
-          // alert(
-          //   "You have successfully purchased the item with id " + this.state.id
-          // );
           this.setState({ dimmer: false, successModalOpen: true });
         } else {
           alert("The purchase of item " + this.state.id + " has failed.");
@@ -325,14 +333,20 @@ class item extends Component {
 
   //fetch object from server and write to state
   async componentWillMount() {
+    //create instance of the SC
     verify = await new web3.eth.Contract(ABI, contractAddress);
+
+    //object that will be modified and used only in this method
     let thisObject;
 
+    //fetch objectId from path (integer after the "/")
     let pathname = window.location.pathname.split("/");
     let id = pathname[pathname.length - 1];
 
+    //fetch object from DB
     let response = await axios.post(window.location.origin + "/item", { id });
     if (response.data.success) {
+      //if successful, write to thisObject
       thisObject = response.data.object;
       let picsTemp = [];
 
@@ -358,6 +372,8 @@ class item extends Component {
         );
       }
 
+      //this block fetches the current ETH/CHF ratio and gives user an accurate estimation
+      //of the price in ETH that he will be paying for an item
       let ethToCHF = await cc.price("ETH", ["CHF"]);
       let priceToNumber = Number(
         thisObject[0].price.slice(0, this.state.price.length - 4)
@@ -377,6 +393,7 @@ class item extends Component {
         ethPrice: price
       });
     }
+
     //fetch currentUser from cookie
     let resultTwo = await axios.post(
       window.location.origin + "/getEthAccounts",
@@ -384,6 +401,7 @@ class item extends Component {
         seller: thisObject[0].owner
       }
     );
+
     if (resultTwo.data.success) {
       this.setState({
         currentUser: resultTwo.data.username,
@@ -391,6 +409,7 @@ class item extends Component {
         sellerAddress: resultTwo.data.sellerAddress
       });
     }
+    //if user is also owner of the item, the purchase button will be hidden
     if (resultTwo.data.buyerAddress === resultTwo.data.sellerAddress) {
       this.setState({ ownsItem: true });
     }

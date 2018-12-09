@@ -9,6 +9,7 @@ import { ABI, contractAddress } from "../ethereum/deployedContract";
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 
+//predefined categories the user can choose from to categorize his item
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
   { key: "audioVideoTv", text: "Audio, Video & TV", value: "audioVideoTv" },
@@ -74,11 +75,14 @@ const categories = [
     value: "wineConsumption"
   }
 ];
+//possible states of an item
 const ownerOptions = [
   { key: "owned", text: "owned", value: "owned" },
-  { key: "borrowed", text: "borrowed", value: "borrowed" }
+  { key: "borrowed", text: "borrowed", value: "borrowed" },
+  { key: "stolen", text: "stolen", value: "stolen" }
 ];
 
+//arrays that will be used for modifications further down
 let options = [];
 let currentValues = [];
 let allPics = [];
@@ -91,10 +95,12 @@ class sell extends Component {
       status: "",
       category: "",
       userAddress: "",
-      objectId: ""
+      objectId: "",
+      metaMask: false
     };
   }
 
+  //function to register an item on the Smart Contract
   pushToChain = () => {
     let register = new web3.eth.Contract(ABI, contractAddress);
     register.methods
@@ -125,13 +131,19 @@ class sell extends Component {
       alert("The tag retrieval was not successfull on the client side");
     }
 
-    await web3.eth.getAccounts((err, accounts) => {
-      if (err) {
-        console.log(err);
-      } else {
-        this.setState({ userAddress: accounts[0] });
-      }
-    });
+    //metamask extension login is needed in order to sell an item
+    setInterval(() => {
+      web3.eth.getAccounts((err, accounts) => {
+        if (err) console.log(err);
+        else if (accounts.length === 0) this.setState({ metaMask: false });
+        else if (accounts.length > 0) {
+          this.setState({
+            metaMask: true,
+            userAccount: window.web3.eth.defaultAccount
+          });
+        }
+      });
+    }, 500);
   }
 
   onSubmit = async () => {
@@ -176,6 +188,7 @@ class sell extends Component {
     }
   };
 
+  //handler for addition of a Tag
   handleAddition = (e, { value }) => {
     options.push({
       key: Math.random()
@@ -186,10 +199,12 @@ class sell extends Component {
     });
   };
 
+  //handler to always have a current array of all tags to submit
   handleChange = (e, { value }) => {
     currentValues[0] = value;
   };
 
+  //category change handler
   handleCategoryChange = (e, { value }) => {
     for (let i = 0; i < categories.length; i++) {
       if (value === categories[i].value) {
@@ -198,6 +213,7 @@ class sell extends Component {
     }
   };
 
+  //handler to track item status that is input
   statusHandler = (e, { value }) => {
     e.persist();
     switch (value) {
@@ -207,9 +223,13 @@ class sell extends Component {
       case "borrowed":
         this.setState({ status: "borrowed" });
         break;
+      case "stolen":
+        this.setState({ status: "stolen" });
+        break;
     }
   };
 
+  //handler for photo upload
   handleFiles = e => {
     let i;
     let tempFiles = e.target.files;
@@ -228,101 +248,113 @@ class sell extends Component {
             <Header style={{ color: "#7a7a52" }} textAlign="center" size="huge">
               Welcome to the selling page
             </Header>
-            <Header
-              textAlign="center"
-              size="medium"
-              style={{ marginBottom: "70px", color: "#7a7a52" }}
-            >
-              Please enter all the information about your item below
-            </Header>
-            <Form onSubmit={this.onSubmit}>
-              <Form.Group>
-                <Form.Input
-                  fluid="true"
-                  id="title"
-                  control="input"
-                  label="Item title"
-                  placeholder="Enter the title that should appear in searchresults"
-                  width={16}
-                  required
-                  autoFocus
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Input
-                  fluid="true"
-                  id="description"
-                  control="textarea"
-                  label="Description"
-                  placeholder="Specify additional information about your object here"
-                  width={16}
-                  required
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Select
-                  label="Category"
-                  options={categories}
-                  placeholder="Category"
-                  width={12}
-                  required
-                  onChange={this.handleCategoryChange}
-                />
-                <FormInput required label="Selling price" fluid>
-                  <NumberFormat
-                    id="price"
-                    placeholder="Item price"
-                    customInput={FormInput}
-                    thousandSeparator="´"
-                    suffix=" CHF"
-                    allowNegative={false}
-                  />
-                </FormInput>
-              </Form.Group>
-              <Form.Group>
-                <Form.Select
-                  label="Tags"
-                  options={options}
-                  placeholder="Enter the tags here that describe your item"
-                  search
-                  selection
-                  fluid
-                  multiple
-                  allowAdditions
-                  value={currentValues}
-                  onAddItem={this.handleAddition}
-                  onChange={this.handleChange}
-                  width={12}
-                  required
-                />
-                <Form.Select
-                  label="Status"
-                  onChange={this.statusHandler}
-                  options={ownerOptions}
-                  placeholder="What is the status of this item?"
-                  selection
-                  search
-                  required
-                  width={4}
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Input
-                  fluid
-                  type="file"
-                  label="Upload your pictures here"
-                  name="file"
-                  id="file"
-                  multiple
-                  onChange={this.handleFiles}
-                />
-              </Form.Group>
+            {this.state.metaMask ? (
+              <div>
+                <Header
+                  textAlign="center"
+                  size="medium"
+                  style={{ marginBottom: "70px", color: "#7a7a52" }}
+                >
+                  Please enter all the information about your item below
+                </Header>
+                <Form onSubmit={this.onSubmit}>
+                  <Form.Group>
+                    <Form.Input
+                      fluid="true"
+                      id="title"
+                      control="input"
+                      label="Item title"
+                      placeholder="Enter the title that should appear in searchresults"
+                      width={16}
+                      required
+                      autoFocus
+                    />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Input
+                      fluid="true"
+                      id="description"
+                      control="textarea"
+                      label="Description"
+                      placeholder="Specify additional information about your object here"
+                      width={16}
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Select
+                      label="Category"
+                      options={categories}
+                      placeholder="Category"
+                      width={12}
+                      required
+                      onChange={this.handleCategoryChange}
+                    />
+                    <FormInput required label="Selling price" fluid>
+                      <NumberFormat
+                        id="price"
+                        placeholder="Item price"
+                        customInput={FormInput}
+                        thousandSeparator="´"
+                        suffix=" CHF"
+                        allowNegative={false}
+                      />
+                    </FormInput>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Select
+                      label="Tags"
+                      options={options}
+                      placeholder="Enter the tags here that describe your item"
+                      search
+                      selection
+                      fluid
+                      multiple
+                      allowAdditions
+                      value={currentValues}
+                      onAddItem={this.handleAddition}
+                      onChange={this.handleChange}
+                      width={12}
+                      required
+                    />
+                    <Form.Select
+                      label="Status"
+                      onChange={this.statusHandler}
+                      options={ownerOptions}
+                      placeholder="What is the status of this item?"
+                      selection
+                      search
+                      required
+                      width={4}
+                    />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Input
+                      fluid
+                      type="file"
+                      label="Upload your pictures here"
+                      name="file"
+                      id="file"
+                      multiple
+                      onChange={this.handleFiles}
+                    />
+                  </Form.Group>
 
-              <Button
-                content="Place item"
-                style={{ color: "white", backgroundColor: "tomato" }}
-              />
-            </Form>
+                  <Button
+                    content="Place item"
+                    style={{ color: "white", backgroundColor: "tomato" }}
+                  />
+                </Form>
+              </div>
+            ) : (
+              <Header
+                textAlign="center"
+                size="medium"
+                style={{ marginBottom: "70px", color: "#7a7a52" }}
+              >
+                You need to login to MetaMask in order to sell an item
+              </Header>
+            )}
           </div>
         </Container>
       </Layout>
