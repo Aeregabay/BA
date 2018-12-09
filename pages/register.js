@@ -29,8 +29,11 @@ let ABI = [
   },
   {
     constant: false,
-    inputs: [],
-    name: "payKYC",
+    inputs: [
+      { name: "kycKey", type: "string" },
+      { name: "platformAddress", type: "address" }
+    ],
+    name: "verify",
     outputs: [],
     payable: true,
     stateMutability: "payable",
@@ -38,11 +41,8 @@ let ABI = [
   },
   {
     constant: false,
-    inputs: [
-      { name: "kycKey", type: "string" },
-      { name: "platformAddress", type: "address" }
-    ],
-    name: "transfer",
+    inputs: [],
+    name: "payKYC",
     outputs: [],
     payable: true,
     stateMutability: "payable",
@@ -52,7 +52,8 @@ let ABI = [
     anonymous: false,
     inputs: [
       { indexed: false, name: "kycKey", type: "string" },
-      { indexed: false, name: "platformAddress", type: "address" }
+      { indexed: false, name: "platformAddress", type: "address" },
+      { indexed: false, name: "sender", type: "address" }
     ],
     name: "KycListen",
     type: "event"
@@ -83,7 +84,10 @@ class register extends Component {
         if (err) console.log(err);
         else if (accounts.length === 0) this.setState({ metaMask: false });
         else if (accounts.length > 0) {
-          this.setState({ metaMask: true, userAccount: accounts[0] });
+          this.setState({
+            metaMask: true,
+            userAccount: window.web3.eth.defaultAccount
+          });
           clearInterval(interval);
         }
       });
@@ -91,14 +95,17 @@ class register extends Component {
 
     verify = new web3.eth.Contract(
       ABI,
-      "0x7bef31F17d4305A7f0AEdDC64feF61Dd6C0620C6"
+      "0xe78285A95542F415A20c46933544b0bDfCC3263B"
     );
   }
   onSubmit = async () => {
+    Web3.givenProvider.on("error", e => console.error("WS Error", e));
+    Web3.givenProvider.on("end", e => console.error("WS End", e));
+
     this.setState({ dimmer: true });
     let kycKey = document.getElementById("kycKey").value;
 
-    verify.methods.transfer(kycKey, adminAddress).send({
+    verify.methods.verify(kycKey, adminAddress).send({
       from: this.state.userAccount,
       value: web3.utils.toWei(".01", "ether")
     });

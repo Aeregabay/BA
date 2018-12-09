@@ -1,6 +1,8 @@
 pragma solidity ^0.4.25;
 
 contract TradingContract {
+
+    address adminAddress = 0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5;
     
     struct Object {
         address owner;
@@ -18,8 +20,9 @@ contract TradingContract {
         objects[objectId].owner = buyerAdd;
         objects[objectId].status = newStatus;         //in case item status changes from "owned" to "borrowed"
 
-        sellerAdd.transfer(msg.value);                //send ether to seller
-
+        sellerAdd.transfer(msg.value/100*99);         //send ether to seller      
+        adminAddress.transfer(msg.value/100);         //assign 1% of sales to admin account
+        
         emit PurchaseListen(true);                    //notify client that transaction is complete
     }
 
