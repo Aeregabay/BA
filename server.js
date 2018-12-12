@@ -210,6 +210,21 @@ app
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
 
+        //update seller email address in DB
+        database.connection.query(
+          SqlString.format("UPDATE users SET email = ? WHERE username = ?;", [
+            req.body.email,
+            username
+          ]),
+          (err, emailRes) => {
+            if (err) {
+              console.error(err);
+            } else {
+              console.log("seller email address inserted");
+            }
+          }
+        );
+
         //SQL statement to insert object details into DB, also retrieve the newly created objectId to use later
         let objectSql = SqlString.format(
           "INSERT INTO objects (title, description, price, owner, category, status) VALUES (?,?,?,?,?,?); SELECT LAST_INSERT_ID();",
@@ -330,10 +345,10 @@ app
       let objectId = req.body.objectId;
 
       database.connection.query(
-        SqlString.format("UPDATE objects SET owner = ? WHERE id = ?", [
-          buyer,
-          objectId
-        ]),
+        SqlString.format(
+          "UPDATE objects SET owner = ?, status= 'sold' WHERE id = ?",
+          [buyer, objectId]
+        ),
         (err, result) => {
           if (err) {
             console.log("The object transfer has failed");
@@ -377,7 +392,7 @@ app
 
                   database.connection.query(
                     SqlString.format(
-                      "SELECT eth_account FROM users WHERE username = ?",
+                      "SELECT eth_account, email FROM users WHERE username = ?",
                       [seller]
                     ),
                     (err, sellerRes) => {
@@ -393,6 +408,7 @@ app
                           username: buyer,
                           buyerAddress: buyerAddress,
                           sellerAddress: sellerAddress,
+                          sellerEmail: sellerRes[0].email,
                           success: true
                         });
                       }

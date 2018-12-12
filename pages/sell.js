@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import Router from "../routes";
-import { Container, Form, Button, Header, FormInput } from "semantic-ui-react";
+import {
+  Container,
+  Form,
+  Button,
+  Header,
+  FormInput,
+  Input
+} from "semantic-ui-react";
 import axios from "axios";
 import NumberFormat from "react-number-format";
 import { ABI, contractAddress } from "../ethereum/deployedContract";
@@ -77,9 +84,9 @@ const categories = [
 ];
 //possible states of an item
 const ownerOptions = [
-  { key: "owned", text: "owned", value: "owned" },
-  { key: "borrowed", text: "borrowed", value: "borrowed" },
-  { key: "stolen", text: "stolen", value: "stolen" }
+  { key: "new", text: "new", value: "new" },
+  { key: "used", text: "used", value: "used" },
+  { key: "damaged", text: "damaged", value: "damaged" }
 ];
 
 //arrays that will be used for modifications further down
@@ -152,6 +159,7 @@ class sell extends Component {
     //these properties are fetchable via document.getElementById() from JSX part
     formData.append("title", document.getElementById("title").value);
     formData.append("price", document.getElementById("price").value);
+    formData.append("email", document.getElementById("email").value);
 
     formData.append(
       "description",
@@ -260,7 +268,6 @@ class sell extends Component {
                 <Form onSubmit={this.onSubmit}>
                   <Form.Group>
                     <Form.Input
-                      fluid="true"
                       id="title"
                       control="input"
                       label="Item title"
@@ -272,7 +279,6 @@ class sell extends Component {
                   </Form.Group>
                   <Form.Group>
                     <Form.Input
-                      fluid="true"
                       id="description"
                       control="textarea"
                       label="Description"
@@ -286,11 +292,11 @@ class sell extends Component {
                       label="Category"
                       options={categories}
                       placeholder="Category"
-                      width={12}
+                      width={14}
                       required
                       onChange={this.handleCategoryChange}
                     />
-                    <FormInput required label="Selling price" fluid>
+                    <FormInput required label="Selling price">
                       <NumberFormat
                         id="price"
                         placeholder="Item price"
@@ -337,6 +343,16 @@ class sell extends Component {
                       id="file"
                       multiple
                       onChange={this.handleFiles}
+                    />
+                    <FormInput
+                      fluid
+                      id="email"
+                      control="input"
+                      type="email"
+                      label="Email Address"
+                      placeholder="This will only be displayed once a user has successfully bought your item"
+                      width={12}
+                      required
                     />
                   </Form.Group>
 

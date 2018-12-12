@@ -123,6 +123,7 @@ class item extends Component {
       verifiedOwner: "",
       buyerAddress: "",
       sellerAddress: "",
+      sellerEmail: "",
       ethPrice: "",
       ownsItem: false,
       dimmer: false,
@@ -292,7 +293,7 @@ class item extends Component {
 
   //function is executed if user confirms transaction in modal window
   purchaseItem = async () => {
-    this.setState({ purchaseInit: false, dimmer: true });
+    this.setState({ purchaseInit: false, dimmer: true, status: "sold" });
 
     //call to the Smart Contract with necessary information
     verify.methods
@@ -406,7 +407,8 @@ class item extends Component {
       this.setState({
         currentUser: resultTwo.data.username,
         buyerAddress: resultTwo.data.buyerAddress,
-        sellerAddress: resultTwo.data.sellerAddress
+        sellerAddress: resultTwo.data.sellerAddress,
+        sellerEmail: resultTwo.data.sellerEmail
       });
     }
     //if user is also owner of the item, the purchase button will be hidden
@@ -1032,6 +1034,14 @@ class item extends Component {
                       <Header size="huge" style={{ color: "white" }}>
                         Congratulations, you now own this object!
                       </Header>
+                      <Header size="huge" style={{ color: "white" }}>
+                        You can contact the seller via this email:
+                      </Header>
+                      <span>{this.state.sellerEmail}</span>
+                      <Header size="huge" style={{ color: "red" }}>
+                        Be sure to note this email address, it will NOT be shown
+                        again!
+                      </Header>
                       <Icon name="check" size="huge" color="green" />
                     </Modal.Header>
                     <Modal.Actions>
@@ -1080,24 +1090,30 @@ class item extends Component {
                   You already own this item
                 </p>
               ) : (
-                <Button
-                  key="buyButton"
-                  style={{
-                    maxWidth: "20%",
-                    marginTop: "5px",
-                    border: "1px solid #7a7a52",
-                    margin: "auto"
-                  }}
-                  basic
-                  hidden={this.state.ownsItem}
-                  fluid
-                  size="small"
-                  onClick={() => this.setState({ purchaseInit: true })}
-                >
-                  <span key="buyBtnContent" style={{ color: "#adad85" }}>
-                    Purchase for {this.state.price}
-                  </span>
-                </Button>
+                <div>
+                  {this.state.status === "sold" ? (
+                    ""
+                  ) : (
+                    <Button
+                      key="buyButton"
+                      style={{
+                        maxWidth: "20%",
+                        marginTop: "5px",
+                        border: "1px solid #7a7a52",
+                        margin: "auto"
+                      }}
+                      basic
+                      hidden={this.state.ownsItem}
+                      fluid
+                      size="small"
+                      onClick={() => this.setState({ purchaseInit: true })}
+                    >
+                      <span key="buyBtnContent" style={{ color: "#adad85" }}>
+                        Purchase for {this.state.price}
+                      </span>
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
             <Modal

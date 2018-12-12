@@ -18,7 +18,7 @@ contract TradingContract {
 
     function tradeObject(address buyerAdd, address sellerAdd, uint objectId, string newStatus) public payable {
         objects[objectId].owner = buyerAdd;
-        objects[objectId].status = newStatus;         //in case item status changes from "owned" to "borrowed"
+        objects[objectId].status = newStatus;
 
         sellerAdd.transfer(msg.value/100*99);         //send ether to seller      
         adminAddress.transfer(msg.value/100);         //assign 1% of sales to admin account
