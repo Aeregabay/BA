@@ -76,7 +76,6 @@ app
         "SELECT * FROM users WHERE users.username = ?;",
         [req.body.username]
       );
-
       database.connection.query(sql, (err, result) => {
         //if query fails
         if (err) {
@@ -181,7 +180,8 @@ app
         let decoded = jwtDecode(cookie);
         let username = decoded.username;
         let sql = SqlString.format(
-          "SELECT * FROM users WHERE users.username = ?;"[username]
+          "SELECT * FROM users WHERE users.username = ?;",
+          [username]
         );
         database.connection.query(sql, (err, result) => {
           //This error should not be reached, since the user would already be blocked from

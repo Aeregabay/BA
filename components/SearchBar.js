@@ -24,7 +24,6 @@ class SearchBar extends Component {
       query: newQuery
     });
     if (result.data.success) {
-      console.log(result.data.ids);
       this.props.passObjectIds(result.data.ids);
       this.setState({ query: "", isLoading: false });
     } else {

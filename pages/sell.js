@@ -139,7 +139,7 @@ class sell extends Component {
         else if (accounts.length > 0) {
           this.setState({
             metaMask: true,
-            userAccount: window.web3.eth.defaultAccount
+            userAddress: window.web3.eth.defaultAccount
           });
         }
       });
