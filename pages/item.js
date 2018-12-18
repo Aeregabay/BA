@@ -1285,15 +1285,15 @@ class item extends Component {
                   >
                     Shipping Address
                   </Header>
-                  <Form.Input
+                  <Input
                     key="buyerShippingAddress"
                     style={{ width: "70%", height: "200px" }}
                     control="textarea"
-                    // value={}
+                    value={this.state.shippingAddress}
                     placeholder="Enter your desired shipping address here"
                     onChange={event =>
                       this.setState({
-                        buyerShippingAddress: event.target.value
+                        shippingAddress: event.target.value
                       })
                     }
                   />
