@@ -343,10 +343,33 @@ app
     server.post("/purchaseItem", urlEncodedParser, (req, res) => {
       let buyer = req.body.buyer;
       let objectId = req.body.objectId;
+      let shippingAddress = req.body.shippingAddress;
 
       database.connection.query(
         SqlString.format(
-          "UPDATE objects SET owner = ?, status= 'sold' WHERE id = ?",
+          "UPDATE objects SET buyer = ?, shippingAddress = ?, status= 'sold' WHERE id = ?",
+          [buyer, shippingAddress, objectId]
+        ),
+        (err, result) => {
+          if (err) {
+            console.log("The object transfer has failed");
+          } else {
+            console.log(
+              "The object with id " + objectId + " was bought by " + buyer
+            );
+            res.status(200).json({ success: true });
+          }
+        }
+      );
+    });
+
+    server.post("/confirmPurchase", urlEncodedParser, (req, res) => {
+      let buyer = req.body.buyer;
+      let objectId = req.body.objectId;
+
+      database.connection.query(
+        SqlString.format(
+          "UPDATE objects SET owner = ?, buyer = '', shippingAddress = '' WHERE id = ?",
           [buyer, objectId]
         ),
         (err, result) => {
@@ -354,7 +377,7 @@ app
             console.log("The object transfer has failed");
           } else {
             console.log(
-              "The object with id " + objectId + " is now owned by " + buyer
+              "The object with id " + objectId + " was bought by " + buyer
             );
             res.status(200).json({ success: true });
           }

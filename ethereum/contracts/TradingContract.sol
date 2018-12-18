@@ -6,7 +6,10 @@ contract TradingContract {
     
     struct Object {
         address owner;
-        string status;          //"borrowed", "owned" or "stolen"
+        address seller;
+        address buyer;
+        string status;          //"new", "used", "damaged"
+        uint price;
     }
 
     //notifies client that a transaction occurred
@@ -17,17 +20,35 @@ contract TradingContract {
     mapping (uint => Object) public objects;
 
     function tradeObject(address buyerAdd, address sellerAdd, uint objectId, string newStatus) public payable {
-        objects[objectId].owner = buyerAdd;
+        objects[objectId].buyer = buyerAdd;
+        objects[objectId].seller = sellerAdd;
         objects[objectId].status = newStatus;
+        objects[objectId].price = msg.value;
 
-        sellerAdd.transfer(msg.value/100*99);         //send ether to seller      
-        adminAddress.transfer(msg.value/100);         //assign 1% of sales to admin account
+        adminAddress.transfer(msg.value);           //block buyer payment on admin account
         
-        emit PurchaseListen(true);                    //notify client that transaction is complete
+        emit PurchaseListen(true);                  //notify client that transaction is complete
+    }
+
+    function confirmTransaction(uint objectId) public {
+        uint price = objects[objectId].price;
+        address seller = objects[objectId].seller;
+        address buyer = objects[objectId].buyer;
+
+        seller.transfer(price * 3 / 2 - price / 100);           //send seller 99% of the price + his collateral, 1% admin fee
+        
+        objects[objectId].owner = buyer;                        //assign buyer as new owner        
+        objects[objectId].buyer = address(0);                   //delete buyer
+        objects[objectId].seller = address(0);                  //and seller address
+
+        emit PurchaseListen(true);                              //notify client that purchase is confirmed
     }
 
     function registerObject(uint objectId, address owner, string status) public payable {
-        objects[objectId] = Object(owner, status);
+        objects[objectId] = Object(owner, address(0), address(0), status, uint(0));
+        adminAddress.transfer(msg.value);           //send seller collateral to admin account, will be 50% of item price
+
+        emit PurchaseListen(true);
     }
 
     function getObject(uint objectId) public view returns (address owner, string status ) {

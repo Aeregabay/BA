@@ -39,12 +39,24 @@ const ABI = [
     type: "function"
   },
   {
+    constant: false,
+    inputs: [{ name: "objectId", type: "uint256" }],
+    name: "confirmTransaction",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
     constant: true,
     inputs: [{ name: "", type: "uint256" }],
     name: "objects",
     outputs: [
       { name: "owner", type: "address" },
-      { name: "status", type: "string" }
+      { name: "seller", type: "address" },
+      { name: "buyer", type: "address" },
+      { name: "status", type: "string" },
+      { name: "price", type: "uint256" }
     ],
     payable: false,
     stateMutability: "view",
@@ -57,6 +69,6 @@ const ABI = [
     type: "event"
   }
 ];
-const contractAddress = "0xEb7704979bAAcC51Fa9386fbd3597530892ba326";
+const contractAddress = "0x38381F19c730173018e19767Fc146fDffEffAffa";
 
 export { ABI, contractAddress };

@@ -127,7 +127,9 @@ class item extends Component {
       ethPrice: "",
       ownsItem: false,
       dimmer: false,
-      successModalOpen: false
+      successModalOpen: false,
+      shippingAddress: "",
+      isBuyer: ""
     };
   }
 
@@ -314,12 +316,13 @@ class item extends Component {
       if (err) {
         console.log(err);
       } else if (res.returnValues.confirmed) {
-        //if successful, write user to DB
+        //if successful, write to DB
         let purchaseRes = await axios.post(
           window.location.origin + "/purchaseItem",
           {
             objectId: this.state.id,
-            buyer: this.state.currentUser
+            buyer: this.state.currentUser,
+            shippingAddress: this.state.shippingAddress
           }
         );
         //if DB query successful, inform user of success
@@ -331,9 +334,53 @@ class item extends Component {
       }
     });
   };
+  confirmPurchase = async () => {
+    this.setState({ dimmer: true });
+
+    //call to the Smart Contract with necessary information
+    verify.methods.confirmTransaction(this.state.id).send({
+      from: this.state.buyerAddress
+    });
+
+    //while user is promted to wait, listen for the Event that will be emitted from the
+    //Smart Contract as soon as the transaction between seller and buyer is completed.
+    verify.events.PurchaseListen({}, async (err, res) => {
+      if (err) {
+        console.log(err);
+      } else if (res.returnValues.confirmed) {
+        //if successful, write to DB
+        let purchaseRes = await axios.post(
+          window.location.origin + "/confirmPurchase",
+          {
+            objectId: this.state.id,
+            buyer: this.state.currentUser
+          }
+        );
+        //if DB query successful, inform user of success
+        if (purchaseRes.data.success) {
+          this.setState({ dimmer: false, successModalOpen: true });
+        } else {
+          alert("The confirmation of item " + this.state.id + " has failed.");
+        }
+      }
+    });
+  };
 
   //fetch object from server and write to state
   async componentWillMount() {
+    //metamask extension login is needed in order to buy an item
+    setInterval(() => {
+      web3.eth.getAccounts((err, accounts) => {
+        if (err) console.log(err);
+        else if (accounts.length === 0) this.setState({ metaMask: false });
+        else if (accounts.length > 0) {
+          this.setState({
+            metaMask: true
+          });
+        }
+      });
+    }, 500);
+
     //create instance of the SC
     verify = await new web3.eth.Contract(ABI, contractAddress);
 
@@ -389,6 +436,7 @@ class item extends Component {
         owner: thisObject[0].owner,
         price: thisObject[0].price,
         status: thisObject[0].status,
+        shippingAddress: thisObject[0].shippingAddress,
         tags: tagsToReturn,
         pics: picsTemp,
         ethPrice: price
@@ -414,6 +462,12 @@ class item extends Component {
     //if user is also owner of the item, the purchase button will be hidden
     if (resultTwo.data.buyerAddress === resultTwo.data.sellerAddress) {
       this.setState({ ownsItem: true });
+    }
+
+    if (this.state.currentUser === thisObject[0].buyer) {
+      this.setState({ isBuyer: true });
+    } else {
+      this.setState({ isBuyer: false });
     }
 
     //fetch tags from DB to display options when editing tags
@@ -959,14 +1013,18 @@ class item extends Component {
                     key="verifyStatusBtn"
                     basic
                     fluid
-                    content="Verify Status"
                     style={{
                       float: "right",
                       maxWidth: "40%",
+                      border: "1px solid #7a7a52",
                       marginTop: "3px"
                     }}
                     onClick={this.verifyItem}
-                  />
+                  >
+                    <span key="verifyBtnContent" style={{ color: "#adad85" }}>
+                      Verify Status
+                    </span>
+                  </Button>
                   <Modal
                     key="verifyModal"
                     dimmer="blurring"
@@ -1032,7 +1090,8 @@ class item extends Component {
                   >
                     <Modal.Header>
                       <Header size="huge" style={{ color: "white" }}>
-                        Congratulations, you now own this object!
+                        Congratulations, you bought this object! It will be on
+                        its way shortly!
                       </Header>
                       <Header size="huge" style={{ color: "white" }}>
                         You can contact the seller via this email:
@@ -1076,46 +1135,127 @@ class item extends Component {
                   style={{ marginLeft: 10 }}
                 />
               </Header>
-              {this.state.ownsItem ? (
+              {this.state.metaMask ? (
+                <div>
+                  {this.state.status === "sold" ? (
+                    <div>
+                      <p
+                        key="itemSold"
+                        align="justify"
+                        size="big"
+                        style={{
+                          marginLeft: 15,
+                          color: "#ccccb3",
+                          textAlign: "center",
+                          fontWeight: "bold"
+                        }}
+                      >
+                        This item has been sold
+                      </p>
+                      {this.state.ownsItem ? (
+                        <div>
+                          <p
+                            key="shippingAddress"
+                            align="justify"
+                            size="big"
+                            style={{
+                              marginLeft: 15,
+                              color: "#ccccb3",
+                              textAlign: "center",
+                              fontWeight: "bold"
+                            }}
+                          >
+                            Please ship the item to following address:
+                          </p>
+                          <p
+                            style={{
+                              marginLeft: 15,
+                              color: "#ccccb3",
+                              textAlign: "center"
+                            }}
+                          >
+                            {this.state.shippingAddress}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          {this.state.isBuyer ? (
+                            <Button
+                              key="confirmButton"
+                              style={{
+                                maxWidth: "20%",
+                                marginTop: "5px",
+                                border: "1px solid #7a7a52",
+                                margin: "auto"
+                              }}
+                              fluid
+                              size="small"
+                              basic
+                              onClick={this.confirmPurchase}
+                            >
+                              <span
+                                key="confirmBtnContent"
+                                style={{ color: "#adad85" }}
+                              >
+                                I have recieved the item!
+                              </span>
+                            </Button>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {this.state.ownsItem ? (
+                        <p
+                          style={{
+                            marginLeft: 15,
+                            color: "#ccccb3",
+                            textAlign: "center"
+                          }}
+                        >
+                          You already own this item
+                        </p>
+                      ) : (
+                        <Button
+                          key="buyButton"
+                          style={{
+                            maxWidth: "20%",
+                            marginTop: "5px",
+                            border: "1px solid #7a7a52",
+                            margin: "auto"
+                          }}
+                          basic
+                          fluid
+                          size="small"
+                          onClick={() => this.setState({ purchaseInit: true })}
+                        >
+                          <span
+                            key="buyBtnContent"
+                            style={{ color: "#adad85" }}
+                          >
+                            Purchase for {this.state.price}
+                          </span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
                 <p
-                  key="description"
-                  align="justify"
-                  size="big"
                   style={{
                     marginLeft: 15,
                     color: "#ccccb3",
                     textAlign: "center"
                   }}
                 >
-                  You already own this item
+                  You have to enable MetaMask in order to buy an item
                 </p>
-              ) : (
-                <div>
-                  {this.state.status === "sold" ? (
-                    ""
-                  ) : (
-                    <Button
-                      key="buyButton"
-                      style={{
-                        maxWidth: "20%",
-                        marginTop: "5px",
-                        border: "1px solid #7a7a52",
-                        margin: "auto"
-                      }}
-                      basic
-                      hidden={this.state.ownsItem}
-                      fluid
-                      size="small"
-                      onClick={() => this.setState({ purchaseInit: true })}
-                    >
-                      <span key="buyBtnContent" style={{ color: "#adad85" }}>
-                        Purchase for {this.state.price}
-                      </span>
-                    </Button>
-                  )}
-                </div>
               )}
             </div>
+
             <Modal
               key="purchaseModal"
               dimmer="blurring"
@@ -1139,6 +1279,24 @@ class item extends Component {
                   </Header>
                   {this.state.price}
                   <p>~ {Number(this.state.ethPrice).toFixed(2)} ETH</p>
+                  <Header
+                    size="large"
+                    style={{ color: "white", marginBottom: "5px" }}
+                  >
+                    Shipping Address
+                  </Header>
+                  <Form.Input
+                    key="buyerShippingAddress"
+                    style={{ width: "70%", height: "200px" }}
+                    control="textarea"
+                    // value={}
+                    placeholder="Enter your desired shipping address here"
+                    onChange={event =>
+                      this.setState({
+                        buyerShippingAddress: event.target.value
+                      })
+                    }
+                  />
                 </Modal.Description>
               </Modal.Content>
               <Modal.Actions>

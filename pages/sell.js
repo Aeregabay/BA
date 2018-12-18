@@ -7,7 +7,9 @@ import {
   Button,
   Header,
   FormInput,
-  Input
+  Checkbox,
+  Dimmer,
+  Loader
 } from "semantic-ui-react";
 import axios from "axios";
 import NumberFormat from "react-number-format";
@@ -15,6 +17,13 @@ import { ABI, contractAddress } from "../ethereum/deployedContract";
 
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
+let register;
+
+global.fetch = require("node-fetch");
+const cc = require("cryptocompare");
+cc.setApiKey(
+  "41e7dfb621809bb8dc9f905d7fa8a728389852a7d41e9e225d88e68cfe6d2b4b"
+);
 
 //predefined categories the user can choose from to categorize his item
 const categories = [
@@ -103,13 +112,21 @@ class sell extends Component {
       category: "",
       userAddress: "",
       objectId: "",
-      metaMask: false
+      metaMask: false,
+      agreement: false,
+      dimmer: false
     };
   }
 
   //function to register an item on the Smart Contract
-  pushToChain = () => {
-    let register = new web3.eth.Contract(ABI, contractAddress);
+  pushToChain = async () => {
+    let ethToCHF = await cc.price("ETH", ["CHF"]);
+    let priceToNumber = Number(
+      this.state.price.slice(0, this.state.price.length - 4)
+    );
+    let price = priceToNumber / ethToCHF.CHF;
+    let collateral = price / 2;
+
     register.methods
       .registerObject(
         parseInt(this.state.objectId),
@@ -117,12 +134,14 @@ class sell extends Component {
         this.state.status
       )
       .send({
-        from: this.state.userAddress
+        from: this.state.userAddress,
+        value: web3.utils.toWei(collateral.toString(), "ether")
       });
   };
 
   //load tags from DB to choose from
   async componentWillMount() {
+    register = new web3.eth.Contract(ABI, contractAddress);
     let tags = await axios.post(window.location.origin + "/getTags");
     if (tags.data.success) {
       for (let i = 0; i < tags.data.tags.length; i++) {
@@ -159,6 +178,7 @@ class sell extends Component {
     //these properties are fetchable via document.getElementById() from JSX part
     formData.append("title", document.getElementById("title").value);
     formData.append("price", document.getElementById("price").value);
+    this.setState({ price: document.getElementById("price").value });
     formData.append("email", document.getElementById("email").value);
 
     formData.append(
@@ -186,10 +206,17 @@ class sell extends Component {
 
       //when successful, redirect to /browse page
       if (res.data.success) {
-        alert("Your item has successfully submitted");
-        this.setState({ objectId: res.data.objectId });
+        this.setState({ objectId: res.data.objectId, dimmer: true });
         this.pushToChain();
-        Router.pushRoute("browse");
+
+        register.events.PurchaseListen({}, (err, res) => {
+          if (err) {
+            console.log(err);
+          } else if (res.returnValues.confirmed) {
+            //if successful, write to DB
+            Router.pushRoute("browse");
+          }
+        });
       }
     } catch (err) {
       alert("Your request has not been successful, here is the error:" + err);
@@ -223,16 +250,16 @@ class sell extends Component {
 
   //handler to track item status that is input
   statusHandler = (e, { value }) => {
-    e.persist();
+    // e.persist();
     switch (value) {
-      case "owned":
-        this.setState({ status: "owned" });
+      case "new":
+        this.setState({ status: "new" });
         break;
-      case "borrowed":
-        this.setState({ status: "borrowed" });
+      case "used":
+        this.setState({ status: "used" });
         break;
-      case "stolen":
-        this.setState({ status: "stolen" });
+      case "damaged":
+        this.setState({ status: "damaged" });
         break;
     }
   };
@@ -252,6 +279,12 @@ class sell extends Component {
     return (
       <Layout>
         <Container style={{ margin: "20px" }}>
+          <Dimmer inverted active={this.state.dimmer}>
+            <Loader>
+              Please wait for the transaction to complete, do not refresh or
+              leave the page
+            </Loader>
+          </Dimmer>
           <div>
             <Header style={{ color: "#7a7a52" }} textAlign="center" size="huge">
               Welcome to the selling page
@@ -355,11 +388,29 @@ class sell extends Component {
                       required
                     />
                   </Form.Group>
-
-                  <Button
-                    content="Place item"
-                    style={{ color: "white", backgroundColor: "tomato" }}
+                  <Checkbox
+                    label={
+                      <label>
+                        By checking this box, you agree that 50% of the item's
+                        price will be sent to the platforms escrow account as
+                        collateral. You will recieve these funds back together
+                        with the rest of the sale, as soon as the buyer has
+                        recieved the item
+                      </label>
+                    }
+                    onClick={() =>
+                      this.setState({ agreement: !this.state.agreement })
+                    }
                   />
+                  <p />
+                  {this.state.agreement ? (
+                    <Button
+                      content="Place item"
+                      style={{ color: "white", backgroundColor: "tomato" }}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </Form>
               </div>
             ) : (
