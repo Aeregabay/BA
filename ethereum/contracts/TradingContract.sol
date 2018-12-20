@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.25; 
 
 contract TradingContract {
 
@@ -6,10 +6,10 @@ contract TradingContract {
     
     struct Object {
         address owner;
-        address seller;
         address buyer;
         string status;          //"new", "used", "damaged"
-        uint price;
+        uint sellerCollateral;
+        uint buyerCollateral;
     }
 
     //notifies client that a transaction occurred
@@ -18,35 +18,35 @@ contract TradingContract {
     );
 
     mapping (uint => Object) public objects;
-
-    function tradeObject(address buyerAdd, address sellerAdd, uint objectId, string newStatus) public payable {
+    
+    //allocates buyerCollateral to contract and tracks amount in the Object to send it to seller later
+    function tradeObject(address buyerAdd, uint objectId, string newStatus) public payable {
         objects[objectId].buyer = buyerAdd;
-        objects[objectId].seller = sellerAdd;
         objects[objectId].status = newStatus;
-        objects[objectId].price = msg.value;
+        objects[objectId].buyerCollateral = msg.value;
 
-        adminAddress.transfer(msg.value);           //block buyer payment on admin account
-        
-        emit PurchaseListen(true);                  //notify client that transaction is complete
+        emit PurchaseListen(true);                              //notify client that transaction is complete
     }
 
     function confirmTransaction(uint objectId) public {
-        uint price = objects[objectId].price;
-        address seller = objects[objectId].seller;
+        address owner = objects[objectId].owner;
         address buyer = objects[objectId].buyer;
+        uint amount = objects[objectId].sellerCollateral + objects[objectId].buyerCollateral;
+        uint adminFee = (objects[objectId].sellerCollateral + objects[objectId].buyerCollateral) / 100;
 
-        seller.transfer(price * 3 / 2 - price / 100);           //send seller 99% of the price + his collateral, 1% admin fee
+        owner.transfer(amount - adminFee);                      //send seller his collateral + the selling price - adminFee
+        adminAddress.transfer(adminFee);                        //send admin the adminFee
         
         objects[objectId].owner = buyer;                        //assign buyer as new owner        
         objects[objectId].buyer = address(0);                   //delete buyer
-        objects[objectId].seller = address(0);                  //and seller address
+        objects[objectId].sellerCollateral = uint(0);           //and both collaterals
+        objects[objectId].buyerCollateral = uint(0);
 
         emit PurchaseListen(true);                              //notify client that purchase is confirmed
     }
-
+    //allocates the msg.value to the contract and tracks the amount, to later send it back to seller (collateral)
     function registerObject(uint objectId, address owner, string status) public payable {
-        objects[objectId] = Object(owner, address(0), address(0), status, uint(0));
-        adminAddress.transfer(msg.value);           //send seller collateral to admin account, will be 50% of item price
+        objects[objectId] = Object(owner, address(0), status, msg.value, uint(0));
 
         emit PurchaseListen(true);
     }

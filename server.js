@@ -347,7 +347,7 @@ app
 
       database.connection.query(
         SqlString.format(
-          "UPDATE objects SET buyer = ?, shippingAddress = ?, status= 'sold' WHERE id = ?",
+          "UPDATE objects SET buyer = ?, shippingAddress = ?, status= 'shipping' WHERE id = ?",
           [buyer, shippingAddress, objectId]
         ),
         (err, result) => {
@@ -363,13 +363,33 @@ app
       );
     });
 
+    server.post("/deleteItem", urlEncodedParser, (req, res) => {
+      let objectId = req.body.id;
+
+      database.connection.query(
+        SqlString.format("DELETE FROM objects WHERE id = ?;", [objectId]),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(
+              "Object with id " +
+                objectId +
+                " has successfully been deleted from the DB"
+            );
+            res.status(200).json({ success: true });
+          }
+        }
+      );
+    });
+
     server.post("/confirmPurchase", urlEncodedParser, (req, res) => {
       let buyer = req.body.buyer;
       let objectId = req.body.objectId;
 
       database.connection.query(
         SqlString.format(
-          "UPDATE objects SET owner = ?, buyer = '', shippingAddress = '' WHERE id = ?",
+          "UPDATE objects SET owner = ?, buyer = '', shippingAddress = '', status = 'sold' WHERE id = ?",
           [buyer, objectId]
         ),
         (err, result) => {

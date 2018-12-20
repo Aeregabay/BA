@@ -28,7 +28,6 @@ const ABI = [
     constant: false,
     inputs: [
       { name: "buyerAdd", type: "address" },
-      { name: "sellerAdd", type: "address" },
       { name: "objectId", type: "uint256" },
       { name: "newStatus", type: "string" }
     ],
@@ -53,10 +52,10 @@ const ABI = [
     name: "objects",
     outputs: [
       { name: "owner", type: "address" },
-      { name: "seller", type: "address" },
       { name: "buyer", type: "address" },
       { name: "status", type: "string" },
-      { name: "price", type: "uint256" }
+      { name: "sellerCollateral", type: "uint256" },
+      { name: "buyerCollateral", type: "uint256" }
     ],
     payable: false,
     stateMutability: "view",
@@ -69,6 +68,6 @@ const ABI = [
     type: "event"
   }
 ];
-const contractAddress = "0x38381F19c730173018e19767Fc146fDffEffAffa";
+const contractAddress = "0xe0fF264aB7bA2F80f4edD38c6dFB0486bCcEC7d0";
 
 export { ABI, contractAddress };
