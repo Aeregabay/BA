@@ -92,7 +92,7 @@ const categories = [
   }
 ];
 //possible states of an item
-const ownerOptions = [
+const statusOptions = [
   { key: "new", text: "new", value: "new" },
   { key: "used", text: "used", value: "used" },
   { key: "damaged", text: "damaged", value: "damaged" }
@@ -110,6 +110,7 @@ class sell extends Component {
       files: [],
       status: "",
       category: "",
+      price: "",
       userAddress: "",
       objectId: "",
       metaMask: false,
@@ -144,8 +145,9 @@ class sell extends Component {
     register = new web3.eth.Contract(ABI, contractAddress);
     let tags = await axios.post(window.location.origin + "/getTags");
     if (tags.data.success) {
+      let tempOptions = [];
       for (let i = 0; i < tags.data.tags.length; i++) {
-        options.push({
+        tempOptions.push({
           key: Math.random()
             .toString(36)
             .substr(2, 16),
@@ -153,6 +155,8 @@ class sell extends Component {
           value: tags.data.tags[i].content
         });
       }
+      let temp = new Set(tempOptions);
+      options = Array.from(temp);
     } else {
       alert("The tag retrieval was not successfull on the client side");
     }
@@ -173,53 +177,68 @@ class sell extends Component {
   }
 
   onSubmit = async () => {
-    //create FormData with object details to send to server
-    let formData = new FormData();
-    //these properties are fetchable via document.getElementById() from JSX part
-    formData.append("title", document.getElementById("title").value);
-    formData.append("price", document.getElementById("price").value);
-    this.setState({ price: document.getElementById("price").value });
-    formData.append("email", document.getElementById("email").value);
+    if (
+      this.state.category !== "" &&
+      this.state.price !== "" &&
+      currentValues !== [] &&
+      this.state.status !== "" &&
+      this.state.files !== []
+    ) {
+      //create FormData with object details to send to server
+      let formData = new FormData();
+      //these properties are fetchable via document.getElementById() from JSX part
+      formData.append("title", document.getElementById("title").value);
+      formData.append("price", document.getElementById("price").value);
+      this.setState({ price: document.getElementById("price").value });
+      formData.append("email", document.getElementById("email").value);
 
-    formData.append(
-      "description",
-      document.getElementById("description").value
-    );
-    //these properties were written into variables by their onChange methods and
-    //retrieved that way
-    formData.append("category", this.state.category);
-    formData.append("currentValues", currentValues);
-    let uniqueOptions = new Set(options);
-    formData.append("options", uniqueOptions);
+      formData.append(
+        "description",
+        document.getElementById("description").value
+      );
+      //these properties were written into variables by their onChange methods and
+      //retrieved that way
+      formData.append("category", this.state.category);
+      formData.append("currentValues", currentValues);
+      // let uniqueOptions = new Set(options);
+      // formData.append("options", uniqueOptions);
 
-    //append all pics inside allPics array to the formData individually with
-    //incrementing key names like pic$ (pic0, pic1, etc...)
-    for (let i = 0; i < allPics.length; i++) {
-      formData.append("pic" + i, this.state.files[i]);
-    }
-    //status entered by the user concerning the object
-    formData.append("status", this.state.status);
-
-    //send created formData to server
-    try {
-      const res = await axios.post(window.location.origin + "/sell", formData);
-
-      //when successful, redirect to /browse page
-      if (res.data.success) {
-        this.setState({ objectId: res.data.objectId, dimmer: true });
-        this.pushToChain();
-
-        register.events.PurchaseListen({}, (err, res) => {
-          if (err) {
-            console.log(err);
-          } else if (res.returnValues.confirmed) {
-            //if successful, write to DB
-            Router.pushRoute("browse");
-          }
-        });
+      //append all pics inside allPics array to the formData individually with
+      //incrementing key names like pic$ (pic0, pic1, etc...)
+      for (let i = 0; i < allPics.length; i++) {
+        formData.append("pic" + i, this.state.files[i]);
       }
-    } catch (err) {
-      alert("Your request has not been successful, here is the error:" + err);
+      //status entered by the user concerning the object
+      formData.append("status", this.state.status);
+
+      //send created formData to server
+      try {
+        const res = await axios.post(
+          window.location.origin + "/sell",
+          formData
+        );
+
+        //when successful, redirect to /browse page
+        if (res.data.success) {
+          this.setState({ objectId: res.data.objectId, dimmer: true });
+          this.pushToChain();
+
+          register.events.PurchaseListen({}, (err, res) => {
+            if (err) {
+              console.log(err);
+            } else if (res.returnValues.confirmed) {
+              //if successful, write to DB
+              Router.pushRoute("browse");
+            }
+          });
+        }
+      } catch (err) {
+        alert("Your request has not been successful, here is the error:" + err);
+      }
+    } else {
+      alert("Please fill out all the required fields (marked with a star)");
+      console.log(this.state);
+      console.log(currentValues);
     }
   };
 
@@ -337,6 +356,9 @@ class sell extends Component {
                         thousandSeparator="´"
                         suffix=" CHF"
                         allowNegative={false}
+                        onChange={e => {
+                          this.setState({ price: e.target.value });
+                        }}
                       />
                     </FormInput>
                   </Form.Group>
@@ -359,7 +381,7 @@ class sell extends Component {
                     <Form.Select
                       label="Status"
                       onChange={this.statusHandler}
-                      options={ownerOptions}
+                      options={statusOptions}
                       placeholder="What is the status of this item?"
                       selection
                       search
