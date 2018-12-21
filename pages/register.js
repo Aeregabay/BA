@@ -124,7 +124,7 @@ class register extends Component {
           let userAddress = this.state.userAccount;
 
           //create JSON with user input and send it to DB
-          let data = { username, password, userAddress };
+          let data = { username, password, userAddress, kycKey };
 
           const res = await axios.post(
             window.location.origin + "/register",

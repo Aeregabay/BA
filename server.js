@@ -51,8 +51,8 @@ app
           //hash password before writing to DB
           bcrypt.hash(req.body.password, 10, (err, hash) => {
             let sql = SqlString.format(
-              "INSERT INTO users (username, pw, profile_pic, eth_account) VALUES (?, ?, 'icon.png', ?);",
-              [username, hash, req.body.userAddress]
+              "INSERT INTO users (username, pw, profile_pic, eth_account, kycKey) VALUES (?, ?, 'icon.png', ?, ?);",
+              [username, hash, req.body.userAddress, req.body.kycKey]
             );
             database.connection.query(sql, (err, result) => {
               if (err) {
@@ -463,6 +463,21 @@ app
           }
         });
       }
+    });
+
+    server.post("/getUsers", urlEncodedParser, (req, res) => {
+      database.connection.query(
+        SqlString.format("SELECT * FROM users"),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(result[0]);
+            console.log(result);
+            res.status(200).json({ success: true, users: result });
+          }
+        }
+      );
     });
 
     //decode username from browser cookie
