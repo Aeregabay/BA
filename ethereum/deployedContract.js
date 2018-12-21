@@ -55,7 +55,8 @@ const ABI = [
       { name: "buyer", type: "address" },
       { name: "status", type: "string" },
       { name: "sellerCollateral", type: "uint256" },
-      { name: "buyerCollateral", type: "uint256" }
+      { name: "buyerCollateral", type: "uint256" },
+      { name: "price", type: "uint256" }
     ],
     payable: false,
     stateMutability: "view",
@@ -68,6 +69,6 @@ const ABI = [
     type: "event"
   }
 ];
-const contractAddress = "0xe0fF264aB7bA2F80f4edD38c6dFB0486bCcEC7d0";
+const contractAddress = "0xD828491DaDd690De22b36EAC8CB326B85CB69433";
 
 export { ABI, contractAddress };
