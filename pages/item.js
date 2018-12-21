@@ -316,12 +316,16 @@ class item extends Component {
   purchaseItem = async () => {
     this.setState({ purchaseInit: false, dimmer: true, status: "shipping" });
 
+    //collateral of 50% added
+    let collateral = this.state.price / 2;
+    let finalPrice = this.state.price + collateral;
+
     //call to the Smart Contract with necessary information
     verify.methods
       .tradeObject(this.state.buyerAddress, this.state.id, this.state.status)
       .send({
         from: this.state.buyerAddress,
-        value: web3.utils.toWei(this.state.ethPrice.toString(), "ether")
+        value: web3.utils.toWei(finalPrice.toString(), "ether")
       });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
@@ -1389,8 +1393,16 @@ class item extends Component {
                   >
                     Price
                   </Header>
-                  {this.state.price}
-                  <p>~ {Number(this.state.ethPrice).toFixed(2)} ETH</p>
+                  <p style={{ fontWeight: "bold" }}>
+                    {this.state.price} ~{" "}
+                    {Number(this.state.ethPrice).toFixed(2)} ETH
+                  </p>
+                  <p style={{ color: "orange", fontWeight: "bold" }}>
+                    In order to secure a fair and complete transaction, you as a
+                    buyer will have to deposit 50% of the item price as
+                    collateral, which you will get back after you have received
+                    the item
+                  </p>
                   <Header
                     size="large"
                     style={{ color: "white", marginBottom: "5px" }}

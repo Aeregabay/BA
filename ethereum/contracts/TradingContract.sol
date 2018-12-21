@@ -10,6 +10,7 @@ contract TradingContract {
         string status;          //"new", "used", "damaged"
         uint sellerCollateral;
         uint buyerCollateral;
+        uint price;
     }
 
     //notifies client that a transaction occurred
@@ -23,7 +24,8 @@ contract TradingContract {
     function tradeObject(address buyerAdd, uint objectId, string newStatus) public payable {
         objects[objectId].buyer = buyerAdd;
         objects[objectId].status = newStatus;
-        objects[objectId].buyerCollateral = msg.value;
+        objects[objectId].buyerCollateral = msg.value / 3;
+        objects[objectId].price = msg.value / 3 * 2;
 
         emit PurchaseListen(true);                              //notify client that transaction is complete
     }
@@ -31,22 +33,26 @@ contract TradingContract {
     function confirmTransaction(uint objectId) public {
         address owner = objects[objectId].owner;
         address buyer = objects[objectId].buyer;
-        uint amount = objects[objectId].sellerCollateral + objects[objectId].buyerCollateral;
-        uint adminFee = (objects[objectId].sellerCollateral + objects[objectId].buyerCollateral) / 100;
+        uint adminFee = objects[objectId].price / 100;
 
-        owner.transfer(amount - adminFee);                      //send seller his collateral + the selling price - adminFee
+        owner.transfer(objects[objectId].price +
+        objects[objectId].sellerCollateral - adminFee);         //send seller his collateral + the selling price - adminFee
+        
+        buyer.transfer(objects[objectId].buyerCollateral);      //refund buyer his collateral
+
         adminAddress.transfer(adminFee);                        //send admin the adminFee
         
         objects[objectId].owner = buyer;                        //assign buyer as new owner        
         objects[objectId].buyer = address(0);                   //delete buyer
         objects[objectId].sellerCollateral = uint(0);           //and both collaterals
         objects[objectId].buyerCollateral = uint(0);
+        objects[objectId].price = uint(0);                      //and price
 
         emit PurchaseListen(true);                              //notify client that purchase is confirmed
     }
     //allocates the msg.value to the contract and tracks the amount, to later send it back to seller (collateral)
     function registerObject(uint objectId, address owner, string status) public payable {
-        objects[objectId] = Object(owner, address(0), status, msg.value, uint(0));
+        objects[objectId] = Object(owner, address(0), status, msg.value, uint(0), uint(0));
 
         emit PurchaseListen(true);
     }
