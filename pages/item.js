@@ -132,7 +132,9 @@ class item extends Component {
       isBuyer: "",
       purchaseInit: false,
       deleteInit: false,
-      confirmedInit: false
+      confirmedInit: false,
+      reportContent: "",
+      reportModal: false
     };
   }
 
@@ -352,6 +354,8 @@ class item extends Component {
       }
     });
   };
+
+  //as soon as buyer receives item
   confirmPurchase = async () => {
     this.setState({ dimmer: true, status: "sold" });
 
@@ -382,6 +386,24 @@ class item extends Component {
         }
       }
     });
+  };
+
+  reportItem = async () => {
+    let result = await axios.post(window.location.origin + "/report", {
+      message: this.state.reportContent,
+      user: this.state.currentUser,
+      id: this.state.id
+    });
+
+    if (result.data.success) {
+      alert(
+        "Your report has been submitted, the admin will process your request as soon as possible"
+      );
+      this.setState({ dimmer: false });
+      location.reload();
+    } else {
+      console.log(result);
+    }
   };
 
   //fetch object from server and write to state
@@ -538,10 +560,7 @@ class item extends Component {
         </div>
         <Layout>
           <Dimmer inverted active={this.state.dimmer}>
-            <Loader>
-              Please wait for the transaction to complete, do not refresh or
-              leave the page
-            </Loader>
+            <Loader>Please wait, do not refresh or leave the page</Loader>
           </Dimmer>
           <Container
             key="objectInfo"
@@ -1143,149 +1162,60 @@ class item extends Component {
               section
               style={{ maxWidth: "90%", marginLeft: "5%" }}
             />
-            {this.state.status === "sold" && this.state.ownsItem ? (
-              <Button
-                key="deleteButton"
-                style={{
-                  maxWidth: "20%",
-                  marginTop: "5px",
-                  border: "1px solid #7a7a52",
-                  margin: "auto"
-                }}
-                basic
-                fluid
-                size="small"
-                onClick={() => this.setState({ deleteInit: true })}
-              >
-                <span key="deleteBtnContent" style={{ color: "#adad85" }}>
-                  Delete this item
-                </span>
-              </Button>
-            ) : (
-              <div
-                key="buySection"
-                style={{ margin: "auto", marginTop: "20px" }}
-              >
-                <Header key="buyHeader" style={{ color: "#7a7a52" }}>
-                  Buy Item
-                  <Icon
-                    key="buyIcon"
-                    name="handshake"
-                    size="mini"
-                    style={{ marginLeft: 10 }}
-                  />
-                </Header>
-                {this.state.metaMask ? (
-                  <div>
-                    {this.state.status === "shipping" ? (
-                      <div>
-                        <p
-                          key="itemSold"
-                          align="justify"
-                          size="big"
-                          style={{
-                            marginLeft: 15,
-                            color: "#ccccb3",
-                            textAlign: "center",
-                            fontWeight: "bold"
-                          }}
-                        >
-                          This item has been sold
-                        </p>
-                        {this.state.ownsItem ? (
-                          <div>
-                            <p
-                              key="shippingAddress"
-                              align="justify"
-                              size="big"
-                              style={{
-                                marginLeft: 15,
-                                color: "#ccccb3",
-                                textAlign: "center",
-                                fontWeight: "bold"
-                              }}
-                            >
-                              Please ship the item to following address:
-                            </p>
-                            <p
-                              style={{
-                                marginLeft: 15,
-                                color: "#ccccb3",
-                                textAlign: "center"
-                              }}
-                            >
-                              {this.state.shippingAddress}
-                            </p>
-                          </div>
-                        ) : (
-                          <div>
-                            {this.state.isBuyer ? (
-                              <Button
-                                key="confirmButton"
-                                style={{
-                                  maxWidth: "20%",
-                                  marginTop: "5px",
-                                  border: "1px solid #7a7a52",
-                                  margin: "auto"
-                                }}
-                                fluid
-                                size="small"
-                                basic
-                                onClick={this.confirmPurchase}
-                              >
-                                <span
-                                  key="confirmBtnContent"
-                                  style={{ color: "#adad85" }}
-                                >
-                                  I have recieved the item!
-                                </span>
-                              </Button>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        {this.state.ownsItem ? (
+            <Segment style={{ maxWidth: "90%", margin: "auto" }}>
+              {this.state.status === "sold" && this.state.ownsItem ? (
+                <Button
+                  key="deleteButton"
+                  style={{
+                    maxWidth: "20%",
+                    marginTop: "5px",
+                    border: "1px solid #7a7a52",
+                    margin: "auto"
+                  }}
+                  basic
+                  fluid
+                  size="small"
+                  onClick={() => this.setState({ deleteInit: true })}
+                >
+                  <span key="deleteBtnContent" style={{ color: "#adad85" }}>
+                    Delete this item
+                  </span>
+                </Button>
+              ) : (
+                <div
+                  key="buySection"
+                  style={{ margin: "auto", marginTop: "20px", maxWidth: "80%" }}
+                >
+                  <Header key="buyHeader" style={{ color: "#7a7a52" }}>
+                    Buy Item
+                    <Icon
+                      key="buyIcon"
+                      name="handshake"
+                      size="mini"
+                      style={{ marginLeft: 10 }}
+                    />
+                  </Header>
+
+                  {this.state.metaMask ? (
+                    <div>
+                      {this.state.status === "shipping" ? (
+                        <div>
                           <p
+                            key="itemSold"
+                            align="justify"
+                            size="big"
                             style={{
-                              marginLeft: 15,
                               color: "#ccccb3",
-                              textAlign: "center"
+                              textAlign: "center",
+                              fontWeight: "bold"
                             }}
                           >
-                            You already own this item
+                            This item has been sold
                           </p>
-                        ) : (
-                          <div>
-                            {this.state.status !== "sold" ? (
-                              <Button
-                                key="buyButton"
-                                style={{
-                                  maxWidth: "20%",
-                                  marginTop: "5px",
-                                  border: "1px solid #7a7a52",
-                                  margin: "auto"
-                                }}
-                                basic
-                                fluid
-                                size="small"
-                                onClick={() =>
-                                  this.setState({ purchaseInit: true })
-                                }
-                              >
-                                <span
-                                  key="buyBtnContent"
-                                  style={{ color: "#adad85" }}
-                                >
-                                  Purchase for {this.state.price}
-                                </span>
-                              </Button>
-                            ) : (
+                          {this.state.ownsItem ? (
+                            <div>
                               <p
-                                key="itemSold"
+                                key="shippingAddress"
                                 align="justify"
                                 size="big"
                                 style={{
@@ -1295,27 +1225,136 @@ class item extends Component {
                                   fontWeight: "bold"
                                 }}
                               >
-                                This item has been sold
+                                Please ship the item to following address:
                               </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p
+                              <p
+                                style={{
+                                  marginLeft: 15,
+                                  color: "#ccccb3",
+                                  textAlign: "center"
+                                }}
+                              >
+                                {this.state.shippingAddress}
+                              </p>
+                            </div>
+                          ) : (
+                            <div>
+                              {this.state.isBuyer ? (
+                                <Button
+                                  key="confirmButton"
+                                  style={{
+                                    maxWidth: "20%",
+                                    marginTop: "5px",
+                                    border: "1px solid #7a7a52",
+                                    margin: "auto"
+                                  }}
+                                  fluid
+                                  size="small"
+                                  basic
+                                  onClick={this.confirmPurchase}
+                                >
+                                  <span
+                                    key="confirmBtnContent"
+                                    style={{ color: "#adad85" }}
+                                  >
+                                    I have received the item!
+                                  </span>
+                                </Button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          {this.state.ownsItem ? (
+                            <p
+                              style={{
+                                marginLeft: 15,
+                                color: "#ccccb3",
+                                textAlign: "center"
+                              }}
+                            >
+                              You already own this item
+                            </p>
+                          ) : (
+                            <div>
+                              {this.state.status !== "sold" ? (
+                                <Button
+                                  key="buyButton"
+                                  style={{
+                                    maxWidth: "25%",
+                                    marginTop: "5px",
+                                    border: "1px solid #7a7a52",
+                                    margin: "auto"
+                                  }}
+                                  basic
+                                  fluid
+                                  size="small"
+                                  onClick={() =>
+                                    this.setState({ purchaseInit: true })
+                                  }
+                                >
+                                  <span
+                                    key="buyBtnContent"
+                                    style={{ color: "#adad85" }}
+                                  >
+                                    Purchase for {this.state.price}
+                                  </span>
+                                </Button>
+                              ) : (
+                                <p
+                                  key="itemSold"
+                                  align="justify"
+                                  size="big"
+                                  style={{
+                                    color: "#ccccb3",
+                                    textAlign: "center",
+                                    fontWeight: "bold"
+                                  }}
+                                >
+                                  This item has been sold
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p
+                      style={{
+                        marginLeft: 15,
+                        color: "#ccccb3",
+                        textAlign: "center"
+                      }}
+                    >
+                      You have to enable MetaMask in order to buy an item
+                    </p>
+                  )}
+                  {/* <p /> */}
+                  <Button
+                    key="reportBtn"
+                    basic
+                    fluid
                     style={{
-                      marginLeft: 15,
-                      color: "#ccccb3",
-                      textAlign: "center"
+                      width: "23%",
+                      border: "1px solid #8B0000",
+                      marginLeft: "auto",
+                      marginRight: "-8.5%"
+                    }}
+                    onClick={() => {
+                      this.setState({ reportModal: true });
                     }}
                   >
-                    You have to enable MetaMask in order to buy an item
-                  </p>
-                )}
-              </div>
-            )}
+                    <span key="reportBtnContent" style={{ color: "#8B0000" }}>
+                      Report this Item
+                    </span>
+                  </Button>
+                </div>
+              )}
+            </Segment>
 
             <Modal
               key="confirmedModal"
@@ -1458,6 +1497,62 @@ class item extends Component {
                   labelPosition="right"
                   content="Confirm Purchase"
                   onClick={this.purchaseItem}
+                />
+              </Modal.Actions>
+            </Modal>
+            <Modal
+              key="reportModal"
+              dimmer="blurring"
+              open={this.state.reportModal}
+              onClose={() => this.setState({ reportModal: false })}
+              basic
+              style={{ textAlign: "center" }}
+            >
+              <Modal.Header>
+                <Header size="huge" style={{ color: "white" }}>
+                  Do you want to report this item/user?
+                </Header>
+              </Modal.Header>
+              <Modal.Content>
+                <Modal.Description>
+                  <p style={{ color: "orange", fontWeight: "bold" }}>
+                    Please describe as accurately as possible, how this
+                    item/user is breaching the guidelines.
+                  </p>
+                  <Input
+                    key="reportInput"
+                    style={{ width: "70%", height: "200px" }}
+                    control="textarea"
+                    value={this.state.reportContent}
+                    placeholder="Enter your description here"
+                    onChange={event =>
+                      this.setState({
+                        reportContent: event.target.value
+                      })
+                    }
+                  />
+                </Modal.Description>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button
+                  key="reportCancel"
+                  negative
+                  icon="remove"
+                  labelPosition="right"
+                  content="Cancel"
+                  onClick={() => this.setState({ reportModal: false })}
+                  style={{ float: "left" }}
+                />
+                <Button
+                  key="reportConfirm"
+                  positive
+                  icon="checkmark"
+                  labelPosition="right"
+                  content="Report"
+                  onClick={() => {
+                    this.reportItem();
+                    this.setState({ dimmer: true, reportModal: false });
+                  }}
                 />
               </Modal.Actions>
             </Modal>

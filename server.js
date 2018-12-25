@@ -700,6 +700,43 @@ app
       });
     });
 
+    //register report
+    server.post("/report", (req, res) => {
+      let reporter = req.body.user;
+      let report = req.body.message;
+      let id = req.body.id;
+
+      database.connection.query(
+        SqlString.format(
+          "INSERT INTO reports (content, objectId, reporter) VALUES (?, ?, ?);",
+          [report, id, reporter]
+        ),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("Report successfully written to DB");
+            res.status(200).json({ success: true });
+          }
+        }
+      );
+    });
+
+    //fetch reports for admin
+    server.post("/getReports", (req, res) => {
+      database.connection.query(
+        SqlString.format("SELECT * FROM reports"),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("Report successfully written to DB");
+            res.status(200).json({ success: true, data: result });
+          }
+        }
+      );
+    });
+
     //add new pictures to DB after item edit
     server.post("/addNewPictures", (req, res) => {
       let username = req.body.username;

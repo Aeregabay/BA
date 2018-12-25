@@ -415,9 +415,9 @@ class sell extends Component {
                       <label>
                         By checking this box, you agree that 50% of the item's
                         price will be sent to the platforms escrow account as
-                        collateral. You will recieve these funds back together
+                        collateral. You will receive these funds back together
                         with the rest of the sale, as soon as the buyer has
-                        recieved the item
+                        received the item
                       </label>
                     }
                     onClick={() =>

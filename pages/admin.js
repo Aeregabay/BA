@@ -15,23 +15,39 @@ class admin extends Component {
     super(props);
     this.state = {
       users: [],
+      reports: [],
       userId: "",
       username: "",
       ethAddress: "",
       kycKey: "",
       email: "",
-      userModal: false
+      userModal: false,
+      reportModal: false,
+      reporter: "",
+      reportContent: "",
+      objectId: "",
+      reportId: ""
     };
   }
 
   async componentWillMount() {
     let result = await axios.post(window.location.origin + "/getUsers");
+    let reports = await axios.post(window.location.origin + "/getReports");
 
     if (result.data.success) {
       console.log("user retrieval successful");
       this.setState({ users: result.data.users });
     } else {
+      console.error(result);
       console.error("user retrieval failed");
+    }
+
+    if (reports.data.success) {
+      console.log("report retrieval successful");
+      this.setState({ reports: reports.data.data });
+    } else {
+      console.error(reports);
+      console.error("report retrieval failed");
     }
   }
 
@@ -45,11 +61,20 @@ class admin extends Component {
       userModal: true
     });
   }
+  displayReport(index) {
+    this.setState({
+      reporter: this.state.reports[index].reporter,
+      objectId: this.state.reports[index].objectId,
+      reportContent: this.state.reports[index].content,
+      reportId: this.state.reports[index].id,
+      reportModal: true
+    });
+  }
 
   renderUsers() {
     let userList = [];
     if (!this.state.users) {
-      setTimeout(this.renderusers, 10);
+      setTimeout(renderUsers(), 10);
     } else {
       for (let i = 0; i < this.state.users.length; i++) {
         let username = this.state.users[i].username;
@@ -61,6 +86,22 @@ class admin extends Component {
       }
     }
     return userList;
+  }
+
+  renderReports() {
+    let reportList = [];
+    if (!this.state.reports) {
+      setTimeout(renderReports(), 10);
+    } else {
+      for (let i = 0; i < this.state.reports.length; i++) {
+        reportList.push(
+          <List.Item as="a" onClick={() => this.displayReport(i)}>
+            # {i + 1}
+          </List.Item>
+        );
+      }
+    }
+    return reportList;
   }
 
   render() {
@@ -76,27 +117,56 @@ class admin extends Component {
         >
           This is the Admin Page
         </Header>
-        <Header
-          size="large"
-          style={{
-            marginBottom: "30px",
-            marginLeft: "20%",
-            textAlign: "left",
-            color: "#7a7a52"
-          }}
-        >
-          Userlist
-        </Header>
-        <Container
-          style={{
-            textAlign: "left",
-            width: "60%",
-            margin: "auto",
-            marginBottom: "20px"
-          }}
-        >
-          <List link>{this.renderUsers()}</List>
-        </Container>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={8}>
+              <Header
+                size="large"
+                style={{
+                  marginBottom: "30px",
+                  marginLeft: "20%",
+                  textAlign: "left",
+                  color: "#7a7a52"
+                }}
+              >
+                Userlist
+              </Header>
+              <Container
+                style={{
+                  textAlign: "left",
+                  width: "60%",
+                  margin: "auto",
+                  marginBottom: "20px"
+                }}
+              >
+                <List link>{this.renderUsers()}</List>
+              </Container>
+            </Grid.Column>
+            <Grid.Column width={8}>
+              <Header
+                size="large"
+                style={{
+                  marginBottom: "30px",
+                  marginLeft: "20%",
+                  textAlign: "left",
+                  color: "#7a7a52"
+                }}
+              >
+                Reports
+              </Header>
+              <Container
+                style={{
+                  textAlign: "left",
+                  width: "60%",
+                  margin: "auto",
+                  marginBottom: "20px"
+                }}
+              >
+                <List link>{this.renderReports()}</List>
+              </Container>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
         <Modal
           key="userModal"
           dimmer="blurring"
@@ -120,15 +190,6 @@ class admin extends Component {
             </Modal.Description>
           </Modal.Content>
           <Modal.Actions>
-            {/* <Button
-              key="userModalCancel"
-              negative
-              icon="remove"
-              labelPosition="right"
-              content="Cancel"
-              onClick={() => this.setState({ userModal: false })}
-              style={{ float: "left" }}
-            /> */}
             <Button
               key="userModalOkay"
               positive
@@ -136,6 +197,38 @@ class admin extends Component {
               labelPosition="right"
               content="Okay"
               onClick={() => this.setState({ userModal: false })}
+            />
+          </Modal.Actions>
+        </Modal>
+        <Modal
+          key="reportModal"
+          dimmer="blurring"
+          open={this.state.reportModal}
+          onClose={() => this.setState({ reportModal: false })}
+          style={{ textAlign: "center" }}
+        >
+          <Modal.Header>
+            <Header size="huge" style={{ color: "black" }}>
+              Report # {this.state.reportId}
+            </Header>
+          </Modal.Header>
+          <Modal.Content>
+            <Modal.Description
+              style={{ margin: "auto", textAlign: "left", marginLeft: "1%" }}
+            >
+              <p>Reporter: {this.state.reporter}</p>
+              <p>Concerning Object: {this.state.objectId}</p>
+              <p>Content: {this.state.reportContent}</p>
+            </Modal.Description>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button
+              key="reportModalOkay"
+              positive
+              icon="checkmark"
+              labelPosition="right"
+              content="Close"
+              onClick={() => this.setState({ reportModal: false })}
             />
           </Modal.Actions>
         </Modal>
