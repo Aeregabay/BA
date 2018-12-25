@@ -317,8 +317,8 @@ class item extends Component {
     this.setState({ purchaseInit: false, dimmer: true, status: "shipping" });
 
     //collateral of 50% added
-    let collateral = this.state.price / 2;
-    let finalPrice = this.state.price + collateral;
+    let collateral = this.state.ethPrice / 2;
+    let finalPrice = this.state.ethPrice + collateral;
 
     //call to the Smart Contract with necessary information
     verify.methods
@@ -1259,28 +1259,46 @@ class item extends Component {
                             You already own this item
                           </p>
                         ) : (
-                          <Button
-                            key="buyButton"
-                            style={{
-                              maxWidth: "20%",
-                              marginTop: "5px",
-                              border: "1px solid #7a7a52",
-                              margin: "auto"
-                            }}
-                            basic
-                            fluid
-                            size="small"
-                            onClick={() =>
-                              this.setState({ purchaseInit: true })
-                            }
-                          >
-                            <span
-                              key="buyBtnContent"
-                              style={{ color: "#adad85" }}
-                            >
-                              Purchase for {this.state.price}
-                            </span>
-                          </Button>
+                          <div>
+                            {this.state.status !== "sold" ? (
+                              <Button
+                                key="buyButton"
+                                style={{
+                                  maxWidth: "20%",
+                                  marginTop: "5px",
+                                  border: "1px solid #7a7a52",
+                                  margin: "auto"
+                                }}
+                                basic
+                                fluid
+                                size="small"
+                                onClick={() =>
+                                  this.setState({ purchaseInit: true })
+                                }
+                              >
+                                <span
+                                  key="buyBtnContent"
+                                  style={{ color: "#adad85" }}
+                                >
+                                  Purchase for {this.state.price}
+                                </span>
+                              </Button>
+                            ) : (
+                              <p
+                                key="itemSold"
+                                align="justify"
+                                size="big"
+                                style={{
+                                  marginLeft: 15,
+                                  color: "#ccccb3",
+                                  textAlign: "center",
+                                  fontWeight: "bold"
+                                }}
+                              >
+                                This item has been sold
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
