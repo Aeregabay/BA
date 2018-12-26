@@ -472,8 +472,6 @@ app
           if (err) {
             console.error(err);
           } else {
-            console.log(result[0]);
-            console.log(result);
             res.status(200).json({ success: true, users: result });
           }
         }
@@ -732,6 +730,22 @@ app
           } else {
             console.log("Report successfully written to DB");
             res.status(200).json({ success: true, data: result });
+          }
+        }
+      );
+    });
+
+    //delete a report
+    server.post("/deleteReport", (req, res) => {
+      let id = req.body.reportId;
+      database.connection.query(
+        SqlString.format("DELETE FROM reports WHERE id = ?;", [id]),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("Report successfully deleted from DB");
+            res.status(200).json({ success: true });
           }
         }
       );

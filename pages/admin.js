@@ -5,10 +5,14 @@ import {
   Button,
   List,
   Modal,
-  Grid
+  Grid,
+  Icon
 } from "semantic-ui-react";
 import Layout from "../components/Layout";
 import axios from "axios";
+import Web3 from "web3";
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
+const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
 
 class admin extends Component {
   constructor(props) {
@@ -97,12 +101,64 @@ class admin extends Component {
         reportList.push(
           <List.Item as="a" onClick={() => this.displayReport(i)}>
             # {i + 1}
+            <Icon
+              name="remove"
+              color="red"
+              fitted
+              link
+              style={{ float: "right" }}
+              onClick={() => {
+                this.deleteReport(i);
+              }}
+            />
           </List.Item>
         );
       }
     }
     return reportList;
   }
+
+  deleteReport = async index => {
+    let result = await axios.post(window.location.origin + "/deleteReport", {
+      reportId: this.state.reports[index].id
+    });
+
+    if (result.data.success) {
+      console.log(
+        "Report with id " + this.state.reports[index].id + " has been deleted"
+      );
+    } else {
+      console.error(result);
+    }
+    location.reload();
+  };
+
+  rewardReporter = async reporter => {
+    let reporterAddress;
+    for (let i = 0; i < this.state.users.length; i++) {
+      if (this.state.users[i].username === reporter) {
+        reporterAddress = this.state.users[i].eth_account;
+        break;
+      }
+    }
+    if (reporterAddress) {
+      web3.eth.sendTransaction(
+        {
+          to: reporterAddress,
+          from: adminAddress,
+          value: web3.utils.toWei("0.03")
+        },
+        (err, res) => {
+          if (!err) {
+            alert("Reporter has been rewarded");
+            this.setState({ reportModal: false });
+          } else {
+            alert("Something went wrong, try again");
+          }
+        }
+      );
+    }
+  };
 
   render() {
     return (
@@ -229,6 +285,15 @@ class admin extends Component {
               labelPosition="right"
               content="Close"
               onClick={() => this.setState({ reportModal: false })}
+            />
+            <Button
+              key="reportModalOkay"
+              color="linkedin"
+              floated="left"
+              icon="dollar"
+              labelPosition="right"
+              content="Reward Reporter"
+              onClick={() => this.rewardReporter(this.state.reporter)}
             />
           </Modal.Actions>
         </Modal>
