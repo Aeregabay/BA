@@ -68,6 +68,73 @@ app
       });
     });
 
+    //change password or email address
+    server.post("/changeData", (req, res) => {
+      let type = req.body.type;
+      let userId = req.body.userId;
+      let oldPassword = req.body.oldPw;
+      let newPassword = req.body.newPw;
+      let newEmail = req.body.email;
+
+      //if password is being changed
+      if (type === "pw") {
+        database.connection.query(
+          SqlString.format("SELECT pw FROM users WHERE id = ?;", [userId]),
+          (err, result) => {
+            if (err) {
+              console.error(err);
+            } else {
+              bcrypt.compare(oldPassword, result[0].pw, (err, result2) => {
+                if (result2) {
+                  bcrypt.hash(newPassword, 10, (err, hash) => {
+                    if (err) {
+                      console.error(err);
+                    } else {
+                      console.log(hash);
+                      database.connection.query(
+                        SqlString.format(
+                          "UPDATE users SET pw = ? WHERE id = ?;",
+                          [hash, userId]
+                        ),
+                        (err, result3) => {
+                          if (err) {
+                            console.error(err);
+                          } else {
+                            console.log("password changed");
+                            res.status(200).json({ success: true });
+                          }
+                        }
+                      );
+                    }
+                  });
+                } else {
+                  console.error(err);
+                }
+              });
+            }
+          }
+        );
+      }
+      //if email is being changed
+      if (type === "email") {
+        database.connection.query(
+          SqlString.format("UPDATE users SET email = ? WHERE id = ?;", [
+            newEmail,
+            userId
+          ]),
+          (err, result) => {
+            if (err) {
+              console.error(err);
+            } else {
+              console.log("email changed");
+              console.log(result);
+              res.status(200).json({ success: true });
+            }
+          }
+        );
+      }
+    });
+
     //Login User and check whether login data is in DB
     //if not, rederict to register
     //if yes, redirect to myprofile
