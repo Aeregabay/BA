@@ -49,13 +49,13 @@ class Layout extends Component {
       this.setState({ loginModal: true });
     }
   };
-  toSettings = () => {
-    if (this.state.isLoggedIn) {
-      Router.pushRoute("settings");
-    } else {
-      this.setState({ loginModal: true });
-    }
-  };
+  // toSettings = () => {
+  //   if (this.state.isLoggedIn) {
+  //     Router.pushRoute("settings");
+  //   } else {
+  //     this.setState({ loginModal: true });
+  //   }
+  // };
   toBrowse = e => {
     Router.pushRoute("browse");
   };
@@ -203,14 +203,14 @@ class Layout extends Component {
                 <Icon name="user" />
                 My Profile
               </a>
-              <a
+              {/* <a
                 className="item"
                 onClick={this.toSettings}
                 style={{ color: "#7a7a52" }}
               >
                 <Icon name="settings" />
                 Settings
-              </a>
+              </a> */}
               <div className="right menu">
                 {this.state.currentUser.length < 1 ? (
                   <a

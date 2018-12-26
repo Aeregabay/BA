@@ -13,6 +13,7 @@ import axios from "axios";
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
+import Router from "../routes";
 
 class admin extends Component {
   constructor(props) {
@@ -160,6 +161,11 @@ class admin extends Component {
     }
   };
 
+  goToSeller = () => {
+    this.setState({ userModal: false });
+    Router.pushRoute("user", { id: this.state.userId });
+  };
+
   render() {
     return (
       <Layout>
@@ -253,6 +259,16 @@ class admin extends Component {
               labelPosition="right"
               content="Okay"
               onClick={() => this.setState({ userModal: false })}
+            />
+            <Button
+              key="goToUser"
+              positive
+              color="linkedin"
+              floated="left"
+              icon="arrow up"
+              labelPosition="right"
+              content="Go to profile"
+              onClick={this.goToSeller}
             />
           </Modal.Actions>
         </Modal>

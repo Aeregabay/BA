@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { Container, Card, Icon, Image } from "semantic-ui-react";
 import axios from "axios";
 import Router from "../routes";
-
-let currentObjectId = "";
+import { truncate, truncateTags } from "../utils/Truncate";
 
 class Itemlist extends Component {
   constructor(props) {
@@ -74,33 +73,6 @@ class Itemlist extends Component {
     }
   }
 
-  //truncate description to fit in Card
-  truncate(text) {
-    if (text.length > 100) {
-      return text.substring(0, 97) + "...";
-    } else {
-      return text;
-    }
-  }
-
-  //only display 2 lines of tags
-  truncateTags(tags) {
-    let maxLength;
-    let string = "";
-    for (let i = 0; i < tags.length; i++) {
-      if (string.length + tags[i].length < 85) {
-        string += tags[i];
-      } else {
-        maxLength = i;
-        console.log();
-        tags[maxLength - 1] = tags[maxLength - 1].replace("|", "");
-        break;
-      }
-    }
-
-    return tags.slice(0, maxLength);
-  }
-
   pushRoute(id) {
     Router.pushRoute("item", { id: id });
   }
@@ -121,7 +93,6 @@ class Itemlist extends Component {
       let title = this.state.initObjects[i].title;
       let description = this.state.initObjects[i].description;
       let id = this.state.initObjects[i].id;
-      currentObjectId = id;
       let owner = this.state.initObjects[i].owner;
       let price = this.state.initObjects[i].price;
       let category = this.state.initObjects[i].category;
@@ -184,7 +155,7 @@ class Itemlist extends Component {
                     color: "#ccccb3"
                   }}
                 >
-                  {this.truncate(description)}
+                  {truncate(description)}
                 </span>
               </Card.Description>
             </Card.Content>
@@ -201,9 +172,7 @@ class Itemlist extends Component {
               <p />
               <a>
                 <Icon name="tags" style={{ color: "#7a7a52" }} />
-                <span style={{ color: "#ccccb3" }}>
-                  {this.truncateTags(tags)}
-                </span>
+                <span style={{ color: "#ccccb3" }}>{truncateTags(tags)}</span>
               </a>
             </Card.Content>
           </Card>
@@ -213,6 +182,7 @@ class Itemlist extends Component {
 
     return finalObjects;
   }
+
   render() {
     return (
       <Container

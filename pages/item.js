@@ -304,9 +304,7 @@ class item extends Component {
   };
 
   onSellerClick = () => {
-    //TODO create public page for owner and corresponding items for sale
-    //also ratings for this user could be displayed here
-    // Router.pushRoute("profile/xxx");
+    Router.pushRoute("user", { id: this.state.sellerId });
   };
 
   onTagClick = content => {
@@ -479,7 +477,8 @@ class item extends Component {
         shippingAddress: thisObject[0].shippingAddress,
         tags: tagsToReturn,
         pics: picsTemp,
-        ethPrice: price
+        ethPrice: price,
+        sellerId: response.data.sellerId
       });
     }
 

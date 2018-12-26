@@ -465,14 +465,86 @@ app
       }
     });
 
+    //get all users to display on admin page
     server.post("/getUsers", urlEncodedParser, (req, res) => {
       database.connection.query(
-        SqlString.format("SELECT * FROM users"),
+        SqlString.format("SELECT * FROM users;"),
         (err, result) => {
           if (err) {
             console.error(err);
           } else {
             res.status(200).json({ success: true, users: result });
+          }
+        }
+      );
+    });
+
+    //get single user, all corresponding objects
+    server.post("/getUser", urlEncodedParser, (req, res) => {
+      let userId = req.body.userId;
+      database.connection.query(
+        SqlString.format(
+          "SELECT id, username, eth_account, email FROM users WHERE id = ?;",
+          [userId]
+        ),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("user retrieval success");
+            let username = result[0].username;
+            database.connection.query(
+              SqlString.format("SELECT * FROM objects WHERE owner = ?;", [
+                username
+              ]),
+              (err, objResult) => {
+                if (err) {
+                  console.error(err);
+                } else {
+                  console.log("objects retrieval success");
+                  let objectIds = [];
+                  for (let i = 0; i < objResult.length; i++) {
+                    objectIds.push(objResult[i].id);
+                  }
+                  if (objectIds.length < 1) {
+                    res.status(200).json({ success: true, user: result[0] });
+                  } else {
+                    let picsQuery =
+                      "SELECT * FROM pics WHERE corresp_obj_id IN (";
+                    for (let i = 0; i < objectIds.length; i++) {
+                      picsQuery += objectIds[i] + ", ";
+                    }
+                    picsQuery = picsQuery.slice(0, picsQuery.length - 2);
+                    picsQuery += ");";
+                    database.connection.query(picsQuery, (err, picsResult) => {
+                      if (err) {
+                        console.error(err);
+                      } else {
+                        console.log("pics retrieval success");
+                        tagsQuery = picsQuery.replace("pics", "tags");
+                        database.connection.query(
+                          tagsQuery,
+                          (err, tagsResult) => {
+                            if (err) {
+                              console.error(err);
+                            } else {
+                              console.log("tags retrieval success");
+                              res.status(200).json({
+                                success: true,
+                                user: result[0],
+                                objects: objResult,
+                                pics: picsResult,
+                                tags: tagsResult
+                              });
+                            }
+                          }
+                        );
+                      }
+                    });
+                  }
+                }
+              }
+            );
           }
         }
       );
@@ -627,6 +699,9 @@ app
 
     //fetch item information
     server.post("/item", (req, res) => {
+      console.log(
+        "asdfasjdfkasjdföskdfjaösdkfjöaskdjföaaksjdföasjdöfasöldfjaösdkf"
+      );
       let objectId = req.body.id;
       let getObjectSql = SqlString.format(
         "SELECT * FROM objects WHERE id = ?;",
@@ -651,31 +726,50 @@ app
           console.log("The retrieval of object #" + objectId + " has failed.");
         } else {
           object = resObject;
-          database.connection.query(tagSql, (err, resTags) => {
-            if (err) {
-              console.log(err);
-              console.log(
-                "The retrieval of tags for object #" + objectId + " has failed."
-              );
-            } else {
-              tags = resTags;
-              database.connection.query(picSql, (err, resPics) => {
-                if (err) {
-                  console.log(err);
-                  console.log(
-                    "The retrieval of pics for object #" +
-                      objectId +
-                      " has failed."
-                  );
-                } else {
-                  pics = resPics;
-                  res
-                    .status(200)
-                    .send({ success: true, object, tags, pics, id: objectId });
-                }
-              });
+          database.connection.query(
+            SqlString.format("SELECT id FROM users WHERE username = ?;", [
+              object[0].owner
+            ]),
+            (err, userResult) => {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log("user id retrieval success");
+                database.connection.query(tagSql, (err, resTags) => {
+                  if (err) {
+                    console.log(err);
+                    console.log(
+                      "The retrieval of tags for object #" +
+                        objectId +
+                        " has failed."
+                    );
+                  } else {
+                    tags = resTags;
+                    database.connection.query(picSql, (err, resPics) => {
+                      if (err) {
+                        console.log(err);
+                        console.log(
+                          "The retrieval of pics for object #" +
+                            objectId +
+                            " has failed."
+                        );
+                      } else {
+                        pics = resPics;
+                        res.status(200).send({
+                          success: true,
+                          object,
+                          tags,
+                          pics,
+                          id: objectId,
+                          sellerId: userResult[0].id
+                        });
+                      }
+                    });
+                  }
+                });
+              }
             }
-          });
+          );
         }
       });
     });
