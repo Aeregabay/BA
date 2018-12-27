@@ -1162,7 +1162,7 @@ class item extends Component {
               style={{ maxWidth: "90%", marginLeft: "5%" }}
             />
             <Segment style={{ maxWidth: "90%", margin: "auto" }}>
-              {this.state.status === "sold" && this.state.ownsItem ? (
+              {this.state.status !== "shipping" && this.state.ownsItem ? (
                 <Button
                   key="deleteButton"
                   style={{
@@ -1332,29 +1332,30 @@ class item extends Component {
                       You have to enable MetaMask in order to buy an item
                     </p>
                   )}
-                  {/* <p /> */}
-                  <Button
-                    key="reportBtn"
-                    basic
-                    fluid
-                    style={{
-                      width: "23%",
-                      border: "1px solid #8B0000",
-                      marginLeft: "auto",
-                      marginRight: "-8.5%"
-                    }}
-                    onClick={() => {
-                      this.setState({ reportModal: true });
-                    }}
-                  >
-                    <span key="reportBtnContent" style={{ color: "#8B0000" }}>
-                      Report this Item
-                    </span>
-                  </Button>
                 </div>
               )}
             </Segment>
-
+            <Segment style={{ width: "90%", margin: "auto", marginTop: "3%" }}>
+              <Button
+                key="reportBtn"
+                basic
+                fluid
+                style={{
+                  width: "23%",
+                  border: "1px solid #8B0000",
+                  margin: "auto"
+                  // marginLeft: "auto",
+                  // marginRight: "-8.5%"
+                }}
+                onClick={() => {
+                  this.setState({ reportModal: true });
+                }}
+              >
+                <span key="reportBtnContent" style={{ color: "#8B0000" }}>
+                  Report this Item
+                </span>
+              </Button>
+            </Segment>
             <Modal
               key="confirmedModal"
               dimmer="blurring"
