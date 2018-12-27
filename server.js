@@ -773,9 +773,6 @@ app
 
     //fetch item information
     server.post("/item", (req, res) => {
-      console.log(
-        "asdfasjdfkasjdföskdfjaösdkfjöaskdjföaaksjdföasjdöfasöldfjaösdkf"
-      );
       let objectId = req.body.id;
       let getObjectSql = SqlString.format(
         "SELECT * FROM objects WHERE id = ?;",
@@ -798,7 +795,7 @@ app
         if (err) {
           console.log(err);
           console.log("The retrieval of object #" + objectId + " has failed.");
-        } else {
+        } else if (resObject.length > 0) {
           object = resObject;
           database.connection.query(
             SqlString.format("SELECT id FROM users WHERE username = ?;", [
@@ -844,6 +841,8 @@ app
               }
             }
           );
+        } else {
+          res.status(200).json({ success: false });
         }
       });
     });

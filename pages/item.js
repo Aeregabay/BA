@@ -480,49 +480,52 @@ class item extends Component {
         ethPrice: price,
         sellerId: response.data.sellerId
       });
-    }
 
-    //fetch currentUser from cookie
-    let resultTwo = await axios.post(
-      window.location.origin + "/getEthAccounts",
-      {
-        seller: thisObject[0].owner
-      }
-    );
+      //fetch currentUser from cookie
+      let resultTwo = await axios.post(
+        window.location.origin + "/getEthAccounts",
+        {
+          seller: thisObject[0].owner
+        }
+      );
 
-    if (resultTwo.data.success) {
-      this.setState({
-        currentUser: resultTwo.data.username,
-        buyerAddress: resultTwo.data.buyerAddress,
-        sellerAddress: resultTwo.data.sellerAddress,
-        sellerEmail: resultTwo.data.sellerEmail
-      });
-    }
-    //if user is also owner of the item, the purchase button will be hidden
-    if (resultTwo.data.buyerAddress === resultTwo.data.sellerAddress) {
-      this.setState({ ownsItem: true });
-    }
-
-    if (this.state.currentUser === thisObject[0].buyer) {
-      this.setState({ isBuyer: true });
-    } else {
-      this.setState({ isBuyer: false });
-    }
-
-    //fetch tags from DB to display options when editing tags
-    let tags = await axios.post(window.location.origin + "/getTags");
-    if (tags.data.success) {
-      for (let i = 0; i < tags.data.tags.length; i++) {
-        options.push({
-          key: Math.random()
-            .toString(36)
-            .substr(2, 16),
-          text: tags.data.tags[i].content,
-          value: tags.data.tags[i].content
+      if (resultTwo.data.success) {
+        this.setState({
+          currentUser: resultTwo.data.username,
+          buyerAddress: resultTwo.data.buyerAddress,
+          sellerAddress: resultTwo.data.sellerAddress,
+          sellerEmail: resultTwo.data.sellerEmail
         });
       }
+      //if user is also owner of the item, the purchase button will be hidden
+      if (resultTwo.data.buyerAddress === resultTwo.data.sellerAddress) {
+        this.setState({ ownsItem: true });
+      }
+
+      if (this.state.currentUser === thisObject[0].buyer) {
+        this.setState({ isBuyer: true });
+      } else {
+        this.setState({ isBuyer: false });
+      }
+
+      //fetch tags from DB to display options when editing tags
+      let tags = await axios.post(window.location.origin + "/getTags");
+      if (tags.data.success) {
+        for (let i = 0; i < tags.data.tags.length; i++) {
+          options.push({
+            key: Math.random()
+              .toString(36)
+              .substr(2, 16),
+            text: tags.data.tags[i].content,
+            value: tags.data.tags[i].content
+          });
+        }
+      } else {
+        alert("The tag retrieval was not successfull on the client side");
+      }
     } else {
-      alert("The tag retrieval was not successfull on the client side");
+      alert("This item doesn't exist");
+      Router.pushRoute("browse");
     }
   }
 
