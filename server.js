@@ -559,59 +559,66 @@ app
             console.error(err);
           } else {
             console.log("user retrieval success");
-            let username = result[0].username;
-            database.connection.query(
-              SqlString.format("SELECT * FROM objects WHERE owner = ?;", [
-                username
-              ]),
-              (err, objResult) => {
-                if (err) {
-                  console.error(err);
-                } else {
-                  console.log("objects retrieval success");
-                  let objectIds = [];
-                  for (let i = 0; i < objResult.length; i++) {
-                    objectIds.push(objResult[i].id);
-                  }
-                  if (objectIds.length < 1) {
-                    res.status(200).json({ success: true, user: result[0] });
+            if (result.length > 0) {
+              let username = result[0].username;
+              database.connection.query(
+                SqlString.format("SELECT * FROM objects WHERE owner = ?;", [
+                  username
+                ]),
+                (err, objResult) => {
+                  if (err) {
+                    console.error(err);
                   } else {
-                    let picsQuery =
-                      "SELECT * FROM pics WHERE corresp_obj_id IN (";
-                    for (let i = 0; i < objectIds.length; i++) {
-                      picsQuery += objectIds[i] + ", ";
+                    console.log("objects retrieval success");
+                    let objectIds = [];
+                    for (let i = 0; i < objResult.length; i++) {
+                      objectIds.push(objResult[i].id);
                     }
-                    picsQuery = picsQuery.slice(0, picsQuery.length - 2);
-                    picsQuery += ");";
-                    database.connection.query(picsQuery, (err, picsResult) => {
-                      if (err) {
-                        console.error(err);
-                      } else {
-                        console.log("pics retrieval success");
-                        tagsQuery = picsQuery.replace("pics", "tags");
-                        database.connection.query(
-                          tagsQuery,
-                          (err, tagsResult) => {
-                            if (err) {
-                              console.error(err);
-                            } else {
-                              console.log("tags retrieval success");
-                              res.status(200).json({
-                                success: true,
-                                user: result[0],
-                                objects: objResult,
-                                pics: picsResult,
-                                tags: tagsResult
-                              });
-                            }
-                          }
-                        );
+                    if (objectIds.length < 1) {
+                      res.status(200).json({ success: true, user: result[0] });
+                    } else {
+                      let picsQuery =
+                        "SELECT * FROM pics WHERE corresp_obj_id IN (";
+                      for (let i = 0; i < objectIds.length; i++) {
+                        picsQuery += objectIds[i] + ", ";
                       }
-                    });
+                      picsQuery = picsQuery.slice(0, picsQuery.length - 2);
+                      picsQuery += ");";
+                      database.connection.query(
+                        picsQuery,
+                        (err, picsResult) => {
+                          if (err) {
+                            console.error(err);
+                          } else {
+                            console.log("pics retrieval success");
+                            tagsQuery = picsQuery.replace("pics", "tags");
+                            database.connection.query(
+                              tagsQuery,
+                              (err, tagsResult) => {
+                                if (err) {
+                                  console.error(err);
+                                } else {
+                                  console.log("tags retrieval success");
+                                  res.status(200).json({
+                                    success: true,
+                                    user: result[0],
+                                    objects: objResult,
+                                    pics: picsResult,
+                                    tags: tagsResult
+                                  });
+                                }
+                              }
+                            );
+                          }
+                        }
+                      );
+                    }
                   }
                 }
-              }
-            );
+              );
+            } else {
+              res.status(200).json({ success: false });
+            }
           }
         }
       );

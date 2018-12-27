@@ -34,6 +34,9 @@ class user extends Component {
         pics: result.data.pics,
         tags: result.data.tags
       });
+    } else {
+      alert("This user doesn't exist");
+      Router.pushRoute("browse");
     }
   }
 
