@@ -31,6 +31,8 @@ contract TradingContract {
     }
 
     function confirmTransaction(uint objectId) public {
+        require(msg.sender == objects[objectId].buyer, "You need to be the registered buyer to confirm this transaction");
+        
         address owner = objects[objectId].owner;
         address buyer = objects[objectId].buyer;
         uint adminFee = objects[objectId].price / 100;
