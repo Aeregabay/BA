@@ -1,12 +1,9 @@
-const next = require("next");
 const router = require("./routes");
-const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handler = router.getRequestHandler(app);
 const bodyParser = require("body-parser");
 const urlEncodedParser = bodyParser.urlencoded({ extended: false });
 const database = require("./database");
 const bcrypt = require("bcrypt");
-const express = require("express");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const jwtDecode = require("jwt-decode");
@@ -15,6 +12,9 @@ const secret = "realmadrid";
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const SqlString = require("sqlstring");
+const next = require("next");
+const app = next({ dev: process.env.NODE_ENV !== "production" });
+const express = require("express");
 
 app
   .prepare()
