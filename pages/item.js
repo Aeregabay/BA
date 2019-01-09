@@ -1460,8 +1460,8 @@ class item extends Component {
                   <p style={{ color: "orange", fontWeight: "bold" }}>
                     In order to secure a fair and complete transaction, you as a
                     buyer will have to deposit 50% of the item price as
-                    collateral, which you will get back after you have received
-                    the item
+                    collateral, which will be refunded back to you receiving the
+                    item
                   </p>
                   <Header
                     size="large"
