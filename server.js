@@ -1,5 +1,4 @@
 const router = require("./routes");
-const handler = router.getRequestHandler(app);
 const bodyParser = require("body-parser");
 const urlEncodedParser = bodyParser.urlencoded({ extended: false });
 const database = require("./database");
@@ -15,6 +14,7 @@ const SqlString = require("sqlstring");
 const next = require("next");
 const app = next({ dev: process.env.NODE_ENV !== "production" });
 const express = require("express");
+const handler = router.getRequestHandler(app);
 
 app
   .prepare()
@@ -672,7 +672,7 @@ app
         objectSql =
           "SELECT * FROM objects WHERE id IN (" + req.body.objectIds + ")";
       } else {
-        //select statement for 10 objects from DB to display
+        //select statement for 12 objects from DB to display
         //this is done on browse page startup (without search query)
         objectSql = "SELECT * FROM objects LIMIT 12;";
       }

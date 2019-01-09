@@ -53,7 +53,7 @@ class Itemlist extends Component {
         //now split all the ids that are delimited with "-"
         let objectIdsFinal = objectIdsDash.split("-");
 
-        //call getObjects with newly contructed array of ids of objects to fetch
+        //call getObjects with newly constructed array of ids of objects to fetch
         objects = await axios.post(window.location.origin + "/getObjects", {
           objectIds: objectIdsFinal
         });
