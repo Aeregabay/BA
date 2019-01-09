@@ -325,7 +325,9 @@ class item extends Component {
       .tradeObject(this.state.buyerAddress, this.state.id, this.state.status)
       .send({
         from: this.state.buyerAddress,
-        value: web3.utils.toWei(finalPrice.toString(), "ether")
+        value: web3.utils.toWei(finalPrice.toString(), "ether"),
+        gas: 21000,
+        gasPrice: "20000000000"
       });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
@@ -359,7 +361,9 @@ class item extends Component {
 
     //call to the Smart Contract with necessary information
     verify.methods.confirmTransaction(this.state.id).send({
-      from: this.state.buyerAddress
+      from: this.state.buyerAddress,
+      gas: 21000,
+      gasPrice: "20000000000"
     });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
