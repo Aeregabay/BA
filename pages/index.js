@@ -5,7 +5,8 @@ import {
   Menu,
   Divider,
   Grid,
-  Card
+  Card,
+  Segment
 } from "semantic-ui-react";
 import Layout from "../components/Layout";
 import { renderObjects } from "../utils/renderObjectsUtil";
@@ -142,596 +143,629 @@ class App extends Component {
             style={{ textAlign: "center", color: "#7a7a52" }}
           />
           <Divider />
-          <Grid columns={2}>
-            <Grid.Row>
+          <Grid columns={2} style={{ marginTop: "20px" }}>
+            <Segment style={{ width: "27%", marginLeft: "1.2%" }}>
               <Grid.Column width={5}>
-                <Header
-                  size="large"
-                  content="Browse for categories"
-                  style={{
-                    textAlign: "left",
-                    color: "#7a7a52",
-                    marginLeft: "22px"
-                  }}
-                />
+                <Grid.Row>
+                  <Header
+                    size="large"
+                    content="Browse for categories"
+                    style={{
+                      textAlign: "left",
+                      color: "#7a7a52",
+                      marginLeft: "22px"
+                    }}
+                  />
+                </Grid.Row>
+                <Grid.Row style={{ marginTop: "20px" }}>
+                  <Menu vertical style={{ width: "20rem" }}>
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Antiquities & Art")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="palette"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Antiquities & Art
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Audio, Video & TV")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="headphones-alt"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Audio, Video & TV
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Poststamps")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="stamp"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Poststamps</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Books & Comics")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="book-open"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "15px",
+                          marginLeft: "2"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Books & Comics</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Office & Industry")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="industry"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Office & Industry
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Computer & Network")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="desktop"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "15px",
+                          marginLeft: "2"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Computer & Network
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Vehicles")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="car-side"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "15px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Vehicles</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Vehicle Accessories")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="tools"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "18px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Vehicle Accessories
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Movies & DVDs")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="compact-disc"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "18px",
+                          marginLeft: "3"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Movies & DVDs</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Photography & Optics")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="camera-retro"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Photography & Optics
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Gaming")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="gamepad"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "13px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Gaming</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Crafting & Garden")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="leaf"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Crafting & Garden
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Cellphones")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="mobile"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "22px",
+                          marginLeft: "9px"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Cellphones</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Home & Living")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="couch"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "13px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Home & Living</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Kids & Babies")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="baby"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "21px",
+                          marginLeft: "7"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Kids & Babies</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Clothes & Accessories")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="tshirt"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "13px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Clothes & Accessories
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Cosmetics & Grooming")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="restroom"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "13px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Cosmetics & Grooming
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Modelling & Hobby")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="shapes"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Modelling & Hobby
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Music & Instruments")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="guitar"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "15px",
+                          marginLeft: "6"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Music & Instruments
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Coins")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="coins"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "15px",
+                          marginLeft: "5"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Coins</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Collector's Items")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="box-open"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "13px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Collector's Items
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Toys & Handicraft")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="robot"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "13px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Toys & Handicraft
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Sports")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="futbol"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}> Sports</span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Tickets & Vouchers")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="ticket-alt"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "15px",
+                          marginLeft: "2"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Tickets & Vouchers
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Animal Accessories")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="paw"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "17px",
+                          marginLeft: "4"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Animal Accessories
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Watches & Jewellery")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="crown"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "14px",
+                          marginLeft: "auto"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Watches & Jewellery
+                      </span>
+                    </Menu.Item>
+
+                    <Menu.Item
+                      style={{
+                        lineHeight: "28px",
+                        fontWeight: "600"
+                      }}
+                      onClick={() => this.getObjectIds("Wine & Consumables")}
+                    >
+                      <FontAwesomeIcon
+                        color="#7a7a52"
+                        icon="wine-glass-alt"
+                        size="2x"
+                        style={{
+                          float: "left",
+                          marginRight: "23px",
+                          marginLeft: "10px"
+                        }}
+                      />
+                      <span style={{ color: "#7a7a52" }}>
+                        Wine & Consumables
+                      </span>
+                    </Menu.Item>
+                  </Menu>
+                </Grid.Row>
               </Grid.Column>
-              <Grid.Column width={11}>
-                <Header
-                  size="large"
-                  content="Or try your luck"
-                  style={{
-                    color: "#7a7a52",
-                    textAlign: "center"
-                  }}
-                />
+            </Segment>
+            <Segment
+              style={{
+                marginLeft: "20px",
+                width: "68.8%",
+                marginTop: "0%",
+                marginBottom: "1.2%"
+              }}
+            >
+              <Grid.Column width={12}>
+                <Grid.Row>
+                  <Header
+                    size="large"
+                    content="Or try your luck"
+                    style={{
+                      color: "#7a7a52",
+                      textAlign: "center"
+                    }}
+                  />
+                </Grid.Row>
+                <Grid.Row style={{ marginTop: "4.3%" }}>
+                  <Card.Group
+                    centered
+                    itemsPerRow={2}
+                    // style={{ marginTop: "1px" }}
+                  >
+                    {this.callRender()}
+                  </Card.Group>
+                </Grid.Row>
               </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column width={5}>
-                <Menu vertical style={{ width: "20rem" }}>
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Antiquities & Art")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="palette"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Antiquities & Art</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Audio, Video & TV")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="headphones-alt"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Audio, Video & TV</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Poststamps")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="stamp"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Poststamps</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Books & Comics")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="book-open"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "15px",
-                        marginLeft: "2"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Books & Comics</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Office & Industry")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="industry"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Office & Industry</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Computer & Network")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="desktop"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "15px",
-                        marginLeft: "2"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Computer & Network</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Vehicles")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="car-side"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "15px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Vehicles</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Vehicle Accessories")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="tools"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "18px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>
-                      Vehicle Accessories
-                    </span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Movies & DVDs")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="compact-disc"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "18px",
-                        marginLeft: "3"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Movies & DVDs</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Photography & Optics")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="camera-retro"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>
-                      Photography & Optics
-                    </span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Gaming")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="gamepad"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "13px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Gaming</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Crafting & Garden")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="leaf"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Crafting & Garden</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Cellphones")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="mobile"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "22px",
-                        marginLeft: "9px"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Cellphones</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Home & Living")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="couch"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "13px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Home & Living</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Kids & Babies")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="baby"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "21px",
-                        marginLeft: "7"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Kids & Babies</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Clothes & Accessories")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="tshirt"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "13px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>
-                      Clothes & Accessories
-                    </span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Cosmetics & Grooming")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="restroom"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "13px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>
-                      Cosmetics & Grooming
-                    </span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Modelling & Hobby")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="shapes"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Modelling & Hobby</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Music & Instruments")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="guitar"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "15px",
-                        marginLeft: "6"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>
-                      Music & Instruments
-                    </span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Coins")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="coins"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "15px",
-                        marginLeft: "5"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Coins</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Collector's Items")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="box-open"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "13px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Collector's Items</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Toys & Handicraft")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="robot"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "13px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Toys & Handicraft</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Sports")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="futbol"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}> Sports</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Tickets & Vouchers")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="ticket-alt"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "15px",
-                        marginLeft: "2"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Tickets & Vouchers</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Animal Accessories")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="paw"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "17px",
-                        marginLeft: "4"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Animal Accessories</span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Watches & Jewellery")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="crown"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "14px",
-                        marginLeft: "auto"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>
-                      Watches & Jewellery
-                    </span>
-                  </Menu.Item>
-
-                  <Menu.Item
-                    style={{
-                      lineHeight: "28px",
-                      fontWeight: "600"
-                    }}
-                    onClick={() => this.getObjectIds("Wine & Consumables")}
-                  >
-                    <FontAwesomeIcon
-                      color="#7a7a52"
-                      icon="wine-glass-alt"
-                      size="2x"
-                      style={{
-                        float: "left",
-                        marginRight: "23px",
-                        marginLeft: "10px"
-                      }}
-                    />
-                    <span style={{ color: "#7a7a52" }}>Wine & Consumables</span>
-                  </Menu.Item>
-                </Menu>
-              </Grid.Column>
-              <Grid.Column width={11}>
-                <Card.Group
-                  centered
-                  itemsPerRow={2}
-                  style={{ marginTop: "1px" }}
-                >
-                  {this.callRender()}
-                </Card.Group>
-              </Grid.Column>
-            </Grid.Row>
+            </Segment>
           </Grid>
         </Container>
       </Layout>
