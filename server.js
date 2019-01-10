@@ -771,6 +771,73 @@ app
       }, 50);
     });
 
+    //fetch up to 4 random objects from the DB to display on the homepage
+    server.post("/getRandomObjects", urlEncodedParser, (req, res) => {
+      let allObjectIds = [];
+      let idsToQuery = [];
+
+      //query all object ids to choose from
+      database.connection.query(
+        SqlString.format("SELECT id FROM objects"),
+        (err, objectIds) => {
+          if (err) {
+            console.error(error);
+          } else {
+            for (let i = 0; i < objectIds.length; i++) {
+              allObjectIds.push(objectIds[i].id);
+            }
+
+            //push up to 4 random objectIds into the idsToQuery array
+            //in case there are less than 4 objects in the DB, all of them will be displayed
+            while (
+              idsToQuery.length < 4 &&
+              idsToQuery.length !== allObjectIds.length
+            ) {
+              let randomId =
+                allObjectIds[Math.floor(Math.random() * allObjectIds.length)];
+              if (!idsToQuery.includes(randomId)) {
+                idsToQuery.push(randomId);
+              }
+            }
+            let query =
+              "SELECT * FROM objects WHERE id IN (" + idsToQuery + ")";
+            database.connection.query(query, (err, objects) => {
+              if (err) {
+                console.error(err);
+              } else {
+                let tagQuery =
+                  "SELECT * FROM tags WHERE corresp_obj_id IN (" +
+                  idsToQuery +
+                  ")";
+                database.connection.query(tagQuery, (err, tags) => {
+                  if (err) {
+                    console.error(err);
+                  } else {
+                    let pictureQuery =
+                      "SELECT * FROM pics WHERE corresp_obj_id IN (" +
+                      idsToQuery +
+                      ")";
+                    database.connection.query(pictureQuery, (err, pictures) => {
+                      if (err) {
+                        console.error(err);
+                      } else {
+                        res.status(200).send({
+                          success: true,
+                          objects,
+                          tags,
+                          pictures
+                        });
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        }
+      );
+    });
+
     //fetch item information
     server.post("/item", (req, res) => {
       let objectId = req.body.id;
