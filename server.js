@@ -577,6 +577,7 @@ app
                     if (objectIds.length < 1) {
                       res.status(200).json({ success: true, user: result[0] });
                     } else {
+                      //create multiple statement query for picture retrieval
                       let picsQuery =
                         "SELECT * FROM pics WHERE corresp_obj_id IN (";
                       for (let i = 0; i < objectIds.length; i++) {
@@ -591,6 +592,8 @@ app
                             console.error(err);
                           } else {
                             console.log("pics retrieval success");
+
+                            //alter picture query by replacing "pics" with "tags"
                             tagsQuery = picsQuery.replace("pics", "tags");
                             database.connection.query(
                               tagsQuery,
@@ -707,17 +710,9 @@ app
               if (err) {
                 console.log("The tags retrieval from the DB has failed");
               } else {
-                //create tag objects to send to client, loop because multiple tags per objectId
+                //push all tags into returing array
                 for (let i = 0; i < tags.length; i++) {
-                  let tag = [
-                    {
-                      id: tags[i].id,
-                      corresp_obj_id: tags[i].corresp_obj_id,
-                      content: tags[i].content
-                    }
-                  ];
-                  //push created tags to array that we return to the client
-                  resultingTags.push(tag);
+                  resultingTags.push(tags[i]);
                 }
               }
             });
@@ -734,14 +729,7 @@ app
                 console.log("The pics retrieval from the DB has failed");
               } else {
                 for (let i = 0; i < pics.length; i++) {
-                  let pic = [
-                    {
-                      id: pics[i].id,
-                      corresp_obj_id: pics[i].corresp_obj_id,
-                      name: pics[i].name
-                    }
-                  ];
-                  resultingPics.push(pic);
+                  resultingPics.push(pics[i]);
                 }
               }
             });
