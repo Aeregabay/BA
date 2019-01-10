@@ -258,7 +258,7 @@ class App extends Component {
             <Grid.Row>
               <Grid.Column width={5}>
                 <Header
-                  size="medium"
+                  size="large"
                   content="Browse for categories"
                   style={{
                     textAlign: "left",
@@ -269,7 +269,7 @@ class App extends Component {
               </Grid.Column>
               <Grid.Column width={11}>
                 <Header
-                  size="medium"
+                  size="large"
                   content="Or try your luck"
                   style={{
                     color: "#7a7a52",
@@ -280,7 +280,7 @@ class App extends Component {
             </Grid.Row>
             <Grid.Row>
               <Grid.Column width={5}>
-                <Menu vertical style={{ width: "17rem" }}>
+                <Menu vertical style={{ width: "20rem" }}>
                   <Menu.Item
                     style={{
                       lineHeight: "28px",
