@@ -144,21 +144,33 @@ class sell extends Component {
 
   //load tags from DB to choose from
   async componentWillMount() {
+    //create local contract to interact with smart contract
     register = new web3.eth.Contract(ABI, contractAddress);
+
+    //fetch tags
     let tags = await axios.post(window.location.origin + "/getTags");
     if (tags.data.success) {
-      let tempOptions = [];
+      let temporary = [];
+
+      //read content and push to temporary array
       for (let i = 0; i < tags.data.tags.length; i++) {
+        temporary.push(tags.data.tags[i].content);
+      }
+      //clean temporary array from duplicates
+      let tempClean = Array.from(new Set(temporary));
+      let tempOptions = [];
+
+      //create json objects to display later on
+      for (let i = 0; i < tempClean.length; i++) {
         tempOptions.push({
           key: Math.random()
             .toString(36)
             .substr(2, 16),
-          text: tags.data.tags[i].content,
-          value: tags.data.tags[i].content
+          text: tempClean[i],
+          value: tempClean[i]
         });
       }
-      let temp = new Set(tempOptions);
-      options = Array.from(temp);
+      options = tempOptions;
     } else {
       alert("The tag retrieval was not successfull on the client side");
     }
