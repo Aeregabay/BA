@@ -146,7 +146,15 @@ class item extends Component {
     });
 
     if (result.data.success) {
+      if (this.state.status !== "sold" && this.state.status !== "shipping") {
+        await verify.methods.releaseSellerCollateral(this.state.id).send({
+          from: this.state.sellerAddress,
+          gas: 100000,
+          gasPrice: "10000000000"
+        });
+      }
       this.setState({ dimmer: false });
+      alert("Your collateral will be refunded to you shortly");
       Router.pushRoute("browse");
     } else {
       alert("Something went wrong, please try again");
@@ -326,8 +334,8 @@ class item extends Component {
       .send({
         from: this.state.buyerAddress,
         value: web3.utils.toWei(finalPrice.toString(), "ether"),
-        gas: 21000,
-        gasPrice: "20000000000"
+        gas: 100000,
+        gasPrice: "10000000000"
       });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
@@ -362,8 +370,8 @@ class item extends Component {
     //call to the Smart Contract with necessary information
     verify.methods.confirmTransaction(this.state.id).send({
       from: this.state.buyerAddress,
-      gas: 21000,
-      gasPrice: "20000000000"
+      gas: 100000,
+      gasPrice: "10000000000"
     });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
@@ -1414,6 +1422,10 @@ class item extends Component {
               <Modal.Content>
                 <Modal.Description>
                   <p>The item will be permanently removed from the platform</p>
+                  <p>
+                    If you delete the item, please accept the Metamask prompt in
+                    order to reclaim your collateral
+                  </p>
                 </Modal.Description>
               </Modal.Content>
               <Modal.Actions>

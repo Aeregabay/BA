@@ -107,12 +107,12 @@ class register extends Component {
     let kycKey = document.getElementById("kycKey").value;
 
     //send the KYC key the user got from the KYC platform to the Verify-SC, to verify the user
-    //21000 gas limit and 20GWEI gas price
+    //100000 gas limit and 10GWEI gas price
     verify.methods.verify(kycKey, adminAddress).send({
       from: this.state.userAccount,
       value: web3.utils.toWei(".01", "ether"),
-      gas: 21000,
-      gasPrice: "20000000000"
+      gas: 100000,
+      gasPrice: "10000000000"
     });
 
     //listen to the event that will be emitted from the SC as soon as the verification processed

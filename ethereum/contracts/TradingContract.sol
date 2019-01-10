@@ -65,4 +65,8 @@ contract TradingContract {
         return (owner, status);
     }
 
+    function releaseSellerCollateral(uint objectId) public {
+        objects[objectId].owner.transfer(objects[objectId].sellerCollateral);
+    }
+
 }

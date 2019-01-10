@@ -137,8 +137,8 @@ class sell extends Component {
       .send({
         from: this.state.userAddress,
         value: web3.utils.toWei(collateral.toString(), "ether"),
-        gas: 21000,
-        gasPrice: "20000000000"
+        gas: 100000,
+        gasPrice: "10000000000"
       });
   };
 

@@ -63,12 +63,21 @@ const ABI = [
     type: "function"
   },
   {
+    constant: false,
+    inputs: [{ name: "objectId", type: "uint256" }],
+    name: "releaseSellerCollateral",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
     anonymous: false,
     inputs: [{ indexed: false, name: "confirmed", type: "bool" }],
     name: "PurchaseListen",
     type: "event"
   }
 ];
-const contractAddress = "0xCec9F4bC2dC3Dea528fe0b457fB491420554740d";
+const contractAddress = "0xC794969B766e11AEA686a172e745763b9badA2F6";
 
 export { ABI, contractAddress };
