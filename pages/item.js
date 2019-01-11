@@ -104,6 +104,7 @@ class item extends Component {
     this.state = {
       id: "",
       title: "",
+      amount: "",
       category: "",
       description: "",
       owner: "",
@@ -141,20 +142,21 @@ class item extends Component {
   deleteItem = async () => {
     this.setState({ deleteInit: false, dimmer: true });
 
+    if (this.state.status !== "sold" && this.state.status !== "shipping") {
+      await verify.methods.releaseSellerCollateral(this.state.id).send({
+        from: this.state.sellerAddress,
+        gas: 100000,
+        gasPrice: "10000000000"
+      });
+    }
+    alert("Your collateral will be refunded to you shortly");
+
     let result = await axios.post(window.location.origin + "/deleteItem", {
       id: this.state.id
     });
 
     if (result.data.success) {
-      if (this.state.status !== "sold" && this.state.status !== "shipping") {
-        await verify.methods.releaseSellerCollateral(this.state.id).send({
-          from: this.state.sellerAddress,
-          gas: 100000,
-          gasPrice: "10000000000"
-        });
-      }
       this.setState({ dimmer: false });
-      alert("Your collateral will be refunded to you shortly");
       Router.pushRoute("browse");
     } else {
       alert("Something went wrong, please try again");
@@ -353,7 +355,6 @@ class item extends Component {
             shippingAddress: this.state.shippingAddress
           }
         );
-        //if DB query successful, inform user of success
         if (purchaseRes.data.success) {
           this.setState({ dimmer: false, successModalOpen: true });
         } else {
@@ -481,6 +482,7 @@ class item extends Component {
       this.setState({
         id: response.data.id,
         title: thisObject[0].title,
+        amount: thisObject[0].amount,
         category: thisObject[0].category,
         description: thisObject[0].description,
         owner: thisObject[0].owner,
@@ -1176,201 +1178,262 @@ class item extends Component {
               section
               style={{ maxWidth: "90%", marginLeft: "5%" }}
             />
-            <Segment style={{ maxWidth: "90%", margin: "auto" }}>
-              {this.state.status !== "shipping" && this.state.ownsItem ? (
-                <Button
-                  key="deleteButton"
-                  style={{
-                    maxWidth: "20%",
-                    marginTop: "5px",
-                    border: "1px solid #7a7a52",
-                    margin: "auto"
-                  }}
-                  basic
-                  fluid
-                  size="small"
-                  onClick={() => this.setState({ deleteInit: true })}
-                >
-                  <span key="deleteBtnContent" style={{ color: "#adad85" }}>
-                    Delete this item
-                  </span>
-                </Button>
-              ) : (
-                <div
-                  key="buySection"
-                  style={{ margin: "auto", marginTop: "20px", maxWidth: "80%" }}
-                >
-                  <Header key="buyHeader" style={{ color: "#7a7a52" }}>
-                    Buy Item
-                    <Icon
-                      key="buyIcon"
-                      name="handshake"
-                      size="mini"
-                      style={{ marginLeft: 10 }}
-                    />
-                  </Header>
-
-                  {this.state.metaMask ? (
+            {/* is user logged in? */}
+            {this.state.currentUser.length > 1 ? (
+              <div>
+                <Segment style={{ maxWidth: "90%", margin: "auto" }}>
+                  {/* Show the available amount only when amount is > 1 */}
+                  {this.state.amount > 1 &&
+                  this.state.status !== "shipping" &&
+                  this.state.status !== "sold" ? (
                     <div>
-                      {this.state.status === "shipping" ? (
+                      <Header key="amountHeader" style={{ color: "#7a7a52" }}>
+                        Amount available
+                        <Icon
+                          key="amountIcon"
+                          name="plus circle"
+                          size="mini"
+                          style={{ marginLeft: 10 }}
+                        />
+                      </Header>
+                      <p
+                        key="amount"
+                        align="justify"
+                        size="big"
+                        style={{
+                          color: "#ccccb3",
+                          textAlign: "center",
+                          fontWeight: "600"
+                        }}
+                      >
+                        There are {this.state.amount} units of this item
+                        available
+                      </p>
+                      <p
+                        key="amountInfo"
+                        align="justify"
+                        size="big"
+                        style={{
+                          color: "#ccccb3",
+                          textAlign: "center",
+                          fontWeight: "600"
+                        }}
+                      >
+                        If you wish to buy multiple units, please execute the
+                        purchase multiple times
+                      </p>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+
+                  {/* conditional rendering of either purchase button, 
+              delete button, shipping address of buyer or confirm button for buyer */}
+                  {this.state.status !== "shipping" && this.state.ownsItem ? (
+                    <Button
+                      key="deleteButton"
+                      style={{
+                        maxWidth: "20%",
+                        marginTop: "5px",
+                        border: "1px solid #7a7a52",
+                        margin: "auto"
+                      }}
+                      basic
+                      fluid
+                      size="small"
+                      onClick={() => this.setState({ deleteInit: true })}
+                    >
+                      <span key="deleteBtnContent" style={{ color: "#adad85" }}>
+                        Delete this item
+                      </span>
+                    </Button>
+                  ) : (
+                    <div
+                      key="buySection"
+                      style={{
+                        margin: "auto",
+                        marginTop: "20px",
+                        maxWidth: "80%"
+                      }}
+                    >
+                      <Header key="buyHeader" style={{ color: "#7a7a52" }}>
+                        Buy Item
+                        <Icon
+                          key="buyIcon"
+                          name="handshake"
+                          size="mini"
+                          style={{ marginLeft: 10 }}
+                        />
+                      </Header>
+
+                      {this.state.metaMask ? (
                         <div>
-                          <p
-                            key="itemSold"
-                            align="justify"
-                            size="big"
-                            style={{
-                              color: "#ccccb3",
-                              textAlign: "center",
-                              fontWeight: "bold"
-                            }}
-                          >
-                            This item has been sold
-                          </p>
-                          {this.state.ownsItem ? (
+                          {this.state.status === "shipping" ? (
                             <div>
                               <p
-                                key="shippingAddress"
+                                key="itemSold"
                                 align="justify"
                                 size="big"
                                 style={{
-                                  marginLeft: 15,
                                   color: "#ccccb3",
                                   textAlign: "center",
                                   fontWeight: "bold"
                                 }}
                               >
-                                Please ship the item to following address:
+                                This item has been sold
                               </p>
-                              <p
-                                style={{
-                                  marginLeft: 15,
-                                  color: "#ccccb3",
-                                  textAlign: "center"
-                                }}
-                              >
-                                {this.state.shippingAddress}
-                              </p>
+                              {this.state.ownsItem ? (
+                                <div>
+                                  <p
+                                    key="shippingAddress"
+                                    align="justify"
+                                    size="big"
+                                    style={{
+                                      marginLeft: 15,
+                                      color: "#ccccb3",
+                                      textAlign: "center",
+                                      fontWeight: "bold"
+                                    }}
+                                  >
+                                    Please ship the item to following address:
+                                  </p>
+                                  <p
+                                    style={{
+                                      marginLeft: 15,
+                                      color: "#ccccb3",
+                                      textAlign: "center"
+                                    }}
+                                  >
+                                    {this.state.shippingAddress}
+                                  </p>
+                                </div>
+                              ) : (
+                                <div>
+                                  {this.state.isBuyer ? (
+                                    <Button
+                                      key="confirmButton"
+                                      style={{
+                                        maxWidth: "20%",
+                                        marginTop: "5px",
+                                        border: "1px solid #7a7a52",
+                                        margin: "auto"
+                                      }}
+                                      fluid
+                                      size="small"
+                                      basic
+                                      onClick={this.confirmPurchase}
+                                    >
+                                      <span
+                                        key="confirmBtnContent"
+                                        style={{ color: "#adad85" }}
+                                      >
+                                        I have received the item!
+                                      </span>
+                                    </Button>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              )}
                             </div>
                           ) : (
                             <div>
-                              {this.state.isBuyer ? (
-                                <Button
-                                  key="confirmButton"
+                              {this.state.ownsItem ? (
+                                <p
                                   style={{
-                                    maxWidth: "20%",
-                                    marginTop: "5px",
-                                    border: "1px solid #7a7a52",
-                                    margin: "auto"
+                                    marginLeft: 15,
+                                    color: "#ccccb3",
+                                    textAlign: "center"
                                   }}
-                                  fluid
-                                  size="small"
-                                  basic
-                                  onClick={this.confirmPurchase}
                                 >
-                                  <span
-                                    key="confirmBtnContent"
-                                    style={{ color: "#adad85" }}
-                                  >
-                                    I have received the item!
-                                  </span>
-                                </Button>
+                                  You already own this item
+                                </p>
                               ) : (
-                                ""
+                                <div>
+                                  {this.state.status !== "sold" ? (
+                                    <Button
+                                      key="buyButton"
+                                      style={{
+                                        maxWidth: "25%",
+                                        marginTop: "5px",
+                                        border: "1px solid #7a7a52",
+                                        margin: "auto"
+                                      }}
+                                      basic
+                                      fluid
+                                      size="small"
+                                      onClick={() =>
+                                        this.setState({ purchaseInit: true })
+                                      }
+                                    >
+                                      <span
+                                        key="buyBtnContent"
+                                        style={{ color: "#adad85" }}
+                                      >
+                                        Purchase for {this.state.price}
+                                      </span>
+                                    </Button>
+                                  ) : (
+                                    <p
+                                      key="itemSold"
+                                      align="justify"
+                                      size="big"
+                                      style={{
+                                        color: "#ccccb3",
+                                        textAlign: "center",
+                                        fontWeight: "bold"
+                                      }}
+                                    >
+                                      This item has been sold
+                                    </p>
+                                  )}
+                                </div>
                               )}
                             </div>
                           )}
                         </div>
                       ) : (
-                        <div>
-                          {this.state.ownsItem ? (
-                            <p
-                              style={{
-                                marginLeft: 15,
-                                color: "#ccccb3",
-                                textAlign: "center"
-                              }}
-                            >
-                              You already own this item
-                            </p>
-                          ) : (
-                            <div>
-                              {this.state.status !== "sold" ? (
-                                <Button
-                                  key="buyButton"
-                                  style={{
-                                    maxWidth: "25%",
-                                    marginTop: "5px",
-                                    border: "1px solid #7a7a52",
-                                    margin: "auto"
-                                  }}
-                                  basic
-                                  fluid
-                                  size="small"
-                                  onClick={() =>
-                                    this.setState({ purchaseInit: true })
-                                  }
-                                >
-                                  <span
-                                    key="buyBtnContent"
-                                    style={{ color: "#adad85" }}
-                                  >
-                                    Purchase for {this.state.price}
-                                  </span>
-                                </Button>
-                              ) : (
-                                <p
-                                  key="itemSold"
-                                  align="justify"
-                                  size="big"
-                                  style={{
-                                    color: "#ccccb3",
-                                    textAlign: "center",
-                                    fontWeight: "bold"
-                                  }}
-                                >
-                                  This item has been sold
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                        <p
+                          style={{
+                            marginLeft: 15,
+                            color: "#ccccb3",
+                            textAlign: "center"
+                          }}
+                        >
+                          You have to enable MetaMask in order to buy an item
+                        </p>
                       )}
                     </div>
-                  ) : (
-                    <p
-                      style={{
-                        marginLeft: 15,
-                        color: "#ccccb3",
-                        textAlign: "center"
-                      }}
-                    >
-                      You have to enable MetaMask in order to buy an item
-                    </p>
                   )}
-                </div>
-              )}
-            </Segment>
-            <Segment style={{ width: "90%", margin: "auto", marginTop: "3%" }}>
-              <Button
-                key="reportBtn"
-                basic
-                fluid
-                style={{
-                  width: "23%",
-                  border: "1px solid #8B0000",
-                  margin: "auto"
-                  // marginLeft: "auto",
-                  // marginRight: "-8.5%"
-                }}
-                onClick={() => {
-                  this.setState({ reportModal: true });
-                }}
-              >
-                <span key="reportBtnContent" style={{ color: "#8B0000" }}>
-                  Report this Item
-                </span>
-              </Button>
-            </Segment>
+                </Segment>
+                <Segment
+                  style={{ width: "90%", margin: "auto", marginTop: "3%" }}
+                >
+                  <Button
+                    key="reportBtn"
+                    basic
+                    fluid
+                    style={{
+                      width: "23%",
+                      border: "1px solid #8B0000",
+                      margin: "auto"
+                      // marginLeft: "auto",
+                      // marginRight: "-8.5%"
+                    }}
+                    onClick={() => {
+                      this.setState({ reportModal: true });
+                    }}
+                  >
+                    <span key="reportBtnContent" style={{ color: "#8B0000" }}>
+                      Report this Item
+                    </span>
+                  </Button>
+                </Segment>
+              </div>
+            ) : (
+              ""
+            )}
+
             <Modal
               key="confirmedModal"
               dimmer="blurring"

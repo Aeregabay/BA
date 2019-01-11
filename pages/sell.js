@@ -25,6 +25,30 @@ cc.setApiKey(
   "41e7dfb621809bb8dc9f905d7fa8a728389852a7d41e9e225d88e68cfe6d2b4b"
 );
 
+//possible amounts of identical objects to sell
+const amountOptions = [
+  { key: 1, text: "1", value: 1 },
+  { key: 2, text: "2", value: 2 },
+  { key: 3, text: "3", value: 3 },
+  { key: 4, text: "4", value: 4 },
+  { key: 5, text: "5", value: 5 },
+  { key: 6, text: "6", value: 6 },
+  { key: 7, text: "7", value: 7 },
+  { key: 8, text: "8", value: 8 },
+  { key: 9, text: "9", value: 9 },
+  { key: 10, text: "10", value: 10 },
+  { key: 11, text: "11", value: 11 },
+  { key: 12, text: "12", value: 12 },
+  { key: 13, text: "13", value: 13 },
+  { key: 14, text: "14", value: 14 },
+  { key: 15, text: "15", value: 15 },
+  { key: 16, text: "16", value: 16 },
+  { key: 17, text: "17", value: 17 },
+  { key: 18, text: "18", value: 16 },
+  { key: 19, text: "19", value: 19 },
+  { key: 20, text: "20", value: 16 }
+];
+
 //predefined categories the user can choose from to categorize his item
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
@@ -113,6 +137,7 @@ class sell extends Component {
       price: "",
       userAddress: "",
       objectId: "",
+      amount: "",
       metaMask: false,
       agreement: false,
       dimmer: false
@@ -126,7 +151,7 @@ class sell extends Component {
       this.state.price.slice(0, this.state.price.length - 4)
     );
     let price = priceToNumber / ethToCHF.CHF;
-    let collateral = price / 2;
+    let collateral = (price / 2).toFixed(10);
 
     register.methods
       .registerObject(
@@ -225,8 +250,21 @@ class sell extends Component {
       //status entered by the user concerning the object
       formData.append("status", this.state.status);
 
-      //send created formData to server
-      try {
+      this.setState({ dimmer: true });
+      for (let i = 0; i < this.state.amount; i++) {
+        //adds the remaining amount of objects in an inventory (in an inventory of 5, the first object will have
+        //an amount of 5, the second one 4 and the last one 1)
+        //amount from precedent object has to first be deleted
+        formData.delete("amount");
+        formData.append("amount", this.state.amount - i);
+
+        if (this.state.amount > 1) {
+          //append "multipleOf" attribute to all the multiples (hence except the first object where i = 0)
+          //needs to happen only once, since stays appended to formData and doesn't change
+          if (i === 1) formData.append("multipleOf", this.state.objectId);
+        }
+
+        //send created formData to server
         const res = await axios.post(
           window.location.origin + "/sell",
           formData
@@ -234,25 +272,27 @@ class sell extends Component {
 
         //when successful, redirect to /browse page
         if (res.data.success) {
-          this.setState({ objectId: res.data.objectId, dimmer: true });
+          //objectId is set for the first object, the rest will have this id in their "multiple_of" column
+          if (i === 0) {
+            this.setState({ objectId: res.data.objectId });
+          }
           this.pushToChain();
 
           register.events.PurchaseListen({}, (err, res) => {
             if (err) {
               console.log(err);
             } else if (res.returnValues.confirmed) {
-              //if successful, write to DB
-              Router.pushRoute("browse");
+              console.log("object has been written to the smart contract");
+              //if last object in inventory, redirect to browse
+              if (i === this.state.amount - 1) {
+                Router.pushRoute("browse");
+              }
             }
           });
         }
-      } catch (err) {
-        alert("Your request has not been successful, here is the error:" + err);
       }
     } else {
       alert("Please fill out all the required fields (marked with a star)");
-      console.log(this.state);
-      console.log(currentValues);
     }
   };
 
@@ -338,9 +378,21 @@ class sell extends Component {
                       control="input"
                       label="Item title"
                       placeholder="Enter the title that should appear in searchresults"
-                      width={16}
+                      width={13}
                       required
                       autoFocus
+                    />
+                    <Form.Select
+                      label="Amount"
+                      onChange={(e, { value }) => {
+                        this.setState({ amount: value });
+                      }}
+                      options={amountOptions}
+                      placeholder="Amount of identical items sold"
+                      selection
+                      search
+                      required
+                      width={4}
                     />
                   </Form.Group>
                   <Form.Group>
@@ -427,11 +479,19 @@ class sell extends Component {
                   <Checkbox
                     label={
                       <label>
-                        By checking this box, you agree that 50% of the item's
-                        price will be sent to the platforms escrow account as
-                        collateral. These funds will be refunded back to you
-                        together with the rest of the sale, as soon as the buyer
-                        has received the item
+                        <p>
+                          By checking this box, you agree that 50% of the item's
+                          price will be sent to the platforms escrow account as
+                          collateral. These funds will be refunded back to you
+                          together with the rest of the sale, as soon as the
+                          buyer has received the item.
+                        </p>
+                        <p>
+                          You also acknowledge that all the information provided
+                          to the platform regarding an item will always remain
+                          on the blockchain, even after deletion from the
+                          platform.
+                        </p>
                       </label>
                     }
                     onClick={() =>

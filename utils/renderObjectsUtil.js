@@ -1,4 +1,10 @@
 import { Card, Image, Icon } from "semantic-ui-react";
+import Router from "../routes";
+
+//push to desired item id
+function pushRoute(id) {
+  Router.pushRoute("item", { id: id });
+}
 
 //truncate description to fit in Card
 function truncate(text) {
@@ -92,7 +98,7 @@ export function renderObjects(objects, tagsIn, picturesIn) {
                 }}
                 value={id}
                 onClick={() => {
-                  this.pushRoute(id);
+                  pushRoute(id);
                 }}
               />
             </div>

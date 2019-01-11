@@ -292,11 +292,21 @@ app
           }
         );
 
+        //assign multipleOf = 0 for the first object in an inventory
+        let multipleOf;
+        if (req.body.multipleOf === undefined) {
+          multipleOf = 0;
+        } else {
+          multipleOf = req.body.multipleOf;
+        }
+
         //SQL statement to insert object details into DB, also retrieve the newly created objectId to use later
         let objectSql = SqlString.format(
-          "INSERT INTO objects (title, description, price, owner, category, status) VALUES (?,?,?,?,?,?); SELECT LAST_INSERT_ID();",
+          "INSERT INTO objects (title, amount, multiple_of, description, price, owner, category, status) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID();",
           [
             req.body.title,
+            req.body.amount,
+            multipleOf,
             req.body.description,
             req.body.price,
             username,
@@ -414,8 +424,11 @@ app
 
       database.connection.query(
         SqlString.format(
-          "UPDATE objects SET buyer = ?, shippingAddress = ?, status= 'shipping' WHERE id = ?",
-          [buyer, shippingAddress, objectId]
+          //After updating, retrieve amount of this particular object, if > 1,
+          //then all the remaining objects in inventory are now assigned to this one
+          "UPDATE objects SET buyer = ?, shippingAddress = ?, status= 'shipping' WHERE id = ?;" +
+            "SELECT amount FROM objects WHERE id = ?; SELECT id FROM objects WHERE multiple_of = ?",
+          [buyer, shippingAddress, objectId, objectId, objectId]
         ),
         (err, result) => {
           if (err) {
@@ -424,8 +437,26 @@ app
             console.log(
               "The object with id " + objectId + " was bought by " + buyer
             );
-            res.status(200).json({ success: true });
+            //activate next item in inventory, if there is inventory
+            //multipleOf of all remaining objects is first set to newly assigned "displayobject", then
+            //displayobjects's multipleOf is set = 0 in order to be displayed
+            if (result[1][0].amount > 1) {
+              database.connection.query(
+                SqlString.format(
+                  "UPDATE objects SET multiple_of = ? WHERE multiple_of = ?; UPDATE objects SET multiple_of = 0 WHERE id = ?;",
+                  [result[2][0].id, objectId, result[2][0].id]
+                ),
+                (err, updateRes) => {
+                  if (err) {
+                    console.error(err);
+                  } else {
+                    console.log("next object is available for sale now");
+                  }
+                }
+              );
+            }
           }
+          res.status(200).json({ success: true });
         }
       );
     });
@@ -562,9 +593,11 @@ app
             if (result.length > 0) {
               let username = result[0].username;
               database.connection.query(
-                SqlString.format("SELECT * FROM objects WHERE owner = ?;", [
-                  username
-                ]),
+                // check if object is not a multiple of another, hence back in the inventory stack
+                SqlString.format(
+                  "SELECT * FROM objects WHERE owner = ? AND multiple_of = 0;",
+                  [username]
+                ),
                 (err, objResult) => {
                   if (err) {
                     console.error(err);
@@ -671,13 +704,16 @@ app
       let objectSql;
 
       //if function is called to update objects (with search query)
+      // only objects that are not multiple of another are returned
       if (req.body.objectIds) {
         objectSql =
-          "SELECT * FROM objects WHERE id IN (" + req.body.objectIds + ")";
+          "SELECT * FROM objects WHERE id IN (" +
+          req.body.objectIds +
+          ") AND multiple_of = 0;";
       } else {
         //select statement for 12 objects from DB to display
         //this is done on browse page startup (without search query)
-        objectSql = "SELECT * FROM objects LIMIT 12;";
+        objectSql = "SELECT * FROM objects WHERE multiple_of = 0 LIMIT 12;";
       }
 
       //arrays to return in the final statement
@@ -770,6 +806,8 @@ app
         (err, objectIds) => {
           if (err) {
             console.error(error);
+          } else if (objectIds.length < 1) {
+            console.log("there is nothing to display");
           } else {
             for (let i = 0; i < objectIds.length; i++) {
               allObjectIds.push(objectIds[i].id);
@@ -787,8 +825,11 @@ app
                 idsToQuery.push(randomId);
               }
             }
+            //only objects that are not a multiple of another are returned
             let query =
-              "SELECT * FROM objects WHERE id IN (" + idsToQuery + ")";
+              "SELECT * FROM objects WHERE id IN (" +
+              idsToQuery +
+              ") AND multiple_of = 0;";
             database.connection.query(query, (err, objects) => {
               if (err) {
                 console.error(err);
@@ -829,77 +870,100 @@ app
     //fetch item information
     server.post("/item", (req, res) => {
       let objectId = req.body.id;
-      let getObjectSql = SqlString.format(
-        "SELECT * FROM objects WHERE id = ?;",
-        [objectId]
-      );
-      let tagSql = SqlString.format(
-        "SELECT content FROM tags WHERE corresp_obj_id = ?;",
-        [objectId]
-      );
-      let picSql = SqlString.format(
-        "SELECT name FROM pics WHERE corresp_obj_id = ?;",
-        [objectId]
-      );
 
-      let object;
-      let tags = [];
-      let pics = [];
+      //check whether object is a multiple of another item, if yes, don't allow access
+      database.connection.query(
+        SqlString.format("SELECT multiple_of FROM objects WHERE id = ?;", [
+          objectId
+        ]),
+        (err, checkRes) => {
+          if (err) {
+            console.error(err);
+          } else {
+            if (checkRes[0].multiple_of !== 0) {
+              res.status(200).send({ success: false });
+            } else {
+              let getObjectSql = SqlString.format(
+                "SELECT * FROM objects WHERE id = ?;",
+                [objectId]
+              );
+              let tagSql = SqlString.format(
+                "SELECT content FROM tags WHERE corresp_obj_id = ?;",
+                [objectId]
+              );
+              let picSql = SqlString.format(
+                "SELECT name FROM pics WHERE corresp_obj_id = ?;",
+                [objectId]
+              );
 
-      database.connection.query(getObjectSql, (err, resObject) => {
-        if (err) {
-          console.log(err);
-          console.log("The retrieval of object #" + objectId + " has failed.");
-        } else if (resObject.length > 0) {
-          object = resObject;
-          database.connection.query(
-            SqlString.format("SELECT id FROM users WHERE username = ?;", [
-              object[0].owner
-            ]),
-            (err, userResult) => {
-              if (err) {
-                console.error(err);
-              } else {
-                console.log("user id retrieval success");
-                database.connection.query(tagSql, (err, resTags) => {
-                  if (err) {
-                    console.log(err);
-                    console.log(
-                      "The retrieval of tags for object #" +
-                        objectId +
-                        " has failed."
-                    );
-                  } else {
-                    tags = resTags;
-                    database.connection.query(picSql, (err, resPics) => {
+              let object;
+              let tags = [];
+              let pics = [];
+
+              database.connection.query(getObjectSql, (err, resObject) => {
+                if (err) {
+                  console.log(err);
+                  console.log(
+                    "The retrieval of object #" + objectId + " has failed."
+                  );
+                } else if (resObject.length > 0) {
+                  object = resObject;
+                  database.connection.query(
+                    SqlString.format(
+                      "SELECT id FROM users WHERE username = ?;",
+                      [object[0].owner]
+                    ),
+                    (err, userResult) => {
                       if (err) {
-                        console.log(err);
-                        console.log(
-                          "The retrieval of pics for object #" +
-                            objectId +
-                            " has failed."
-                        );
+                        console.error(err);
                       } else {
-                        pics = resPics;
-                        res.status(200).send({
-                          success: true,
-                          object,
-                          tags,
-                          pics,
-                          id: objectId,
-                          sellerId: userResult[0].id
+                        console.log("user id retrieval success");
+                        database.connection.query(tagSql, (err, resTags) => {
+                          if (err) {
+                            console.log(err);
+                            console.log(
+                              "The retrieval of tags for object #" +
+                                objectId +
+                                " has failed."
+                            );
+                          } else {
+                            tags = resTags;
+                            database.connection.query(
+                              picSql,
+                              (err, resPics) => {
+                                if (err) {
+                                  console.log(err);
+                                  console.log(
+                                    "The retrieval of pics for object #" +
+                                      objectId +
+                                      " has failed."
+                                  );
+                                } else {
+                                  pics = resPics;
+                                  res.status(200).send({
+                                    success: true,
+                                    object,
+                                    tags,
+                                    pics,
+                                    id: objectId,
+                                    sellerId: userResult[0].id
+                                  });
+                                }
+                              }
+                            );
+                          }
                         });
                       }
-                    });
-                  }
-                });
-              }
+                    }
+                  );
+                } else {
+                  res.status(200).json({ success: false });
+                }
+              });
             }
-          );
-        } else {
-          res.status(200).json({ success: false });
+          }
         }
-      });
+      );
     });
 
     //delete picture from DB
