@@ -302,8 +302,9 @@ app
 
         //SQL statement to insert object details into DB, also retrieve the newly created objectId to use later
         let objectSql = SqlString.format(
-          "INSERT INTO objects (title, amount, multiple_of, description, price, owner, category, status) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID();",
+          "INSERT INTO objects (uid, title, amount, multiple_of, description, price, owner, category, status) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID();",
           [
+            req.body.uid,
             req.body.title,
             req.body.amount,
             multipleOf,

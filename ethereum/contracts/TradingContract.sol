@@ -6,6 +6,7 @@ contract TradingContract {
     
     struct Object {
         address owner;
+        string uid;
         address buyer;
         string status;          //"new", "used", "damaged"
         uint sellerCollateral;
@@ -19,6 +20,8 @@ contract TradingContract {
     );
 
     mapping (uint => Object) public objects;
+
+    mapping (string => address[]) public ownerHistory;
     
     //allocates buyerCollateral to contract and tracks amount in the Object to send it to seller later
     function tradeObject(address buyerAdd, uint objectId, string newStatus) public payable {
@@ -53,8 +56,10 @@ contract TradingContract {
         emit PurchaseListen(true);                              //notify client that purchase is confirmed
     }
     //allocates the msg.value to the contract and tracks the amount, to later send it back to seller (collateral)
-    function registerObject(uint objectId, address owner, string status) public payable {
-        objects[objectId] = Object(owner, address(0), status, msg.value, uint(0), uint(0));
+    function registerObject(string uid, uint objectId, address owner, string status) public payable {
+        objects[objectId] = Object(owner, uid, address(0), status, msg.value, uint(0), uint(0));
+
+        ownerHistory[uid].push(owner);
 
         emit PurchaseListen(true);
     }
@@ -67,6 +72,17 @@ contract TradingContract {
 
     function releaseSellerCollateral(uint objectId) public {
         objects[objectId].owner.transfer(objects[objectId].sellerCollateral);
+    }
+
+    //in case any funds get lost on an item, admin can recover them
+    function recoverItemFunds(uint objectId) public {
+        require(msg.sender == adminAddress, "You need to be an admin to do this");
+        adminAddress.transfer(objects[objectId].sellerCollateral + objects[objectId].buyerCollateral);
+    }
+
+    //return owner history of an object
+    function viewItemHistory (string uid) public view returns(address[] owners){
+        return ownerHistory[uid];
     }
 
 }

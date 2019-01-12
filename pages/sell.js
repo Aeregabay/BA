@@ -138,6 +138,7 @@ class sell extends Component {
       userAddress: "",
       objectId: "",
       amount: "",
+      currentUid: "",
       metaMask: false,
       agreement: false,
       dimmer: false
@@ -156,6 +157,7 @@ class sell extends Component {
     register.methods
       .registerObject(
         parseInt(this.state.objectId),
+        this.state.currentUid,
         this.state.userAddress,
         this.state.status
       )
@@ -264,6 +266,17 @@ class sell extends Component {
           if (i === 1) formData.append("multipleOf", this.state.objectId);
         }
 
+        //append all UIDs
+        // let uidArray = [];
+        // for (let i = 0; i < this.state.amount; i++) {
+        //   let fieldId = "UidInput" + i;
+        //   uidArray.push(document.getElementById(fieldId).value);
+        // }
+        formData.delete("uid");
+        let fieldId = "UidInput" + i;
+        formData.append("uid", document.getElementById(fieldId).value);
+
+        this.setState({ currentUid: document.getElementById(fieldId).value });
         //send created formData to server
         const res = await axios.post(
           window.location.origin + "/sell",
@@ -347,6 +360,28 @@ class sell extends Component {
     this.setState({ files: allPics });
   };
 
+  //render as many UID input fields as the amount selected
+  renderUidInputs() {
+    let resArray = [];
+    for (let i = 0; i < this.state.amount; i++) {
+      let fieldId = "UidInput" + i;
+      let fieldLabel = "UID of object " + i;
+      resArray.push(
+        <Form.Group>
+          <Form.Input
+            id={fieldId}
+            control="input"
+            label={fieldLabel}
+            placeholder="Enter the corresponding unique ID"
+            width={8}
+            required
+          />
+        </Form.Group>
+      );
+    }
+    return resArray;
+  }
+
   render() {
     const { currentValues } = this.state;
     return (
@@ -395,6 +430,7 @@ class sell extends Component {
                       width={4}
                     />
                   </Form.Group>
+                  {this.renderUidInputs()}
                   <Form.Group>
                     <Form.Input
                       id="description"
