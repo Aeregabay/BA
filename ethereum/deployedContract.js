@@ -1,7 +1,29 @@
 const ABI = [
   {
+    constant: true,
+    inputs: [{ name: "objectId", type: "uint256" }],
+    name: "getObject",
+    outputs: [
+      { name: "owner", type: "address" },
+      { name: "status", type: "string" }
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    constant: true,
+    inputs: [{ name: "uid", type: "string" }],
+    name: "viewOwnerHistory",
+    outputs: [{ name: "owners", type: "address[]" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function"
+  },
+  {
     constant: false,
     inputs: [
+      { name: "uid", type: "string" },
       { name: "objectId", type: "uint256" },
       { name: "owner", type: "address" },
       { name: "status", type: "string" }
@@ -13,15 +35,12 @@ const ABI = [
     type: "function"
   },
   {
-    constant: true,
+    constant: false,
     inputs: [{ name: "objectId", type: "uint256" }],
-    name: "getObject",
-    outputs: [
-      { name: "owner", type: "address" },
-      { name: "status", type: "string" }
-    ],
+    name: "recoverItemFunds",
+    outputs: [],
     payable: false,
-    stateMutability: "view",
+    stateMutability: "nonpayable",
     type: "function"
   },
   {
@@ -52,6 +71,7 @@ const ABI = [
     name: "objects",
     outputs: [
       { name: "owner", type: "address" },
+      { name: "uid", type: "string" },
       { name: "buyer", type: "address" },
       { name: "status", type: "string" },
       { name: "sellerCollateral", type: "uint256" },
@@ -78,6 +98,6 @@ const ABI = [
     type: "event"
   }
 ];
-const contractAddress = "0xC794969B766e11AEA686a172e745763b9badA2F6";
+const contractAddress = "0x5D3980046db56fEc95d97Fb586489ED9fc9dAe4c";
 
 export { ABI, contractAddress };

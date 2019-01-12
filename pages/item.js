@@ -103,6 +103,7 @@ class item extends Component {
     super(props);
     this.state = {
       id: "",
+      uid: "",
       title: "",
       amount: "",
       category: "",
@@ -112,6 +113,7 @@ class item extends Component {
       status: "",
       tags: [],
       pics: [],
+      ownerHistory: [],
       descriptionEdit: false,
       priceEdit: false,
       categoryEdit: false,
@@ -169,6 +171,22 @@ class item extends Component {
 
     let result = await verify.methods.getObject(this.state.id).call();
     this.setState({ verifiedStatus: result[1], verifiedOwner: result[0] });
+    let uidResult = await verify.methods
+      .viewOwnerHistory(this.state.uid)
+      .call();
+    this.setState({ ownerHistory: uidResult[0] });
+  };
+
+  renderOwnerHistory = () => {
+    let returnArray = [];
+    for (let i = 0; i < this.state.ownerHistory.length; i++) {
+      returnArray.push(
+        <p>
+          {i} {this.state.ownerHistory[i]}
+        </p>
+      );
+    }
+    return returnArray;
   };
 
   handleFiles = e => {
@@ -481,6 +499,7 @@ class item extends Component {
 
       this.setState({
         id: response.data.id,
+        uid: thisObject[0].uid,
         title: thisObject[0].title,
         amount: thisObject[0].amount,
         category: thisObject[0].category,
@@ -1062,25 +1081,43 @@ class item extends Component {
                       {this.state.status}
                     </a>
                   </p>
-                  <Button
-                    key="verifyStatusBtn"
-                    basic
-                    fluid
-                    style={{
-                      float: "right",
-                      maxWidth: "40%",
-                      border: "1px solid #7a7a52",
-                      marginTop: "3px"
-                    }}
-                    onClick={this.verifyItem}
-                  >
-                    <span key="verifyBtnContent" style={{ color: "#adad85" }}>
-                      Verify Status
-                    </span>
-                  </Button>
+                  {this.state.metaMask ? (
+                    <Button
+                      key="verifyStatusBtn"
+                      basic
+                      fluid
+                      style={{
+                        float: "right",
+                        maxWidth: "40%",
+                        border: "1px solid #7a7a52",
+                        marginTop: "3px"
+                      }}
+                      onClick={this.verifyItem}
+                    >
+                      <span key="verifyBtnContent" style={{ color: "#adad85" }}>
+                        Verify Status
+                      </span>
+                    </Button>
+                  ) : (
+                    <p
+                      style={{
+                        marginLeft: 15,
+                        color: "#ccccb3",
+                        textAlign: "center",
+                        maxWidth: "196px",
+                        float: "right",
+                        textAlign: "right",
+                        marginRight: "30px"
+                      }}
+                    >
+                      You have to enable MetaMask in order to verify the item
+                      status
+                    </p>
+                  )}
+
                   <Modal
                     key="verifyModal"
-                    dimmer="blurring"
+                    // dimmer="blurring"
                     open={this.state.modalOpen}
                     onClose={() => this.setState({ modalOpen: false })}
                     basic
@@ -1116,6 +1153,19 @@ class item extends Component {
                             </Header>
                             {this.state.verifiedStatus}
                           </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row>
+                          <Header
+                            size="large"
+                            style={{
+                              color: "white",
+                              marginTop: "15px",
+                              marginBottom: "5px"
+                            }}
+                          >
+                            Owner History
+                          </Header>
+                          {this.renderOwnerHistory()}
                         </Grid.Row>
                       </Modal.Description>
                     </Modal.Content>
@@ -1216,7 +1266,8 @@ class item extends Component {
                         style={{
                           color: "#ccccb3",
                           textAlign: "center",
-                          fontWeight: "600"
+                          fontWeight: "600",
+                          marginBottom: "20px"
                         }}
                       >
                         If you wish to buy multiple units, please execute the

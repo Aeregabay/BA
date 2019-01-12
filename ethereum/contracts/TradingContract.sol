@@ -21,7 +21,7 @@ contract TradingContract {
 
     mapping (uint => Object) public objects;
 
-    mapping (string => address[]) public ownerHistory;
+    mapping (string => address[]) ownerHistory;
     
     //allocates buyerCollateral to contract and tracks amount in the Object to send it to seller later
     function tradeObject(address buyerAdd, uint objectId, string newStatus) public payable {
@@ -81,8 +81,7 @@ contract TradingContract {
     }
 
     //return owner history of an object
-    function viewItemHistory (string uid) public view returns(address[] owners){
+    function viewOwnerHistory (string uid) public view returns(address[] owners){
         return ownerHistory[uid];
     }
-
 }

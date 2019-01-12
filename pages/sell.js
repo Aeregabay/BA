@@ -156,8 +156,8 @@ class sell extends Component {
 
     register.methods
       .registerObject(
+        toString(this.state.uid),
         parseInt(this.state.objectId),
-        this.state.currentUid,
         this.state.userAddress,
         this.state.status
       )
@@ -266,15 +266,11 @@ class sell extends Component {
           if (i === 1) formData.append("multipleOf", this.state.objectId);
         }
 
-        //append all UIDs
-        // let uidArray = [];
-        // for (let i = 0; i < this.state.amount; i++) {
-        //   let fieldId = "UidInput" + i;
-        //   uidArray.push(document.getElementById(fieldId).value);
-        // }
         formData.delete("uid");
         let fieldId = "UidInput" + i;
         formData.append("uid", document.getElementById(fieldId).value);
+        console.log(fieldId);
+        console.log(document.getElementById(fieldId).value);
 
         this.setState({ currentUid: document.getElementById(fieldId).value });
         //send created formData to server
@@ -282,7 +278,6 @@ class sell extends Component {
           window.location.origin + "/sell",
           formData
         );
-
         //when successful, redirect to /browse page
         if (res.data.success) {
           //objectId is set for the first object, the rest will have this id in their "multiple_of" column
