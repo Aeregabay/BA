@@ -6,7 +6,8 @@ import {
   Divider,
   Grid,
   Card,
-  Segment
+  Segment,
+  Input
 } from "semantic-ui-react";
 import Layout from "../components/Layout";
 import { renderObjects } from "../utils/renderObjectsUtil";
@@ -741,7 +742,7 @@ class App extends Component {
                 marginLeft: "20px",
                 width: "68.8%",
                 marginTop: "0%",
-                marginBottom: "1.2%"
+                marginBottom: "27%"
               }}
             >
               <Grid.Column width={12}>
@@ -763,6 +764,19 @@ class App extends Component {
                   >
                     {this.callRender()}
                   </Card.Group>
+                </Grid.Row>
+                <Grid.Row>
+                  <Segment style={{ marginTop: "20px" }}>
+                    <Header
+                      size="large"
+                      content="Check an item's owner history"
+                      style={{
+                        color: "#7a7a52",
+                        textAlign: "center"
+                      }}
+                    />
+                    <Input label="Enter the item's UID here" />
+                  </Segment>
                 </Grid.Row>
               </Grid.Column>
             </Segment>

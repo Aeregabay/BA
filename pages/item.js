@@ -124,6 +124,8 @@ class item extends Component {
       modalOpen: false,
       verifiedStatus: "",
       verifiedOwner: "",
+      verifiedBuyer: "",
+      verifiedUid: "",
       buyerAddress: "",
       sellerAddress: "",
       sellerEmail: "",
@@ -147,8 +149,8 @@ class item extends Component {
     if (this.state.status !== "sold" && this.state.status !== "shipping") {
       await verify.methods.releaseSellerCollateral(this.state.id).send({
         from: this.state.sellerAddress,
-        gas: 100000,
-        gasPrice: "10000000000"
+        gas: 250000,
+        gasPrice: "5000000000"
       });
     }
     alert("Your collateral will be refunded to you shortly");
@@ -170,11 +172,20 @@ class item extends Component {
     this.setState({ modalOpen: true });
 
     let result = await verify.methods.getObject(this.state.id).call();
-    this.setState({ verifiedStatus: result[1], verifiedOwner: result[0] });
+    this.setState({
+      verifiedOwner: result[0],
+      verifiedUid: result[1],
+      verifiedBuyer: result[2],
+      verifiedStatus: result[3]
+    });
     let uidResult = await verify.methods
-      .viewOwnerHistory(this.state.uid)
+      .viewOwnerHistory(this.state.verifiedUid)
       .call();
-    this.setState({ ownerHistory: uidResult[0] });
+    let ownerHistory = [];
+    uidResult.forEach(function(owner) {
+      ownerHistory.push(owner);
+    });
+    this.setState({ ownerHistory });
   };
 
   renderOwnerHistory = () => {
@@ -182,7 +193,7 @@ class item extends Component {
     for (let i = 0; i < this.state.ownerHistory.length; i++) {
       returnArray.push(
         <p>
-          {i} {this.state.ownerHistory[i]}
+          <span style={{fontWeight: "bold", color:"orange"}}>{i + 1}:</span> {this.state.ownerHistory[i]}
         </p>
       );
     }
@@ -354,8 +365,8 @@ class item extends Component {
       .send({
         from: this.state.buyerAddress,
         value: web3.utils.toWei(finalPrice.toString(), "ether"),
-        gas: 100000,
-        gasPrice: "10000000000"
+        gas: 250000,
+        gasPrice: "5000000000"
       });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
@@ -389,8 +400,8 @@ class item extends Component {
     //call to the Smart Contract with necessary information
     verify.methods.confirmTransaction(this.state.id).send({
       from: this.state.buyerAddress,
-      gas: 100000,
-      gasPrice: "10000000000"
+      gas: 250000,
+      gasPrice: "5000000000"
     });
 
     //while user is promted to wait, listen for the Event that will be emitted from the
@@ -1152,6 +1163,19 @@ class item extends Component {
                               Status
                             </Header>
                             {this.state.verifiedStatus}
+                          </Grid.Column>
+                          <Grid.Column>
+                            <Header
+                              size="large"
+                              style={{
+                                color: "white",
+                                marginTop: "15px",
+                                marginBottom: "5px"
+                              }}
+                            >
+                              Buyer
+                            </Header>
+                            {this.state.verifiedBuyer === "0x0000000000000000000000000000000000000000" ? ("No buyer yet") : (this.state.verifiedBuyer)}
                           </Grid.Column>
                         </Grid.Row>
                         <Grid.Row>

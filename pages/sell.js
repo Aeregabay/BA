@@ -156,7 +156,7 @@ class sell extends Component {
 
     register.methods
       .registerObject(
-        toString(this.state.uid),
+        this.state.currentUid,
         parseInt(this.state.objectId),
         this.state.userAddress,
         this.state.status
@@ -164,8 +164,8 @@ class sell extends Component {
       .send({
         from: this.state.userAddress,
         value: web3.utils.toWei(collateral.toString(), "ether"),
-        gas: 100000,
-        gasPrice: "10000000000"
+        gas: 250000,
+        gasPrice: "5000000000"
       });
   };
 
@@ -269,8 +269,6 @@ class sell extends Component {
         formData.delete("uid");
         let fieldId = "UidInput" + i;
         formData.append("uid", document.getElementById(fieldId).value);
-        console.log(fieldId);
-        console.log(document.getElementById(fieldId).value);
 
         this.setState({ currentUid: document.getElementById(fieldId).value });
         //send created formData to server
@@ -360,7 +358,7 @@ class sell extends Component {
     let resArray = [];
     for (let i = 0; i < this.state.amount; i++) {
       let fieldId = "UidInput" + i;
-      let fieldLabel = "UID of object " + i;
+      let fieldLabel = "UID of object " + i + 1;
       resArray.push(
         <Form.Group>
           <Form.Input

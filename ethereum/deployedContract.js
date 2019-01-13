@@ -5,7 +5,12 @@ const ABI = [
     name: "getObject",
     outputs: [
       { name: "owner", type: "address" },
-      { name: "status", type: "string" }
+      { name: "uid", type: "string" },
+      { name: "buyer", type: "address" },
+      { name: "status", type: "string" },
+      { name: "sellerCollateral", type: "uint256" },
+      { name: "buyerCollateral", type: "uint256" },
+      { name: "price", type: "uint256" }
     ],
     payable: false,
     stateMutability: "view",
@@ -98,6 +103,6 @@ const ABI = [
     type: "event"
   }
 ];
-const contractAddress = "0x5D3980046db56fEc95d97Fb586489ED9fc9dAe4c";
+const contractAddress = "0xdDF46278b92c26d6fF4b1989C92E29Bd8D3221b6";
 
 export { ABI, contractAddress };

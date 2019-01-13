@@ -36,25 +36,33 @@ contract TradingContract {
     function confirmTransaction(uint objectId) public {
         require(msg.sender == objects[objectId].buyer, "You need to be the registered buyer to confirm this transaction");
         
+        //assign the owners from arguments to variables
         address owner = objects[objectId].owner;
         address buyer = objects[objectId].buyer;
+        objects[objectId].owner = buyer; 
+        objects[objectId].buyer = address(0);
+        
+        //assign the correct amounts to variables to prevent Checks-Effects-Interaction violation (double spending)
+        //immediately set values in mapping = 0
         uint adminFee = objects[objectId].price / 100;
-
-        owner.transfer(objects[objectId].price +
-        objects[objectId].sellerCollateral - adminFee);         //send seller his collateral + the selling price - adminFee
-        
-        buyer.transfer(objects[objectId].buyerCollateral);      //refund buyer his collateral
-
-        adminAddress.transfer(adminFee);                        //send admin the adminFee
-        
-        objects[objectId].owner = buyer;                        //assign buyer as new owner        
-        objects[objectId].buyer = address(0);                   //delete buyer
-        objects[objectId].sellerCollateral = uint(0);           //and both collaterals
+        uint sellerAmount = objects[objectId].price + objects[objectId].sellerCollateral - adminFee;
+        objects[objectId].sellerCollateral = uint(0); 
+        objects[objectId].price = uint(0);
+        uint buyerCollateral = objects[objectId].buyerCollateral;
         objects[objectId].buyerCollateral = uint(0);
-        objects[objectId].price = uint(0);                      //and price
 
-        emit PurchaseListen(true);                              //notify client that purchase is confirmed
+        //emit Event before transaction to prevent multiple calls. If transfer fails it will cause a revert and no event is emitted
+        emit PurchaseListen(true);
+        
+        //push new owner's address to item history (owner is already newly allocated)
+        ownerHistory[objects[objectId].uid].push(objects[objectId].owner);
+
+        //send funds
+        owner.transfer(sellerAmount);         
+        buyer.transfer(buyerCollateral);      
+        adminAddress.transfer(adminFee);
     }
+    
     //allocates the msg.value to the contract and tracks the amount, to later send it back to seller (collateral)
     function registerObject(string uid, uint objectId, address owner, string status) public payable {
         objects[objectId] = Object(owner, uid, address(0), status, msg.value, uint(0), uint(0));
@@ -64,10 +72,16 @@ contract TradingContract {
         emit PurchaseListen(true);
     }
 
-    function getObject(uint objectId) public view returns (address owner, string status ) {
+    function getObject(uint objectId) public view returns (address owner, string uid, address buyer, string status, 
+    uint sellerCollateral, uint buyerCollateral, uint price ) {
         owner = objects[objectId].owner;
+        uid = objects[objectId].uid;
+        buyer = objects[objectId].buyer;
         status = objects[objectId].status;
-        return (owner, status);
+        sellerCollateral = objects[objectId].sellerCollateral;
+        buyerCollateral = objects[objectId].buyerCollateral;
+        price = objects[objectId].price;
+        return (owner, uid, buyer, status, sellerCollateral, buyerCollateral, price);
     }
 
     function releaseSellerCollateral(uint objectId) public {

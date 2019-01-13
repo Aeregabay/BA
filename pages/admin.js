@@ -148,8 +148,8 @@ class admin extends Component {
           to: reporterAddress,
           from: adminAddress,
           value: web3.utils.toWei("0.03"),
-          gas: 100000,
-          gasPrice: "10000000000"
+          gas: 250000,
+          gasPrice: "5000000000"
         },
         (err, res) => {
           if (!err) {
