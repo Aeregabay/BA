@@ -7,9 +7,14 @@ import {
   Grid,
   Card,
   Segment,
-  Input
+  Input,
+  Button,
+  Modal
 } from "semantic-ui-react";
 import Layout from "../components/Layout";
+import { ABI, contractAddress } from "../ethereum/deployedContract";
+import Web3 from "web3";
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 import { renderObjects } from "../utils/renderObjectsUtil";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -77,14 +82,19 @@ library.add(
   faWineGlassAlt
 );
 
+let verify;
+
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { objects: [] };
+    this.state = { objects: [], ownerHistory: [], uidModal: false };
   }
 
   //render 4 random objects from the DB
   async componentWillMount() {
+    //create instance of the SC
+    verify = await new web3.eth.Contract(ABI, contractAddress);
+
     let result = await axios.post(window.location.origin + "/getRandomObjects");
 
     if (result.data.success) {
@@ -129,6 +139,41 @@ class App extends Component {
   callRender() {
     return renderObjects(this.state.objects, this.state.tags, this.state.pics);
   }
+
+  renderOwnerHistory = () => {
+    let returnArray = [];
+    for (let i = 0; i < this.state.ownerHistory.length; i++) {
+      returnArray.push(
+        <p>
+          <span style={{ fontWeight: "bold", color: "orange" }}>{i + 1}:</span>{" "}
+          {this.state.ownerHistory[i]}
+        </p>
+      );
+    }
+    return returnArray;
+  };
+
+  //when enter key is hit
+  onEnter(e) {
+    if (e.key === "Enter") {
+      this.checkUid();
+    }
+  }
+
+  checkUid = async () => {
+    let uidResult = await verify.methods
+      .viewOwnerHistory(document.getElementById("uidSearch").value)
+      .call();
+    let ownerHistory = [];
+    uidResult.forEach(function(owner) {
+      ownerHistory.push(owner);
+    });
+    this.setState({
+      ownerHistory,
+      uidModal: true,
+      uid: document.getElementById("uidSearch").value
+    });
+  };
 
   render() {
     return (
@@ -775,12 +820,66 @@ class App extends Component {
                         textAlign: "center"
                       }}
                     />
-                    <Input label="Enter the item's UID here" />
+                    <Input
+                      id="uidSearch"
+                      icon="barcode"
+                      onKeyPress={this.onEnter.bind(this)}
+                      iconPosition="left"
+                      placeholder="UID # ..."
+                      label={{ tag: true, content: "Enter the UID here" }}
+                      labelPosition="right"
+                      style={{
+                        width: "90%",
+                        marginLeft: "5%",
+                        marginTop: "2%"
+                      }}
+                    />
+                    <Button
+                      key="uidBtn"
+                      basic
+                      style={{
+                        float: "middle",
+                        width: "30%",
+                        border: "1px solid #7a7a52",
+                        marginTop: "2%",
+                        marginLeft: "35%"
+                      }}
+                      onClick={this.checkUid}
+                    >
+                      <span key="uidButtonContent" style={{ color: "#adad85" }}>
+                        Get owner History!
+                      </span>
+                    </Button>
                   </Segment>
                 </Grid.Row>
               </Grid.Column>
             </Segment>
           </Grid>
+          <Modal
+            key="verifyModal"
+            // dimmer="blurring"
+            open={this.state.uidModal}
+            onClose={() => this.setState({ uidModal: false })}
+            basic
+            style={{ textAlign: "center" }}
+          >
+            <Modal.Header>
+              <Header size="huge" style={{ color: "white" }}>
+                Owner history of object with UID {this.state.uid}
+              </Header>
+            </Modal.Header>
+            <Modal.Content>{this.renderOwnerHistory()}</Modal.Content>
+            <Modal.Actions>
+              <Button
+                key="verifyOkay"
+                positive
+                icon="checkmark"
+                labelPosition="right"
+                content="Okay"
+                onClick={() => this.setState({ uidModal: false })}
+              />
+            </Modal.Actions>
+          </Modal>
         </Container>
       </Layout>
     );
