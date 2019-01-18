@@ -22,6 +22,15 @@ contract TradingContract {
     mapping (uint => Object) public objects;
 
     mapping (string => address[]) ownerHistory;
+
+    //allocates the msg.value to the contract and tracks the amount, to later send it back to seller (collateral)
+    function registerObject(string uid, uint objectId, address owner, string status) public payable {
+        objects[objectId] = Object(owner, uid, address(0), status, msg.value, uint(0), uint(0));
+
+        ownerHistory[uid].push(owner);
+
+        emit PurchaseListen(true);
+    }
     
     //allocates buyerCollateral to contract and tracks amount in the Object to send it to seller later
     function tradeObject(address buyerAdd, uint objectId, string newStatus) public payable {
@@ -62,15 +71,6 @@ contract TradingContract {
         buyer.transfer(buyerCollateral);      
         adminAddress.transfer(adminFee);
     }
-    
-    //allocates the msg.value to the contract and tracks the amount, to later send it back to seller (collateral)
-    function registerObject(string uid, uint objectId, address owner, string status) public payable {
-        objects[objectId] = Object(owner, uid, address(0), status, msg.value, uint(0), uint(0));
-
-        ownerHistory[uid].push(owner);
-
-        emit PurchaseListen(true);
-    }
 
     function getObject(uint objectId) public view returns (address owner, string uid, address buyer, string status, 
     uint sellerCollateral, uint buyerCollateral, uint price ) {
@@ -86,6 +86,7 @@ contract TradingContract {
 
     function releaseSellerCollateral(uint objectId) public {
         objects[objectId].owner.transfer(objects[objectId].sellerCollateral);
+        objects[objectId].sellerCollateral = uint(0);
     }
 
     //in case any funds get lost on an item, admin can recover them
