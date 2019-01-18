@@ -358,7 +358,7 @@ class sell extends Component {
     let resArray = [];
     for (let i = 0; i < this.state.amount; i++) {
       let fieldId = "UidInput" + i;
-      let fieldLabel = "UID of object " + i + 1;
+      let fieldLabel = "UID of object " + (i + 1);
       resArray.push(
         <Form.Group>
           <Form.Input

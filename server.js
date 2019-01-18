@@ -747,7 +747,7 @@ app
               if (err) {
                 console.log("The tags retrieval from the DB has failed");
               } else {
-                //push all tags into returing array
+                //push all tags into returning array
                 for (let i = 0; i < tags.length; i++) {
                   resultingTags.push(tags[i]);
                 }
@@ -806,7 +806,7 @@ app
         SqlString.format("SELECT id FROM objects"),
         (err, objectIds) => {
           if (err) {
-            console.error(error);
+            console.error(err);
           } else if (objectIds.length < 1) {
             console.log("there is nothing to display");
           } else {

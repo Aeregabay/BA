@@ -190,7 +190,9 @@ class App extends Component {
           />
           <Divider />
           <Grid columns={2} style={{ marginTop: "20px" }}>
-            <Segment style={{ width: "27%", marginLeft: "1.2%" }}>
+            <Segment
+              style={{ width: "27%", marginLeft: "1.2%", height: "90%" }}
+            >
               <Grid.Column width={5}>
                 <Grid.Row>
                   <Header
