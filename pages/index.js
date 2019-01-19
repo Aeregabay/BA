@@ -145,7 +145,7 @@ class App extends Component {
     for (let i = 0; i < this.state.ownerHistory.length; i++) {
       returnArray.push(
         <p>
-          <span style={{ fontWeight: "bold", color: "orange" }}>{i + 1}:</span>{" "}
+          <span style={{ fontWeight: "bold", color: "orange" }}>{i + 1}:</span>
           {this.state.ownerHistory[i]}
         </p>
       );

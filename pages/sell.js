@@ -278,11 +278,9 @@ class sell extends Component {
         );
         //when successful, redirect to /browse page
         if (res.data.success) {
-          //objectId is set for the first object, the rest will have this id in their "multiple_of" column
-          if (i === 0) {
-            this.setState({ objectId: res.data.objectId });
-          }
-          this.pushToChain();
+          //objectId is set for each object with value returned from DB
+          this.setState({ objectId: res.data.objectId });
+          await this.pushToChain();
 
           register.events.PurchaseListen({}, (err, res) => {
             if (err) {

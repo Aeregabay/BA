@@ -802,8 +802,9 @@ app
       let idsToQuery = [];
 
       //query all object ids to choose from
+      //only objects that are not a multiple of another are returned
       database.connection.query(
-        SqlString.format("SELECT id FROM objects"),
+        SqlString.format("SELECT id FROM objects WHERE multiple_of = 0;"),
         (err, objectIds) => {
           if (err) {
             console.error(err);
@@ -826,11 +827,8 @@ app
                 idsToQuery.push(randomId);
               }
             }
-            //only objects that are not a multiple of another are returned
             let query =
-              "SELECT * FROM objects WHERE id IN (" +
-              idsToQuery +
-              ") AND multiple_of = 0;";
+              "SELECT * FROM objects WHERE id IN (" + idsToQuery + ");";
             database.connection.query(query, (err, objects) => {
               if (err) {
                 console.error(err);

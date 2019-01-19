@@ -193,7 +193,8 @@ class item extends Component {
     for (let i = 0; i < this.state.ownerHistory.length; i++) {
       returnArray.push(
         <p>
-          <span style={{fontWeight: "bold", color:"orange"}}>{i + 1}:</span> {this.state.ownerHistory[i]}
+          <span style={{ fontWeight: "bold", color: "orange" }}>{i + 1}:</span>
+          {this.state.ownerHistory[i]}
         </p>
       );
     }
@@ -1175,7 +1176,10 @@ class item extends Component {
                             >
                               Buyer
                             </Header>
-                            {this.state.verifiedBuyer === "0x0000000000000000000000000000000000000000" ? ("No buyer yet") : (this.state.verifiedBuyer)}
+                            {this.state.verifiedBuyer ===
+                            "0x0000000000000000000000000000000000000000"
+                              ? "No buyer yet"
+                              : this.state.verifiedBuyer}
                           </Grid.Column>
                         </Grid.Row>
                         <Grid.Row>
