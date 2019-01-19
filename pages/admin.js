@@ -6,7 +6,8 @@ import {
   List,
   Modal,
   Grid,
-  Icon
+  Icon,
+  Input
 } from "semantic-ui-react";
 import Layout from "../components/Layout";
 import axios from "axios";
@@ -14,6 +15,8 @@ import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
 const adminAddress = "0xa9C3f40905a01240F63AA2b27375b5D43Dcd64E5";
 import Router from "../routes";
+import { ABI, contractAddress } from "../ethereum/deployedContract";
+let verify;
 
 class admin extends Component {
   constructor(props) {
@@ -36,6 +39,12 @@ class admin extends Component {
   }
 
   async componentWillMount() {
+    //create instance of the SC that is deployed from the KYC platform's side
+    verify = new web3.eth.Contract(
+      ABI,
+      "0x0523A4Da9E7f1eBcbcb5BeBa44440D4Ac4Ef0F5A"
+    );
+
     let result = await axios.post(window.location.origin + "/getUsers");
     let reports = await axios.post(window.location.origin + "/getReports");
 
@@ -168,6 +177,20 @@ class admin extends Component {
     Router.pushRoute("user", { id: this.state.userId });
   };
 
+  //when enter key is hit
+  onEnter(e) {
+    if (e.key === "Enter") {
+      this.redeemFunds();
+    }
+  }
+
+  redeemFunds = async () => {
+    await verify.methods
+      .recoverItemFunds(document.getElementById("redeemFunds").value)
+      .call();
+    alert("Successfully redeemed pending funds");
+  };
+
   render() {
     return (
       <Layout>
@@ -181,7 +204,7 @@ class admin extends Component {
         >
           This is the Admin Page
         </Header>
-        <Grid>
+        <Grid columns={2}>
           <Grid.Row>
             <Grid.Column width={8}>
               <Header
@@ -229,6 +252,40 @@ class admin extends Component {
                 <List link>{this.renderReports()}</List>
               </Container>
             </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            {/* <Grid.Column width={8}> */}
+            <Input
+              id="redeemFunds"
+              icon="dollar"
+              onKeyPress={this.onEnter.bind(this)}
+              iconPosition="left"
+              placeholder="object id # ..."
+              label={{ tag: true, content: "Enter the object id here" }}
+              labelPosition="right"
+              style={{
+                width: "30%",
+                marginLeft: "35%",
+                marginTop: "2%"
+              }}
+            />
+            <Button
+              key="redeemBtn"
+              basic
+              style={{
+                float: "middle",
+                width: "10%",
+                border: "1px solid #7a7a52",
+                marginTop: "1%",
+                marginLeft: "45%"
+              }}
+              onClick={this.redeemFunds}
+            >
+              <span key="redeemButtonContent" style={{ color: "#adad85" }}>
+                Redeem funds!
+              </span>
+            </Button>
+            {/* </Grid.Column> */}
           </Grid.Row>
         </Grid>
         <Modal

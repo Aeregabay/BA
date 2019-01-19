@@ -28,6 +28,15 @@ let ABI = [
     type: "function"
   },
   {
+    constant: true,
+    inputs: [],
+    name: "getHashes",
+    outputs: [{ name: "", type: "bytes32[]" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function"
+  },
+  {
     constant: false,
     inputs: [
       { name: "kycKey", type: "string" },
@@ -37,6 +46,15 @@ let ABI = [
     outputs: [],
     payable: true,
     stateMutability: "payable",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [{ name: "newHash", type: "bytes32" }],
+    name: "storeHash",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
     type: "function"
   },
   {
@@ -97,7 +115,7 @@ class register extends Component {
     //create instance of the SC that is deployed from the KYC platform's side
     verify = new web3.eth.Contract(
       ABI,
-      "0xe78285A95542F415A20c46933544b0bDfCC3263B"
+      "0x0523A4Da9E7f1eBcbcb5BeBa44440D4Ac4Ef0F5A"
     );
   }
 
@@ -256,7 +274,7 @@ class register extends Component {
                   <Form.Group>
                     <Form.Input
                       id="kycKey"
-                      label="KYC public key"
+                      label="KYC key"
                       placeholder="Enter key received from KYC platform"
                       required
                       width={16}
