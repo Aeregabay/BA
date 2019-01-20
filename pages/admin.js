@@ -40,11 +40,9 @@ class admin extends Component {
 
   async componentWillMount() {
     //create instance of the SC that is deployed from the KYC platform's side
-    verify = new web3.eth.Contract(
-      ABI,
-      "0x0523A4Da9E7f1eBcbcb5BeBa44440D4Ac4Ef0F5A"
-    );
+    verify = new web3.eth.Contract(ABI, contractAddress);
 
+    //fetch information to display on page
     let result = await axios.post(window.location.origin + "/getUsers");
     let reports = await axios.post(window.location.origin + "/getReports");
 
@@ -65,6 +63,7 @@ class admin extends Component {
     }
   }
 
+  //prepare user data for display in modal
   displayUser(index) {
     this.setState({
       userId: this.state.users[index].id,
@@ -75,6 +74,8 @@ class admin extends Component {
       userModal: true
     });
   }
+
+  //same for reports info
   displayReport(index) {
     this.setState({
       reporter: this.state.reports[index].reporter,
@@ -85,6 +86,7 @@ class admin extends Component {
     });
   }
 
+  //render all the users into a list of React elements
   renderUsers() {
     let userList = [];
     if (!this.state.users) {
@@ -102,6 +104,7 @@ class admin extends Component {
     return userList;
   }
 
+  //same for reports
   renderReports() {
     let reportList = [];
     if (!this.state.reports) {
@@ -109,8 +112,8 @@ class admin extends Component {
     } else {
       for (let i = 0; i < this.state.reports.length; i++) {
         reportList.push(
-          <List.Item as="a" onClick={() => this.displayReport(i)}>
-            # {i + 1}
+          <List.Item>
+            <a onClick={() => this.displayReport(i)}># {i + 1}</a>
             <Icon
               name="remove"
               color="red"
@@ -143,6 +146,7 @@ class admin extends Component {
     location.reload();
   };
 
+  //reward correct report with 0.03 Ether
   rewardReporter = async reporter => {
     let reporterAddress;
     for (let i = 0; i < this.state.users.length; i++) {
@@ -254,7 +258,6 @@ class admin extends Component {
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
-            {/* <Grid.Column width={8}> */}
             <Input
               id="redeemFunds"
               icon="dollar"
@@ -285,7 +288,6 @@ class admin extends Component {
                 Redeem funds!
               </span>
             </Button>
-            {/* </Grid.Column> */}
           </Grid.Row>
         </Grid>
         <Modal

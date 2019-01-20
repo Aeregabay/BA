@@ -32,6 +32,8 @@ function truncateTags(tags) {
   return tags.slice(0, maxLength);
 }
 
+//takes input of all data corresponding to an object and creates
+//React Card elements, pushed them into an array and returns that array
 export function renderObjects(objects, tagsIn, picturesIn) {
   if (objects) {
     //array to return after all 10 items are constructed

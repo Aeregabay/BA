@@ -217,6 +217,8 @@ class sell extends Component {
     }, 500);
   }
 
+  //gathers all data input from the user and appends to formdata
+  //to send to server / blockchain
   onSubmit = async () => {
     if (
       this.state.category !== "" &&
@@ -266,6 +268,8 @@ class sell extends Component {
           if (i === 1) formData.append("multipleOf", this.state.objectId);
         }
 
+        //uid has to be deleted and reappended to formdata for every iteration,
+        // since it changes for every object
         formData.delete("uid");
         let fieldId = "UidInput" + i;
         formData.append("uid", document.getElementById(fieldId).value);

@@ -462,6 +462,7 @@ app
       );
     });
 
+    //deletes object from database
     server.post("/deleteItem", urlEncodedParser, (req, res) => {
       let objectId = req.body.id;
 
@@ -482,6 +483,8 @@ app
       );
     });
 
+    //executes concurrently to the release of funds on the smart contract
+    //updates relevant fields in the database accordingly
     server.post("/confirmPurchase", urlEncodedParser, (req, res) => {
       let buyer = req.body.buyer;
       let objectId = req.body.objectId;
@@ -804,7 +807,9 @@ app
       //query all object ids to choose from
       //only objects that are not a multiple of another are returned
       database.connection.query(
-        SqlString.format("SELECT id FROM objects WHERE multiple_of = 0;"),
+        SqlString.format(
+          "SELECT id FROM objects WHERE multiple_of = 0 AND status != 'sold' AND status != 'shipping';"
+        ),
         (err, objectIds) => {
           if (err) {
             console.error(err);

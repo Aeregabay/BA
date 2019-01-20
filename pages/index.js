@@ -15,10 +15,12 @@ import Layout from "../components/Layout";
 import { ABI, contractAddress } from "../ethereum/deployedContract";
 import Web3 from "web3";
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:3000");
+//renderObjects is used in multiple components, hence import
 import { renderObjects } from "../utils/renderObjectsUtil";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
+//imports for category icons
 import {
   faStamp,
   faPalette,
@@ -140,6 +142,7 @@ class App extends Component {
     return renderObjects(this.state.objects, this.state.tags, this.state.pics);
   }
 
+  //create displayable array from fetched ownerhistory
   renderOwnerHistory = () => {
     let returnArray = [];
     for (let i = 0; i < this.state.ownerHistory.length; i++) {
@@ -160,6 +163,7 @@ class App extends Component {
     }
   }
 
+  //call SC to fetch ownerhistory
   checkUid = async () => {
     let uidResult = await verify.methods
       .viewOwnerHistory(document.getElementById("uidSearch").value)

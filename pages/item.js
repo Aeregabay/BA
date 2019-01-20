@@ -27,6 +27,7 @@ cc.setApiKey(
   "41e7dfb621809bb8dc9f905d7fa8a728389852a7d41e9e225d88e68cfe6d2b4b"
 );
 
+//arrays needed globally visible
 const categories = [
   { key: "antiquities", text: "Antiquities & Art", value: "antiquities" },
   { key: "audioVideoTv", text: "Audio, Video & TV", value: "audioVideoTv" },
@@ -111,6 +112,7 @@ class item extends Component {
       owner: "",
       price: "",
       status: "",
+      currentUser: "",
       tags: [],
       pics: [],
       ownerHistory: [],
@@ -118,7 +120,6 @@ class item extends Component {
       priceEdit: false,
       categoryEdit: false,
       tagEdit: false,
-      currentUser: "",
       pictureEdit: false,
       titleEdit: false,
       modalOpen: false,
@@ -143,6 +144,8 @@ class item extends Component {
     };
   }
 
+  //deletes item from database and if object is not yet sold,
+  //refunds seller the already payed collateral
   deleteItem = async () => {
     this.setState({ deleteInit: false, dimmer: true });
 
@@ -168,6 +171,7 @@ class item extends Component {
     }
   };
 
+  //fetch all object data from SC and display in modal
   verifyItem = async () => {
     this.setState({ modalOpen: true });
 
@@ -188,6 +192,7 @@ class item extends Component {
     this.setState({ ownerHistory });
   };
 
+  //prepare data for display
   renderOwnerHistory = () => {
     let returnArray = [];
     for (let i = 0; i < this.state.ownerHistory.length; i++) {
@@ -201,6 +206,7 @@ class item extends Component {
     return returnArray;
   };
 
+  //picture edit handler
   handleFiles = e => {
     picsToAdd = [];
     let i;
@@ -338,17 +344,18 @@ class item extends Component {
     currentValues[0] = value;
   };
 
+  //shows browse page with object already prefiltered by searchterm === this.state.category
   onCategoryClick = () => {
-    //shows browse page with object already prefiltered by searchterm === this.state.category
     this.getObjectIds(this.state.category);
   };
 
+  //redirects to user page with item sold by latter
   onSellerClick = () => {
     Router.pushRoute("user", { id: this.state.sellerId });
   };
 
+  //same as onCategoryClick but with tag content
   onTagClick = content => {
-    //same as onCategoryClik but with tag content
     this.getObjectIds(content);
   };
 
