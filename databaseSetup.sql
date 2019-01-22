@@ -55,5 +55,4 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
-
-
+INSERT INTO `mytable`.`users` (`id`, `username`, `pw`, `profile_pic`, `eth_account`, `admin`, `email`) VALUES ('1', 'Admin', '$2b$10$0upO9ur2dEQ7pa4mPWkCf.miPvWO9jDFIS7xtjSZ434we9Zt19Aua', 'icon.png', 'YOUR ETHEREUM ADDRESS HERE', '1', 'YOUR EMAIL ADDRESS HERE');
