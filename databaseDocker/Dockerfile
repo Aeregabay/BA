@@ -8,8 +8,7 @@ MAINTAINER Your Name <arik@gmx.ch>
 ENV MYSQL_DATABASE=mytable \
     MYSQL_ROOT_PASSWORD="1234" \
     MYSQL_USER="root" \
-    MYSQL_HOST="localhost" \
-    multipleStatements=true
+    MYSQL_HOST="localhost"
 
 # when container will be started, we'll have the database created with this schema
-COPY ./test-dump.sql /docker-entrypoint-initdb.d/
+COPY ./clean_dump.sql /docker-entrypoint-initdb.d/
