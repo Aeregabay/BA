@@ -1211,7 +1211,7 @@ app
             //this is called as soon as all the terms have been searched for
             if (i === terms.length - 1) {
               //create unique Set of ids (removing duplicates from objectIds)
-              let uniqueIds = new Set(objectIds);
+              let uniqueIds = Array.from(new Set(objectIds));
               res.status(200).send({ success: true, ids: uniqueIds });
             }
           }
