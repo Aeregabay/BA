@@ -462,8 +462,46 @@ app
       );
     });
 
+    //get objectIds to delete all
+    server.post("/getObjectsToDelete", (req, res) => {
+      let objectId = req.body.id;
+      database.connection.query(
+        SqlString.format(
+          "SELECT id FROM objects WHERE multiple_of = ? OR id = ?;",
+          [objectId, objectId]
+        ),
+        (err, resultIds) => {
+          if (err) {
+            console.error(err);
+          } else {
+            let ids = [];
+            for (let i = 0; i < resultIds.length; i++) {
+              ids.push(resultIds[i].id);
+            }
+            res.status(200).send({ success: true, ids });
+          }
+        }
+      );
+    });
+
+    //delete all objects in an inventory
+    server.post("/deleteAllItems", (req, res) => {
+      let idsToDel = req.body.ids;
+      database.connection.query(
+        SqlString.format("DELETE FROM objects WHERE id IN (?)", [idsToDel]),
+        (err, result) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("Objects deleted from database");
+            res.status(200).send({ success: true });
+          }
+        }
+      );
+    });
+
     //deletes object from database
-    server.post("/deleteItem", urlEncodedParser, (req, res) => {
+    server.post("/deleteItem", (req, res) => {
       let objectId = req.body.id;
 
       database.connection.query(
@@ -901,86 +939,90 @@ app
           if (err) {
             console.error(err);
           } else {
-            if (checkRes[0].multiple_of !== 0) {
-              res.status(200).send({ success: false });
-            } else {
-              let getObjectSql = SqlString.format(
-                "SELECT * FROM objects WHERE id = ?;",
-                [objectId]
-              );
-              let tagSql = SqlString.format(
-                "SELECT content FROM tags WHERE corresp_obj_id = ?;",
-                [objectId]
-              );
-              let picSql = SqlString.format(
-                "SELECT name FROM pics WHERE corresp_obj_id = ?;",
-                [objectId]
-              );
+            if (checkRes.length > 0) {
+              if (checkRes[0].multiple_of !== 0) {
+                res.status(200).send({ success: false });
+              } else {
+                let getObjectSql = SqlString.format(
+                  "SELECT * FROM objects WHERE id = ?;",
+                  [objectId]
+                );
+                let tagSql = SqlString.format(
+                  "SELECT content FROM tags WHERE corresp_obj_id = ?;",
+                  [objectId]
+                );
+                let picSql = SqlString.format(
+                  "SELECT name FROM pics WHERE corresp_obj_id = ?;",
+                  [objectId]
+                );
 
-              let object;
-              let tags = [];
-              let pics = [];
+                let object;
+                let tags = [];
+                let pics = [];
 
-              database.connection.query(getObjectSql, (err, resObject) => {
-                if (err) {
-                  console.log(err);
-                  console.log(
-                    "The retrieval of object #" + objectId + " has failed."
-                  );
-                } else if (resObject.length > 0) {
-                  object = resObject;
-                  database.connection.query(
-                    SqlString.format(
-                      "SELECT id FROM users WHERE username = ?;",
-                      [object[0].owner]
-                    ),
-                    (err, userResult) => {
-                      if (err) {
-                        console.error(err);
-                      } else {
-                        console.log("user id retrieval success");
-                        database.connection.query(tagSql, (err, resTags) => {
-                          if (err) {
-                            console.log(err);
-                            console.log(
-                              "The retrieval of tags for object #" +
-                                objectId +
-                                " has failed."
-                            );
-                          } else {
-                            tags = resTags;
-                            database.connection.query(
-                              picSql,
-                              (err, resPics) => {
-                                if (err) {
-                                  console.log(err);
-                                  console.log(
-                                    "The retrieval of pics for object #" +
-                                      objectId +
-                                      " has failed."
-                                  );
-                                } else {
-                                  pics = resPics;
-                                  res.status(200).send({
-                                    success: true,
-                                    object,
-                                    tags,
-                                    pics,
-                                    id: objectId,
-                                    sellerId: userResult[0].id
-                                  });
+                database.connection.query(getObjectSql, (err, resObject) => {
+                  if (err) {
+                    console.log(err);
+                    console.log(
+                      "The retrieval of object #" + objectId + " has failed."
+                    );
+                  } else if (resObject.length > 0) {
+                    object = resObject;
+                    database.connection.query(
+                      SqlString.format(
+                        "SELECT id FROM users WHERE username = ?;",
+                        [object[0].owner]
+                      ),
+                      (err, userResult) => {
+                        if (err) {
+                          console.error(err);
+                        } else {
+                          console.log("user id retrieval success");
+                          database.connection.query(tagSql, (err, resTags) => {
+                            if (err) {
+                              console.log(err);
+                              console.log(
+                                "The retrieval of tags for object #" +
+                                  objectId +
+                                  " has failed."
+                              );
+                            } else {
+                              tags = resTags;
+                              database.connection.query(
+                                picSql,
+                                (err, resPics) => {
+                                  if (err) {
+                                    console.log(err);
+                                    console.log(
+                                      "The retrieval of pics for object #" +
+                                        objectId +
+                                        " has failed."
+                                    );
+                                  } else {
+                                    pics = resPics;
+                                    res.status(200).send({
+                                      success: true,
+                                      object,
+                                      tags,
+                                      pics,
+                                      id: objectId,
+                                      sellerId: userResult[0].id
+                                    });
+                                  }
                                 }
-                              }
-                            );
-                          }
-                        });
+                              );
+                            }
+                          });
+                        }
                       }
-                    }
-                  );
-                } else {
-                  res.status(200).json({ success: false });
-                }
-              });
+                    );
+                  } else {
+                    res.status(200).json({ success: false });
+                  }
+                });
+              }
+            } else {
+              res.status(200).json({ success: false });
             }
           }
         }

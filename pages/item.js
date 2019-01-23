@@ -138,6 +138,7 @@ class item extends Component {
       isBuyer: "",
       purchaseInit: false,
       deleteInit: false,
+      deleteAllInit: false,
       confirmedInit: false,
       reportContent: "",
       reportModal: false
@@ -168,6 +169,43 @@ class item extends Component {
     } else {
       alert("Something went wrong, please try again");
       location.reload();
+    }
+  };
+  //deletes item from database and if object is not yet sold,
+  //refunds seller the already payed collateral
+  deleteAllItems = async () => {
+    this.setState({ deleteAllInit: false, dimmer: true });
+
+    let idResult = await axios.post(
+      window.location.origin + "/getObjectsToDelete",
+      { id: this.state.id }
+    );
+    if (idResult.data.success) {
+      let idsToDelete = idResult.data.ids;
+      if (this.state.status !== "sold" && this.state.status !== "shipping") {
+        for (let i = 0; i < idsToDelete.length; i++) {
+          verify.methods.releaseSellerCollateral(idsToDelete[i]).send({
+            from: this.state.sellerAddress,
+            gas: 250000,
+            gasPrice: "5000000000"
+          });
+        }
+        let result = await axios.post(
+          window.location.origin + "/deleteAllItems",
+          {
+            ids: idsToDelete
+          }
+        );
+        alert("Your collaterals will be refunded to you shortly");
+
+        if (result.data.success) {
+          this.setState({ dimmer: false });
+          Router.pushRoute("browse");
+        } else {
+          alert("Something went wrong, please try again");
+          location.reload();
+        }
+      }
     }
   };
 
@@ -1316,23 +1354,51 @@ class item extends Component {
                   {/* conditional rendering of either purchase button, 
               delete button, shipping address of buyer or confirm button for buyer */}
                   {this.state.status !== "shipping" && this.state.ownsItem ? (
-                    <Button
-                      key="deleteButton"
-                      style={{
-                        maxWidth: "20%",
-                        marginTop: "5px",
-                        border: "1px solid #7a7a52",
-                        margin: "auto"
-                      }}
-                      basic
-                      fluid
-                      size="small"
-                      onClick={() => this.setState({ deleteInit: true })}
-                    >
-                      <span key="deleteBtnContent" style={{ color: "#adad85" }}>
-                        Delete this item
-                      </span>
-                    </Button>
+                    <div>
+                      <Button
+                        key="deleteButton"
+                        style={{
+                          maxWidth: "20%",
+                          marginLeft: "40%",
+                          border: "1px solid #7a7a52"
+                        }}
+                        basic
+                        fluid
+                        size="small"
+                        onClick={() => this.setState({ deleteInit: true })}
+                      >
+                        <span
+                          key="deleteBtnContent"
+                          style={{ color: "#adad85" }}
+                        >
+                          Delete this item
+                        </span>
+                      </Button>
+                      {this.state.amount > 1 ? (
+                        <Button
+                          key="deleteAllButton"
+                          style={{
+                            maxWidth: "20%",
+                            marginTop: "1%",
+                            marginLeft: "40%",
+                            border: "1px solid #7a7a52"
+                          }}
+                          basic
+                          fluid
+                          size="small"
+                          onClick={() => this.setState({ deleteAllInit: true })}
+                        >
+                          <span
+                            key="deleteAllBtnContent"
+                            style={{ color: "#adad85" }}
+                          >
+                            Delete item inventory
+                          </span>
+                        </Button>
+                      ) : (
+                        ""
+                      )}
+                    </div>
                   ) : (
                     <div
                       key="buySection"
@@ -1594,6 +1660,48 @@ class item extends Component {
                   labelPosition="right"
                   content="Confirm"
                   onClick={this.deleteItem}
+                />
+              </Modal.Actions>
+            </Modal>
+            <Modal
+              key="deleteAllModal"
+              dimmer="blurring"
+              open={this.state.deleteAllInit}
+              onClose={() => this.setState({ deleteAllInit: false })}
+              basic
+              style={{ textAlign: "center" }}
+            >
+              <Modal.Header>
+                <Header size="huge" style={{ color: "white" }}>
+                  Are you sure you want to delete all items in this inventory?
+                </Header>
+              </Modal.Header>
+              <Modal.Content>
+                <Modal.Description>
+                  <p>The items will be permanently removed from the platform</p>
+                  <p>
+                    If you delete the items, please accept the Metamask prompts
+                    in order to reclaim your collaterals
+                  </p>
+                </Modal.Description>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button
+                  key="deleteCancel"
+                  negative
+                  icon="remove"
+                  labelPosition="right"
+                  content="Cancel"
+                  onClick={() => this.setState({ deleteAllInit: false })}
+                  style={{ float: "left" }}
+                />
+                <Button
+                  key="deleteOkay"
+                  positive
+                  icon="checkmark"
+                  labelPosition="right"
+                  content="Confirm"
+                  onClick={this.deleteAllItems}
                 />
               </Modal.Actions>
             </Modal>
