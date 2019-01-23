@@ -467,7 +467,10 @@ app
       let objectId = req.body.id;
 
       database.connection.query(
-        SqlString.format("DELETE FROM objects WHERE id = ?;", [objectId]),
+        SqlString.format(
+          "DELETE FROM objects WHERE id = ?;SELECT id FROM objects WHERE multiple_of = ?;",
+          [objectId, objectId]
+        ),
         (err, result) => {
           if (err) {
             console.error(err);
@@ -477,6 +480,20 @@ app
                 objectId +
                 " has successfully been deleted from the DB"
             );
+            if (result[1].length > 0) {
+              //create array of ids from result
+              let resultIds = [];
+              for (let i = 0; i < result[1].length; i++) {
+                resultIds.push(result[1][i].id);
+              }
+              //get next object in inventory to display and update all remaining objects in inventory
+              database.connection.query(
+                SqlString.format(
+                  "UPDATE objects SET multiple_of = ? WHERE id IN (?); UPDATE objects SET multiple_of = 0 WHERE id = ?;",
+                  [resultIds[0], resultIds, resultIds[0]]
+                )
+              );
+            }
             res.status(200).json({ success: true });
           }
         }

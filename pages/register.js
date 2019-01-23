@@ -126,7 +126,7 @@ class register extends Component {
 
     //send the KYC key the user got from the KYC platform to the Verify-SC, to verify the user
     //250000 gas limit and 5GWEI gas price
-    verify.methods.verify(kycKey, adminAddress).send({
+    verify.methods.verify(web3.utils.soliditySha3(kycKey), adminAddress).send({
       from: this.state.userAccount,
       value: web3.utils.toWei(".01", "ether"),
       gas: 250000,
