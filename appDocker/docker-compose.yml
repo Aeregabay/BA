@@ -1,0 +1,26 @@
+# This file brings up the two containers in a functioning manner
+# However, the application can't connect to the database properly, hence
+# it is still not ready for deploymend
+version: "2.1"
+
+services:
+  mysql:
+    build: ../databaseDocker
+    restart: always
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+  p2p-app:
+    image: p2p-app
+    build: .
+    links:
+      - mysql
+    depends_on:
+      - mysql
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
