@@ -6,7 +6,8 @@ var database = mysql.createConnection({
   user: "root",
   password: "1234",
   database: "mytable",
-  multipleStatements: true
+  multipleStatements: true,
+  connectTimeout: 60000
 });
 
 database.connect(err => {
